@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Sakay</string>
+    <string name="googleMaps_key">AIzaSyCKsfpxOe-qjF2td4CMgsPrlKWlvnZz59g</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- Navigation Drawer values-->
+    <string name="nav_traffic_title">Traffic</string>
+    <string name="nav_sakays_title">Sakays</string>
+    <string name="nav_rideOffers_title">Ride Offers</string>
+    <string name="nav_rideRequests_title">Ride Requests</string>
+    <string name="nav_account_title">Account</string>
+    <string name="nav_settings_title">Settings</string>
+    <string name="nav_helpAndSupport_title">Help and Support</string>
+    <string name="nav_aboutSakay_title">About Sakay</string>
+    <string name="nav_preferences_title">Preferences</string>
+    <string name="nav_reachUs_title">Reach Us</string>
+
+    <!--Permission Utils-->
+    <string name="location_permission_denied">Permission Denied</string>
+    <string name="permission_required_toast">Permission Required</string>
+    <string name="permission_rationale_location">Permission Rationale Location</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
