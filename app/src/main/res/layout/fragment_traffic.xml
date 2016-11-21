@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -22,17 +22,54 @@
 
         />
 
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        android:src="@drawable/ic_alert"
-        fab:fab_colorNormal="@color/colorPrimary"
-        fab:fab_colorPressed="@color/colorPrimaryDark"
-        />
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fabTraffic"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true"
+        fab:menu_fab_label="Report Traffic"
+        fab:menu_icon="@drawable/ic_alert"
+        fab:menu_colorNormal="@color/colorPrimary"
+        fab:menu_colorPressed="@color/colorPrimaryDark" >
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_alert3"
+            fab:fab_size="mini"
+            fab:fab_label="High Traffic"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/lightGray"
+            />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_alert2"
+            fab:fab_size="mini"
+            fab:fab_label="Moderate Traffic"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/lightGray"
+            />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_alert1"
+            fab:fab_size="mini"
+            fab:fab_label="Low Traffic"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_colorPressed="@color/lightGray"
+            />
+    </com.github.clans.fab.FloatingActionMenu>
 
 
-</FrameLayout>
+</RelativeLayout>
