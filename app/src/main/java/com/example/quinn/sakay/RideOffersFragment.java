@@ -3,10 +3,15 @@ package com.example.quinn.sakay;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+
+import com.github.clans.fab.FloatingActionButton;
 
 
 /**
@@ -14,27 +19,38 @@ import android.view.ViewGroup;
  */
 public class RideOffersFragment extends Fragment {
 
-
+    private FloatingActionButton addRideOffer;
     public RideOffersFragment() {
         // Required empty public constructor
     }
 
 
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_ride_offers, container, false);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Report Traffic", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        return inflater.inflate(R.layout.fragment_ride_offers, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        addRideOffer = (FloatingActionButton) view.findViewById(R.id.fabRideOffers);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        addRideOffer.hide(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                addRideOffer.show(true);
+                addRideOffer.setShowAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.show_from_bottom));
+                addRideOffer.setHideAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.hide_to_bottom));
+            }
+        }, 300);
     }
 
     public void onResume(){
@@ -43,7 +59,6 @@ public class RideOffersFragment extends Fragment {
         // Set title bar
         ((MainActivity) getActivity())
                 .setActionBarTitle("Ride Offers");
-
     }
 
     public interface OnFragmentInteractionListener {

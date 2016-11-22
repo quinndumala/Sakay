@@ -6,7 +6,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +17,10 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -37,7 +42,11 @@ public class TrafficFragment extends Fragment
     private static final String TAG = "Testing: ";
     MapView mapView;
     GoogleMap googleMap;
-
+    private FloatingActionMenu menuTraffic;
+    private FloatingActionButton fab1;
+    private FloatingActionButton fab2;
+    private FloatingActionButton fab3;
+    private Handler mUiHandler = new Handler();
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -60,7 +69,7 @@ public class TrafficFragment extends Fragment
         super.onCreate(savedInstanceState);
     }
 
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,20 +84,41 @@ public class TrafficFragment extends Fragment
             Log.e(TAG, "Inflate exception");
         }
 
-//        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById();
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Report Traffic", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
-
         return rootView;
 //        View view = inflater.inflate(R.layout.fragment_traffic, container, false);
 //        return view;
     }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        menuTraffic = (FloatingActionMenu) view.findViewById(R.id.fabTraffic);
+        fab1 = (FloatingActionButton) view.findViewById(R.id.fabLow);
+        fab2 = (FloatingActionButton) view.findViewById(R.id.fabModerate);
+        fab3 = (FloatingActionButton) view.findViewById(R.id.fabHigh);
+
+        menuTraffic.setClosedOnTouchOutside(true);
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        menuTraffic.hideMenuButton(false);
+        mUiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                menuTraffic.showMenuButton(true);
+                menuTraffic.setMenuButtonShowAnimation(AnimationUtils.loadAnimation(getActivity(),
+                        R.anim.fab_scale_up));
+                menuTraffic.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(getActivity(),
+                        R.anim.fab_scale_down));
+            }
+        }, 350);
+    }
+
+
 
 //    private void setupMapIfNeeded{
 //        if(googleMap == null){
@@ -155,10 +185,12 @@ public class TrafficFragment extends Fragment
     }
 
     private void enableMyLocation() {
-        if (ActivityCompat.checkSelfPermission(TrafficFragment.this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ActivityCompat.checkSelfPermission(TrafficFragment.this.getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
-            PermissionUtils.requestPermission((AppCompatActivity) TrafficFragment.this.getActivity(), LOCATION_PERMISSION_REQUEST_CODE,
+            PermissionUtils.requestPermission((AppCompatActivity) TrafficFragment.this.getActivity(),
+                    LOCATION_PERMISSION_REQUEST_CODE,
                     Manifest.permission.ACCESS_FINE_LOCATION, true);
         } else if (googleMap != null) {
             // Access to the location has been granted to the app.
