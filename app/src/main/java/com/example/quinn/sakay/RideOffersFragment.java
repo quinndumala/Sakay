@@ -24,12 +24,10 @@ public class RideOffersFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.fragment_ride_offers, container, false);
     }
 
@@ -65,6 +63,7 @@ public class RideOffersFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
 
 
 

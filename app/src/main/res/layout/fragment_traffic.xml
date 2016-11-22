@@ -31,16 +31,16 @@
         fab:menu_labels_ellipsize="end"
         fab:menu_labels_singleLine="true"
         fab:menu_fab_label="Report Traffic"
-        fab:menu_icon="@drawable/ic_alert"
+        fab:menu_icon="@drawable/ic_broadcast"
         fab:menu_colorNormal="@color/colorPrimary"
         fab:menu_colorPressed="@color/colorPrimaryDark" >
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabHigh"
+            android:id="@+id/fabHeavy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_alert3"
             fab:fab_size="mini"
-            fab:fab_label="High Traffic"
+            fab:fab_label="Heavy"
             fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/lightGray"
             />
@@ -51,18 +51,18 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_alert2"
             fab:fab_size="mini"
-            fab:fab_label="Moderate Traffic"
+            fab:fab_label="Moderate"
             fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/lightGray"
             />
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabLow"
+            android:id="@+id/fabLight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_alert1"
             fab:fab_size="mini"
-            fab:fab_label="Low Traffic"
+            fab:fab_label="Light"
             fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/lightGray"
             />

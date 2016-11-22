@@ -2,6 +2,10 @@ package com.example.quinn.sakay;
 
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -18,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.view.animation.OvershootInterpolator;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -93,9 +99,9 @@ public class TrafficFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         menuTraffic = (FloatingActionMenu) view.findViewById(R.id.fabTraffic);
-        fab1 = (FloatingActionButton) view.findViewById(R.id.fabLow);
+        fab1 = (FloatingActionButton) view.findViewById(R.id.fabLight);
         fab2 = (FloatingActionButton) view.findViewById(R.id.fabModerate);
-        fab3 = (FloatingActionButton) view.findViewById(R.id.fabHigh);
+        fab3 = (FloatingActionButton) view.findViewById(R.id.fabHeavy);
 
         menuTraffic.setClosedOnTouchOutside(true);
 
@@ -105,6 +111,9 @@ public class TrafficFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        fab1.setOnClickListener(clickListener);
+        fab2.setOnClickListener(clickListener);
+        fab3.setOnClickListener(clickListener);
         menuTraffic.hideMenuButton(false);
         mUiHandler.postDelayed(new Runnable() {
             @Override
@@ -116,7 +125,58 @@ public class TrafficFragment extends Fragment
                         R.anim.fab_scale_down));
             }
         }, 350);
+        createCustomAnimation();
     }
+
+    private void createCustomAnimation() {
+        AnimatorSet set = new AnimatorSet();
+
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(menuTraffic.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(menuTraffic.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(menuTraffic.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(menuTraffic.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                menuTraffic.getMenuIconView().setImageResource(menuTraffic.isOpened()
+                        ? R.drawable.ic_broadcast : R.drawable.ic_close);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+
+        menuTraffic.setIconToggleAnimatorSet(set);
+    }
+
+    private View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.fabLight:
+                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
+                    menuTraffic.toggle(true);
+                    break;
+                case R.id.fabModerate:
+                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
+                    menuTraffic.toggle(true);
+                    break;
+                case R.id.fabHeavy:
+                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
+                    menuTraffic.toggle(true);
+                    break;
+            }
+        }
+    };
 
 
 
