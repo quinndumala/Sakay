@@ -26,9 +26,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/googleMaps_key"/>
+            android:value="@string/googleMaps_key" />
+
+        <activity
+            android:name=".AddRideOffer"
+            android:label="@string/title_activity_add_ride_offer"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

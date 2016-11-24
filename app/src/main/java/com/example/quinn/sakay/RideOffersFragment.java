@@ -1,6 +1,7 @@
 package com.example.quinn.sakay;
 
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,13 @@ public class RideOffersFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         addRideOffer = (FloatingActionButton) view.findViewById(R.id.fabRideOffers);
+        addRideOffer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddRideOffer.class);
+                getActivity().startActivity(intent);
+            }
+        });
     }
 
     @Override
