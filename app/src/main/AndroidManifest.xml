@@ -40,6 +40,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />
         </activity>
+        <activity
+            android:name=".AddRideRequest"
+            android:label="@string/title_activity_add_ride_request"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
