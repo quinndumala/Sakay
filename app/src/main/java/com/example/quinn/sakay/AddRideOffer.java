@@ -8,8 +8,8 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
+import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -17,6 +17,7 @@ import java.util.Calendar;
 public class AddRideOffer extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
 
     private ReminderDatePicker datePicker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,14 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
                 Toast.makeText(AddRideOffer.this, "Selected date: "+ getDateFormat().format(date.getTime()), Toast.LENGTH_SHORT).show();
             }
         });
+
+
     }
+
+
+
+
+
 
     private java.text.DateFormat savedFormat;
     public java.text.DateFormat getDateFormat() {

@@ -29,4 +29,12 @@
     <string name="title_activity_add_ride_offer">New Ride Offer</string>
     <string name="title_activity_add_ride_request">New Ride Request</string>
 
+    <string name="wifi_connected">WiFi Connected</string>
+    <string name="lost_connection">Lost Connection</string>
+    <string name="connection_error">Connection Error</string>
+    <string name="xml_error">XML Error</string>
+
+    <string name="page_title">Newest StackOverflow questions tagged \'android\'</string>
+    <string name="updated">Last updated:</string>
+
 </resources>
