@@ -6,6 +6,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        android.support.v4.app.FragmentManager sFm = getSupportFragmentManager();
+        //android.support.v4.app.FragmentManager sFm = getSupportFragmentManager();
         int id = item.getItemId();
         Fragment fragment = null;
         Class fragmentClass = null;
@@ -133,7 +134,6 @@ public class MainActivity extends AppCompatActivity
 //                    trafficFragment,
 //                    trafficFragment.getTag()
 //            ).commit();
-
             fragmentClass = TrafficFragment.class;
 
         } else if (id == R.id.nav_sakays) {
@@ -163,8 +163,19 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
+
+        Fragment containerFragment = getSupportFragmentManager().findFragmentById(R.id.content_main);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (!(containerFragment.getClass().getName().equalsIgnoreCase(fragment.getClass().getName()))){
+            transaction.replace(R.id.content_main, fragment);
+   //         transaction.addToBackStack(null);
+            transaction.commit();
+        }
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

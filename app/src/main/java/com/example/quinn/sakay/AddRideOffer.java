@@ -39,11 +39,6 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
 
     }
 
-
-
-
-
-
     private java.text.DateFormat savedFormat;
     public java.text.DateFormat getDateFormat() {
         if(savedFormat == null)
