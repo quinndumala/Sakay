@@ -6,8 +6,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
@@ -17,6 +20,9 @@ import java.util.Calendar;
 public class AddRideOffer extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
 
     private ReminderDatePicker datePicker;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
+    EditText text;
 
 
     @Override
@@ -36,7 +42,11 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
             }
         });
 
-
+        // Connect to the Firebase database
+        database = FirebaseDatabase.getInstance();
+        // Get a reference to the todoItems child items it the database
+        myRef = database.getReference("rideOffers");
+        text = (EditText) findViewById(R.id.addRideOfferStart);
     }
 
     private java.text.DateFormat savedFormat;
@@ -63,6 +73,12 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_add_ride) {
+            // Create a new child with a auto-generated ID.
+            DatabaseReference childRef = myRef.push();
+
+            // Set the child's data to the value passed in from the text box.
+            childRef.setValue(text.getText().toString());
+
             Toast.makeText(getApplicationContext(), "Ride Offer Added", Toast.LENGTH_SHORT).show();
             finish();
         }
