@@ -47,9 +47,10 @@ public class WelcomeActivity extends BaseActivity implements
         findViewById(R.id.sign_in_button_google).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
-//        if (FirebaseUtil.getCurrentUserId() != null) {
-//            startActivity(new Intent(this, MainActivity.class));
-//        }
+        if (FirebaseUtil.getCurrentUserId() != null) {
+            //startActivity(new Intent(this, MainActivity.class));
+            showProgressDialog(getString(R.string.profile_progress_message));
+        }
 
         // GoogleApiClient with Sign In
         mGoogleApiClient = new GoogleApiClient.Builder(this)
