@@ -1,8 +1,10 @@
 package com.example.quinn.sakay;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +15,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -24,7 +28,9 @@ public class MainActivity extends AppCompatActivity
         SakaysFragment.OnFragmentInteractionListener,
         RideOffersFragment.OnFragmentInteractionListener,
         RideRequestsFragment.OnFragmentInteractionListener,
-        BlankFragment.OnFragmentInteractionListener{
+        BlankFragment.OnFragmentInteractionListener,
+        ConnectivityReceiver.ConnectivityReceiverListener
+{
 
    //SupportMapFragment sMapFragment;
 
@@ -82,9 +88,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
-
+        checkConnection();
     }
 
     @Override
@@ -205,5 +209,39 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.drawer_layout), message, Snackbar.LENGTH_LONG);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
 }
 
