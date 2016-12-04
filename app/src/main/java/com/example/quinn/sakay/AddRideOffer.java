@@ -1,12 +1,16 @@
 package com.example.quinn.sakay;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
@@ -17,7 +21,9 @@ import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class AddRideOffer extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
+public class AddRideOffer extends AppCompatActivity
+        implements CompoundButton.OnCheckedChangeListener,
+        ConnectivityReceiver.ConnectivityReceiverListener{
 
     private ReminderDatePicker datePicker;
     FirebaseDatabase database;
@@ -47,6 +53,8 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
         // Get a reference to the todoItems child items it the database
         myRef = database.getReference("rideOffers");
         text = (EditText) findViewById(R.id.addRideOfferStart);
+
+        checkConnection();
     }
 
     private java.text.DateFormat savedFormat;
@@ -87,7 +95,40 @@ public class AddRideOffer extends AppCompatActivity implements CompoundButton.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(findViewById(R.id.add_ride_offer_layout), message, Snackbar.LENGTH_INDEFINITE);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
     }
 }

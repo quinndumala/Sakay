@@ -7,12 +7,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.OvershootInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
@@ -43,7 +46,8 @@ public class TrafficFragment extends Fragment
         implements
         OnMapReadyCallback,
         GoogleMap.OnMyLocationButtonClickListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        ActivityCompat.OnRequestPermissionsResultCallback,
+        ConnectivityReceiver.ConnectivityReceiverListener {
     private View rootView;
     private static final String TAG = "Testing: ";
     MapView mapView;
@@ -93,6 +97,7 @@ public class TrafficFragment extends Fragment
         return rootView;
 //        View view = inflater.inflate(R.layout.fragment_traffic, container, false);
 //        return view;
+
     }
 
     @Override
@@ -104,7 +109,7 @@ public class TrafficFragment extends Fragment
         fab3 = (FloatingActionButton) view.findViewById(R.id.fabHeavy);
 
         menuTraffic.setClosedOnTouchOutside(true);
-
+        checkConnection();
     }
 
     @Override
@@ -126,6 +131,7 @@ public class TrafficFragment extends Fragment
             }
         }, 350);
         createCustomAnimation();
+
     }
 
     private void createCustomAnimation() {
@@ -225,6 +231,7 @@ public class TrafficFragment extends Fragment
 //            mPermissionDenied = false;
 //        }
         mapView.onResume();
+        MyApplication.getInstance().setConnectivityListener(this);
 
     }
 
@@ -297,16 +304,39 @@ public class TrafficFragment extends Fragment
             mPermissionDenied = true;
         }
     }
-//
-//
-//
+
     private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getChildFragmentManager(), "dialog");
     }
 
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(getView().findViewById(R.id.fragment_traffic_layout), message, Snackbar.LENGTH_INDEFINITE);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
     }
 }

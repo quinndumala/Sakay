@@ -2,10 +2,12 @@ package com.example.quinn.sakay;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.database.ChildEventListener;
@@ -26,7 +29,8 @@ import com.google.firebase.database.FirebaseDatabase;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RideOffersFragment extends Fragment {
+public class RideOffersFragment extends Fragment
+    implements ConnectivityReceiver.ConnectivityReceiverListener{
 
     private FloatingActionButton addRideOffer;
     public RideOffersFragment() {
@@ -98,6 +102,7 @@ public class RideOffersFragment extends Fragment {
                 Log.w("TAG:", "Failed to read value.", error.toException());
             }
         });
+        checkConnection();
     }
 
     @Override
@@ -120,6 +125,12 @@ public class RideOffersFragment extends Fragment {
         // Set title bar
         ((MainActivity) getActivity())
                 .setActionBarTitle("Ride Offers");
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
     }
 
     public interface OnFragmentInteractionListener {
@@ -127,7 +138,23 @@ public class RideOffersFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
 
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(getView().findViewById(R.id.fragment_ride_offers_layout), message, Snackbar.LENGTH_INDEFINITE);
 
-
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
+        }
+    }
 }

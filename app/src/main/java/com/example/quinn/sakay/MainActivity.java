@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         SakaysFragment.OnFragmentInteractionListener,
         RideOffersFragment.OnFragmentInteractionListener,
         RideRequestsFragment.OnFragmentInteractionListener,
+        AccountFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
         ConnectivityReceiver.ConnectivityReceiverListener
 {
@@ -88,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        checkConnection();
+     //   checkConnection();
     }
 
     @Override
@@ -151,8 +152,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_rideOffers) {
             fragmentClass = RideOffersFragment.class;
         } else if (id == R.id.nav_account) {
-            fragmentClass = BlankFragment.class;
-            Toast.makeText(this, "Account", Toast.LENGTH_SHORT).show();
+            fragmentClass = AccountFragment.class;
         } else if (id == R.id.nav_settings) {
             fragmentClass = BlankFragment.class;
             Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
