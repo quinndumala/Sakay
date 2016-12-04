@@ -37,4 +37,6 @@
     <string name="page_title">Newest StackOverflow questions tagged \'android\'</string>
     <string name="updated">Last updated:</string>
 
+    <string name="profile_progress_message">Signing in...</string>
+
 </resources>

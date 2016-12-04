@@ -7,4 +7,7 @@
     <color name="colorRipple">#62B2FF</color>
     <color name="white">#FFFFFF</color>
     <color name="lightGray">#a6a6a6</color>
+
+    <color name="black_overlay">#66000000</color>
+    <color name="user_detail_separator">#3a3a3a</color>
 </resources>
