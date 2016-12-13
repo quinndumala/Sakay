@@ -11,15 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SakaysFragment extends Fragment
+public class SettingsFragment extends Fragment
         implements ConnectivityReceiver.ConnectivityReceiverListener{
 
 
-    public SakaysFragment() {
+    public SettingsFragment() {
         // Required empty public constructor
     }
 
@@ -28,26 +27,21 @@ public class SakaysFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sakays, container, false);
+        return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     @Override
     public void onResume(){
         super.onResume();
         ((MainActivity) getActivity())
-                .setActionBarTitle("Sakays");
+                .setActionBarTitle("Settings");
 
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
-        showSnack(isConnected);
-    }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     private void checkConnection() {
@@ -70,4 +64,8 @@ public class SakaysFragment extends Fragment
         }
     }
 
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
 }

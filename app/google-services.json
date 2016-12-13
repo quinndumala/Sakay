@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "813160922961-jho87mk20ck0ali1k0ktl9t58rncd4lq.apps.googleusercontent.com",
+          "client_id": "813160922961-2cqv8iqp87v8u78k7335rd428btqqe8a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.quinn.sakay",
-            "certificate_hash": "3BBD5EAB8177AD83A29FE0F99690172B5220F43F"
+            "certificate_hash": "7D37316758F6D42B22771DA52F004CEA1251782B"
           }
         },
         {

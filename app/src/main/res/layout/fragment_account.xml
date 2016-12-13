@@ -4,6 +4,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.quinn.sakay.AccountFragment">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/profile"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        >
+
+        <!--<ImageView-->
+            <!--android:layout_gravity="center"-->
+            <!--android:id="@+id/profile_user_photo"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_user_photo"
+            android:layout_width="@dimen/profile_user_photo_size"
+            android:layout_height="@dimen/profile_user_photo_size"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/ic_profile_photo"
+        />
+        <TextView
+            android:id="@+id/profile_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:textSize="30dp"
+            style="@style/TextAppearance.AppCompat.Title"/>
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="8dp" />
+        <TextView
+            android:id="@+id/profile_user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_centerHorizontal="true"
+            />
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="20dp" />
+        <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Sign Out"
+            style="@style/Widget.AppCompat.Button.Colored"/>
+    </LinearLayout>
 
 
 

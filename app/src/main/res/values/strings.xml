@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Sakay</string>
-    <string name="googleMaps_key">AIzaSyCKsfpxOe-qjF2td4CMgsPrlKWlvnZz59g</string>
+    <string name="googleMaps_key">AIzaSyCWltYFe6GS0NqtiWV8AmrNb-j1srhid38</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -38,5 +38,18 @@
     <string name="updated">Last updated:</string>
 
     <string name="profile_progress_message">Signing in...</string>
+
+    <string name="facebook_app_id">232435477192287</string>
+    <string name="developer_key_hash">fTcxZ1j21Csidx2lLwBM6hJReCs=</string>
+    <string name="loading">Loading</string>
+    <string name="account_title">Account</string>
+    <string name="traffic_title">Traffic</string>
+    <string name="sakays_title">Sakay</string>
+    <string name="ride_requests_title">Ride Request</string>
+    <string name="ride_offers_title">Ride Offers</string>
+    <string name="no_connection_message">No connection</string>
+    <string name="ride_offer_added_message">Ride offer added</string>
+    <string name="ride_request_added_message">Ride request added</string>
+    <string name="selected_date_message">Selected Date: </string>
 
 </resources>

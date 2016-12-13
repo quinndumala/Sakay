@@ -30,7 +30,8 @@ import com.google.firebase.database.FirebaseDatabase;
  * A simple {@link Fragment} subclass.
  */
 public class RideOffersFragment extends Fragment
-    implements ConnectivityReceiver.ConnectivityReceiverListener{
+    implements
+        ConnectivityReceiver.ConnectivityReceiverListener{
 
     private FloatingActionButton addRideOffer;
     public RideOffersFragment() {

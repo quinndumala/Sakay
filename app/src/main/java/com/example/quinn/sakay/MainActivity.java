@@ -1,7 +1,10 @@
 package com.example.quinn.sakay;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,6 +22,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -29,33 +45,38 @@ public class MainActivity extends AppCompatActivity
         RideOffersFragment.OnFragmentInteractionListener,
         RideRequestsFragment.OnFragmentInteractionListener,
         AccountFragment.OnFragmentInteractionListener,
+        SettingsFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
         ConnectivityReceiver.ConnectivityReceiverListener
 {
+    //private Firebase db;
+    private FirebaseAuth mAuth;
+    private CircleImageView navProfilePhoto;
+    private TextView navProfileName;
+    private TextView navUserEmail;
 
-   //SupportMapFragment sMapFragment;
-
-//    /**
-//     * Request code for location permission request.
-//     *
-//     * @see #onRequestPermissionsResult(int, String[], int[])
-//     */
-//    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-//
-//    /**
-//     * Flag indicating whether a requested permission has been denied after returning in
-//     * {@link #onRequestPermissionsResult(int, String[], int[])}.
-//     */
-//    private boolean mPermissionDenied = false;
-//
-//    private GoogleMap mMap;
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+//        db = new Firebase("https://androidbashfirebaseupdat-bd094.firebaseio.com/users/");
+        mAuth = FirebaseAuth.getInstance();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.getHeaderView(0);
 
         if (savedInstanceState == null) {
             Fragment fragment = null;
@@ -71,25 +92,64 @@ public class MainActivity extends AppCompatActivity
             fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
         }
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Report Traffic", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
+        navProfilePhoto = (CircleImageView) header.findViewById(R.id.nav_user_photo);
+        navProfileName = (TextView) header.findViewById(R.id.nav_user_name);
+        navUserEmail = (TextView) header.findViewById(R.id.nav_email);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        String uid = getIntent().getExtras().getString("user_id");
+        String imageUrl = getIntent().getExtras().getString("profile_picture");
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        new ImageLoadTask(imageUrl, navProfilePhoto).execute();
 
-     //   checkConnection();
+        String nameRef = String.format("users/%s/name", uid);
+        String emailRef = String.format("users/%s/email", uid);
+        DatabaseReference name_ref = database.getReference(nameRef);
+        DatabaseReference email_ref = database.getReference(emailRef);
+        name_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+                navProfileName.setText(data);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+        email_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+                navUserEmail.setText(data);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register connection status listener
+        MyApplication.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
     }
 
     @Override
@@ -154,14 +214,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_account) {
             fragmentClass = AccountFragment.class;
         } else if (id == R.id.nav_settings) {
-            fragmentClass = BlankFragment.class;
-            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+            fragmentClass = SettingsFragment.class;
         } else if (id == R.id.nav_helpAndSupport) {
             fragmentClass = BlankFragment.class;
             Toast.makeText(this, "Help and Support", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_aboutSakay) {
-            fragmentClass = BlankFragment.class;
-            Toast.makeText(this, "About Sakay", Toast.LENGTH_SHORT).show();
+            fragmentClass = SettingsFragment.class;
         }
 
         try {
@@ -181,8 +239,6 @@ public class MainActivity extends AppCompatActivity
    //         transaction.addToBackStack(null);
             transaction.commit();
         }
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -230,13 +286,39 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+        private String url;
+        private CircleImageView imageView;
 
-        // register connection status listener
-        MyApplication.getInstance().setConnectivityListener(this);
+        public ImageLoadTask(String url, CircleImageView imageView) {
+            this.url = url;
+            this.imageView = imageView;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            try {
+                URL urlConnection = new URL(url);
+                HttpURLConnection connection = (HttpURLConnection) urlConnection
+                        .openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(input);
+                return myBitmap;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+            imageView.setImageBitmap(result);
+        }
+
     }
 
     @Override
