@@ -62,10 +62,10 @@ public class AddRideRequest extends BaseActivity
         mDatabase = FirebaseDatabase.getInstance().getReference();
         // [END initialize_database_ref]
 
-        fStart = (EditText) findViewById(R.id.field_start);
-        fDestination = (EditText) findViewById(R.id.field_destination);
-        fDate = (EditText) findViewById(R.id.field_date);
-        fTime = (EditText) findViewById(R.id.field_time);
+        fStart = (EditText) findViewById(R.id.field_request_start);
+        fDestination = (EditText) findViewById(R.id.field_request_destination);
+        fDate = (EditText) findViewById(R.id.field_request_date);
+        fTime = (EditText) findViewById(R.id.field_request_time);
     }
 
     private void submitPost() {

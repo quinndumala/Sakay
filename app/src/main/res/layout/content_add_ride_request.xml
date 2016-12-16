@@ -22,27 +22,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Starting Point"
-            android:id="@+id/field_start" />
+            android:id="@+id/field_request_start" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Destination"
-            android:id="@+id/field_destination" />
+            android:id="@+id/field_request_destination" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date"
             android:inputType="date"
-            android:id="@+id/field_date" />
+            android:id="@+id/field_request_date" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Time"
             android:inputType="time"
-            android:id="@+id/field_time" />
+            android:id="@+id/field_request_time" />
 
     </LinearLayout>
 </FrameLayout>
