@@ -18,70 +18,31 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
-        <android.support.design.widget.TextInputLayout
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:id="@+id/textInputLayout3">
+            android:hint="Starting Point"
+            android:id="@+id/field_start" />
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Starting Point"
-                android:id="@+id/addRideRequestStart" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textInputLayout3"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="11dp">
+            android:hint="Destination"
+            android:id="@+id/field_destination" />
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Destination"
-                android:id="@+id/addRideRequestDestination"
-                android:layout_below="@+id/textInputLayout3"
-                android:layout_alignParentStart="true" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textInputLayout3"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="11dp">
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Date"
-                android:id="@+id/addRideRequestDate"
-                android:layout_marginTop="11dp"
-                android:layout_below="@+id/textInputLayout"
-                android:layout_alignParentStart="true" />
+            android:hint="Date"
+            android:inputType="date"
+            android:id="@+id/field_date" />
 
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
+        <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textInputLayout3"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="11dp">
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Time"
-                android:id="@+id/addRideRequestTime"
-                android:layout_marginTop="11dp"
-                android:layout_below="@+id/textInputLayout"
-                android:layout_alignParentStart="true" />
-
-        </android.support.design.widget.TextInputLayout>
+            android:hint="Time"
+            android:inputType="time"
+            android:id="@+id/field_time" />
 
     </LinearLayout>
 </FrameLayout>

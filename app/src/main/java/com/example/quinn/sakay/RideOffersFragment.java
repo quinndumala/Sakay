@@ -30,8 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
  * A simple {@link Fragment} subclass.
  */
 public class RideOffersFragment extends Fragment
-    implements
-        ConnectivityReceiver.ConnectivityReceiverListener{
+    implements ConnectivityReceiver.ConnectivityReceiverListener{
 
     private FloatingActionButton addRideOffer;
     public RideOffersFragment() {
@@ -72,7 +71,7 @@ public class RideOffersFragment extends Fragment
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
         // Get a reference to the todoItems child items it the database
-        final DatabaseReference myRef = database.getReference("rideOffers");
+        final DatabaseReference myRef = database.getReference("todoItems");
 
         // Assign a listener to detect changes to the child items
         // of the database reference.

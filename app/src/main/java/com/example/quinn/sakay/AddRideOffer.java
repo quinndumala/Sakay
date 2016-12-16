@@ -51,7 +51,7 @@ public class AddRideOffer extends AppCompatActivity
         // Connect to the Firebase database
         database = FirebaseDatabase.getInstance();
         // Get a reference to the todoItems child items it the database
-        myRef = database.getReference("rideOffers");
+        myRef = database.getReference("todoItems");
         text = (EditText) findViewById(R.id.addRideOfferStart);
 
         checkConnection();
