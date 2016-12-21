@@ -6,9 +6,6 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Quinn on 14/12/2016.
- */
 // [START post_class]
 @IgnoreExtraProperties
 public class Post {
@@ -35,7 +32,8 @@ public class Post {
         this.time = time;
     }
 
-    // [START post_to_map]
+
+    // [END post_to_map]// [START post_to_map]
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -48,7 +46,6 @@ public class Post {
 
         return result;
     }
-    // [END post_to_map]
     public String getAuthor() {
         return author;
     }

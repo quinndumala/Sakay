@@ -73,9 +73,9 @@ public class WelcomeActivity extends BaseActivity implements
             // User is signed in
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             String uid = mAuth.getCurrentUser().getUid();
-            String image=mAuth.getCurrentUser().getPhotoUrl().toString();
+            String image = mAuth.getCurrentUser().getPhotoUrl().toString();
             intent.putExtra("user_id", uid);
-            if(image!=null || image!=""){
+            if(image != null || image !=""){
                 intent.putExtra("profile_picture",image);
             }
             startActivity(intent);

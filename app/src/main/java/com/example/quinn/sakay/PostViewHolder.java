@@ -15,7 +15,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder{
     public TextView authorView;
     public ImageView starView;
     public TextView numStarsView;
-    public ImageView authorPhoto;
+    public ImageView authorPhotoView;
     //public TextView bodyView;
 
     public PostViewHolder(View itemView){
@@ -26,7 +26,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder{
         starView = (ImageView) itemView.findViewById(R.id.star);
         numStarsView = (TextView) itemView.findViewById(R.id.post_num_stars);
         destinationView = (TextView) itemView.findViewById(R.id.post_body);
-        authorPhoto = (ImageView) itemView.findViewById(R.id.post_author_photo);
+        authorPhotoView = (ImageView) itemView.findViewById(R.id.post_author_photo);
     }
 
     public void bindToPost(Post post, View.OnClickListener starClickListener) {
@@ -40,7 +40,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder{
     }
 
     public void setIcon(String url, final String authorId) {
-        GlideUtil.loadProfileIcon(url, authorPhoto);
+        GlideUtil.loadProfileIcon(url, authorPhotoView);
 //        mIconView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

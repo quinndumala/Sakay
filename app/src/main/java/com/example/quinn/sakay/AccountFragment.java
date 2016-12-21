@@ -51,6 +51,7 @@ public class AccountFragment extends Fragment
         GoogleApiClient.OnConnectionFailedListener,
         ConnectivityReceiver.ConnectivityReceiverListener{
 
+    private View view;
     private Button signOutFacebook;
    // private Firebase db;
     private FirebaseAuth mAuth;
@@ -68,12 +69,15 @@ public class AccountFragment extends Fragment
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        if (view == null){
+            view = inflater.inflate(R.layout.fragment_account, container, false);
+        } else {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
+
         //db = new Firebase("https://sakay-2af91.firebaseio.com/users/");
         mAuth = FirebaseAuth.getInstance();
 
@@ -109,6 +113,7 @@ public class AccountFragment extends Fragment
 
         String uid = getActivity().getIntent().getExtras().getString("user_id");
         String imageUrl = getActivity().getIntent().getExtras().getString("profile_picture");
+        String photoUrl = "https://graph.facebook.com/" + uid + "/picture?";
 
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
@@ -116,7 +121,8 @@ public class AccountFragment extends Fragment
         DatabaseReference name_ref = database.getReference(nameRef);
         DatabaseReference email_ref = database.getReference(emailRef);
 
-        new ImageLoadTask(imageUrl, profilePhoto).execute();
+        //new ImageLoadTask(imageUrl, profilePhoto).execute();
+        GlideUtil.loadProfileIcon(imageUrl, profilePhoto);
 
         name_ref.addValueEventListener(new ValueEventListener() {
             @Override

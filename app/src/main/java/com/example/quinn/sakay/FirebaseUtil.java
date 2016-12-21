@@ -16,6 +16,7 @@
 
 package com.example.quinn.sakay;
 
+import com.example.quinn.sakay.Models.Author;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -34,10 +35,10 @@ class FirebaseUtil {
         return null;
     }
 
-    public static com.example.quinn.sakay.Models.Author getAuthor() {
+    public static Author getAuthor() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return null;
-        return new com.example.quinn.sakay.Models.Author(user.getDisplayName(), user.getPhotoUrl().toString(), user.getUid());
+        return new Author(user.getDisplayName(), user.getPhotoUrl().toString(), user.getUid());
     }
 
     public static DatabaseReference getCurrentUserRef() {

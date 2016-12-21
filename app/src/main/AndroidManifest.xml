@@ -20,8 +20,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
         <activity
             android:name=".MainActivity"
@@ -61,21 +62,20 @@
         <activity
             android:name=".WelcomeActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar.Fullscreen"
-            >
+            android:theme="@style/AppTheme.NoActionBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BaseActivity"></activity>
-
-        <activity android:name="com.facebook.FacebookActivity"
-            tools:replace="android:theme"
+        <activity android:name=".BaseActivity" />
+        <activity
+            android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:label="@string/app_name" />
-
+            tools:replace="android:theme" />
 
         <receiver
             android:name=".ConnectivityReceiver"
@@ -84,6 +84,7 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>

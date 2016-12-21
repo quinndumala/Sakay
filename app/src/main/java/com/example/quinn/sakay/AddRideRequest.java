@@ -180,17 +180,10 @@ public class AddRideRequest extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.menu_add_ride) {
-//            // Create a new child with a auto-generated ID.
-//            DatabaseReference childRef = myRef.push();
-//
-//            // Set the child's data to the value passed in from the text box.
-//            childRef.setValue(text.getText().toString());
-//
-//
-//            Toast.makeText(getApplicationContext(), "Ride Request Added", Toast.LENGTH_SHORT).show();
-//            finish();
-
             submitPost();
+        } else if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

@@ -51,5 +51,6 @@
     <string name="ride_offer_added_message">Ride offer added</string>
     <string name="ride_request_added_message">Ride request added</string>
     <string name="selected_date_message">Selected Date: </string>
+    <string name="title_activity_test">TestActivity</string>
 
 </resources>

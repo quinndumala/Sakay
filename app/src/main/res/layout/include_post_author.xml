@@ -6,7 +6,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/post_author_photo"
         android:layout_width="35dp"
         android:layout_height="35dp"
@@ -14,11 +14,12 @@
 
     <TextView
         android:id="@+id/post_author"
-        style="@style/Base.TextAppearance.AppCompat.Small"
+        style="@style/TextAppearance.AppCompat.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:gravity="center_vertical"
-        tools:text="someauthor@email.com" />
+        tools:text="someauthor@email.com"
+        android:textStyle="bold"/>
 
 </LinearLayout>

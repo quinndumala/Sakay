@@ -55,6 +55,11 @@ public class MainActivity extends AppCompatActivity
     private TextView navProfileName;
     private TextView navUserEmail;
 
+    private Fragment[] fragments = new Fragment[] { new TrafficFragment(), new SakaysFragment(),
+    new RideOffersFragment(), new RideRequestsFragment(), new AccountFragment(), new SettingsFragment(),
+            new BlankFragment()
+    };
+
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
@@ -99,7 +104,9 @@ public class MainActivity extends AppCompatActivity
         String uid = getIntent().getExtras().getString("user_id");
         String imageUrl = getIntent().getExtras().getString("profile_picture");
 
-        new ImageLoadTask(imageUrl, navProfilePhoto).execute();
+        GlideUtil.loadProfileIcon(imageUrl, navProfilePhoto);
+
+        //new ImageLoadTask(imageUrl, navProfilePhoto).execute();
 
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
@@ -187,26 +194,16 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        //android.support.v4.app.FragmentManager sFm = getSupportFragmentManager();
         int id = item.getItemId();
+
         Fragment fragment = null;
         Class fragmentClass = null;
 
 
         if (id == R.id.nav_traffic) {
-//            TrafficFragment trafficFragment = new TrafficFragment();
-//            FragmentManager manager = getSupportFragmentManager();
-//            manager.beginTransaction().replace(
-//                    R.id.content_main,
-//                    trafficFragment,
-//                    trafficFragment.getTag()
-//            ).commit();
             fragmentClass = TrafficFragment.class;
-
         } else if (id == R.id.nav_sakays) {
             fragmentClass = SakaysFragment.class;
-
         } else if (id == R.id.nav_rideRequests) {
             fragmentClass = RideRequestsFragment.class;
         } else if (id == R.id.nav_rideOffers) {
@@ -227,9 +224,6 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
 
         Fragment containerFragment = getSupportFragmentManager().findFragmentById(R.id.content_main);
 

@@ -24,18 +24,14 @@
         />
 
 
-    <LinearLayout
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:orientation="vertical"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rideOffers_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ListView
-            android:id="@+id/rideOffersList"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-        </ListView>
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:clipToPadding="false"
+        android:padding="5dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_ride_offer" />
 
 </android.support.design.widget.CoordinatorLayout>
