@@ -17,12 +17,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,6 +39,7 @@ import java.net.URL;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.facebook.Profile.getCurrentProfile;
 
 //import static android.support.v4.widget.EdgeEffectCompatIcs.finish;
 
@@ -64,6 +68,11 @@ public class AccountFragment extends Fragment
     private GoogleApiClient mGoogleApiClient;
     private static final int RC_SIGN_IN = 103;
 
+    //test<...
+    String facebookUserId = "";
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    Profile profile = getCurrentProfile();
+    //..>
 
     public AccountFragment() {
         // Required empty public constructor
@@ -113,7 +122,19 @@ public class AccountFragment extends Fragment
 
         String uid = getActivity().getIntent().getExtras().getString("user_id");
         String imageUrl = getActivity().getIntent().getExtras().getString("profile_picture");
-        String photoUrl = "https://graph.facebook.com/" + uid + "/picture?";
+
+        //test..
+//        for(UserInfo profile : user.getProviderData()) {
+//            // check if the provider id matches "facebook.com"
+//            if(profile.getProviderId().equals(getString(R.string.facebook_app_id))) {
+//                facebookUserId = profile.getUid();
+//            }
+//        }
+        facebookUserId = profile.getId();
+        Toast.makeText(getApplicationContext(), facebookUserId, Toast.LENGTH_LONG).show();
+        String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
+
+        //..>
 
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
@@ -121,8 +142,8 @@ public class AccountFragment extends Fragment
         DatabaseReference name_ref = database.getReference(nameRef);
         DatabaseReference email_ref = database.getReference(emailRef);
 
-        //new ImageLoadTask(imageUrl, profilePhoto).execute();
-        GlideUtil.loadProfileIcon(imageUrl, profilePhoto);
+        //new ImageLoadTask(photoUrl, profilePhoto).execute();
+        GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
 
         name_ref.addValueEventListener(new ValueEventListener() {
             @Override
