@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.quinn.sakay.Models.RideOffer;
+import com.facebook.Profile;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,8 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.facebook.Profile.getCurrentProfile;
 
 public class AddRideOffer extends BaseActivity
         implements CompoundButton.OnCheckedChangeListener,
@@ -43,8 +46,10 @@ public class AddRideOffer extends BaseActivity
     private EditText fStart;
     private EditText fDestination;
     private ReminderDatePicker datePicker;
-    public String dateAndTime = "...";
+    public String dateAndTime = "";
     private EditText fVehicle;
+    private String userFacebookId = "";
+    private Profile profile = getCurrentProfile();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,7 @@ public class AddRideOffer extends BaseActivity
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);
         fVehicle = (EditText) findViewById(R.id.field_offer_vehicle);
+        userFacebookId = profile.getId();
 
     }
 
@@ -138,7 +144,7 @@ public class AddRideOffer extends BaseActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            writeNewPost(userId, user.getName(), profilePicture, start, destination,
+                            writeNewPost(userId, user.getName(), userFacebookId, start, destination,
                                     vehicle, dateAndTime);
                         }
 
@@ -173,12 +179,12 @@ public class AddRideOffer extends BaseActivity
     }
 
     // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String profilePicture, String start,
+    private void writeNewPost(String userId, String username, String userFacebookId, String start,
                               String destination, String vehicle, String dateAndTime) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("posts").push().getKey();
-        RideOffer rideOffer = new RideOffer(userId, username, profilePicture, start,
+        RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start,
                 destination, vehicle, dateAndTime);
         Map<String, Object> postValues = rideOffer.toMap();
 

@@ -105,17 +105,17 @@ public class RideOffersFragment extends Fragment
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
 
-        // Set up FirebaseRecyclerAdapter with the Query
+        /*
+        Set up FirebaseRecyclerAdapter with the Query
+        TODO: Check if database node has values first and set a condition
+        */
         Query postsQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class, R.layout.item_ride_offer,
-                RideOfferViewHolder.class, postsQuery) {
+        mAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
+                R.layout.item_ride_offer, RideOfferViewHolder.class, postsQuery) {
             @Override
             protected void populateViewHolder(final RideOfferViewHolder viewHolder, final RideOffer model,
                                               final int position) {
                 final DatabaseReference postRef = getRef(position);
-
-
-                //viewHolder.setIcon(model.getAuthor(), model.getUid());
 
                 // Set click listener for the whole post view
                 final String postKey = postRef.getKey();
@@ -132,11 +132,11 @@ public class RideOffersFragment extends Fragment
                 });
 
                 // Determine if the current user has liked this post and set UI accordingly
-                if (model.stars.containsKey(getUid())) {
-                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
-                } else {
-                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
-                }
+//                if (model.stars.containsKey(getUid())) {
+//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
+//                } else {
+//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
+//                }
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model, new View.OnClickListener() {
@@ -144,11 +144,11 @@ public class RideOffersFragment extends Fragment
                     public void onClick(View starView) {
                         // Need to write to both places the post is stored
                         DatabaseReference globalPostRef = mDatabase.child("rideOffers").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-rideOffer").child(model.uid).child(postRef.getKey());
+                        DatabaseReference userPostRef = mDatabase.child("user-rideOffers").child(model.uid).child(postRef.getKey());
 
                         // Run two transactions
-                        onStarClicked(globalPostRef);
-                        onStarClicked(userPostRef);
+//                        onStarClicked(globalPostRef);
+//                        onStarClicked(userPostRef);
                     }
                 });
             }
@@ -166,6 +166,10 @@ public class RideOffersFragment extends Fragment
 
         return recentPostsQuery;
     }
+
+//    public boolean isEmpty(DataSnapshot dataSnapshot){
+//
+//    }
 
     // [START post_stars_transaction]
     private void onStarClicked(DatabaseReference postRef) {

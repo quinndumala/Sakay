@@ -9,18 +9,18 @@ public class User {
     private String name;
     private String phoneNumber;
     private String email;
-    private String password;
+    private String facebookId;
 
 
     public User() {
     }
 
-    public User(String id, String name, String phoneNumber, String email, String password) {
+    public User(String id, String name, String phoneNumber, String email, String facebookId) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.password = password;
+        this.facebookId = facebookId;
     }
 
     public String getId() {
@@ -57,11 +57,13 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getFacebookId(){return facebookId; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+//    public String getPassword() {
+//        return password;
+//    }
+//
+//    public void setPassword(String password) {
+//        this.password = password;
+//    }
 }

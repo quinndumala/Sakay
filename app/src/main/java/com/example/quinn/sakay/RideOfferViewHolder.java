@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.quinn.sakay.Models.RideOffer;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -37,9 +36,8 @@ public class RideOfferViewHolder extends RecyclerView.ViewHolder{
     }
 
     public void bindToPost(RideOffer rideOffer, View.OnClickListener starClickListener) {
-
+        setPhoto(rideOffer.facebookId);
         authorView.setText(rideOffer.author);
-        GlideUtil.loadProfileIcon(rideOffer.profilePicture, authorPhotoView);
         startView.setText(rideOffer.start);
         destinationView.setText(rideOffer.destination);
         vehicleView.setText(rideOffer.vehicle);
@@ -49,13 +47,9 @@ public class RideOfferViewHolder extends RecyclerView.ViewHolder{
 
     }
 
-    public void setIcon(String url, final String authorId) {
-        GlideUtil.loadProfileIcon(url, authorPhotoView);
-//        mIconView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                showUserDetail(authorId);
-//            }
-//        });
+    public void setPhoto(final String fId) {
+        String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
+        GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
     }
+
 }

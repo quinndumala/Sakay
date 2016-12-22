@@ -11,7 +11,7 @@ public class RideOffer {
     //public Author author;
     public String uid;
     public String author;
-    public String profilePicture;
+    public String facebookId;
     public String start;
     public String destination;
     public String dateAndTime;
@@ -22,49 +22,23 @@ public class RideOffer {
     public RideOffer() {
     }
 
-//    public RideOffer(String uid, String author, String profilePicture, String start, String destination,
-//                     String dateAndTime, String vehicle){
-//        this.uid = uid;
-//        this.author = author;
-//        this.profilePicture = profilePicture;
-//        this.start = start;
-//        this.destination = destination;
-//        this.dateAndTime = dateAndTime;
-//        this.vehicle = vehicle;
-//    }
-
-    public RideOffer(String uid, String author, String profilePicture, String start, String destination,
+    public RideOffer(String uid, String author, String facebookId, String start, String destination,
                      String vehicle, String dateAndTime) {
         this.uid = uid;
         this.author = author;
+        this.facebookId = facebookId;
         this.start = start;
         this.destination = destination;
-        this.profilePicture = profilePicture;
         this.vehicle = vehicle;
         this.dateAndTime = dateAndTime;
     }
-
-    // [END post_to_map]// [START post_to_map]
-//    @Exclude
-//    public Map<String, Object> toMap() {
-//        HashMap<String, Object> result = new HashMap<>();
-//        result.put("uid", uid);
-//        result.put("author", author);
-//        result.put("profilePicture", profilePicture);
-//        result.put("start", start);
-//        result.put("destination", destination);
-//        result.put("dateAndTime", dateAndTime);
-//        result.put("vehicle", vehicle);
-//
-//        return result;
-//    }
 
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("uid", uid);
         result.put("author", author);
-        result.put("profilePicture", profilePicture);
+        result.put("facebookId", facebookId);
         result.put("start", start);
         result.put("destination", destination);
         result.put("vehicle", vehicle);
@@ -72,6 +46,8 @@ public class RideOffer {
 
         return result;
     }
+
+    public String getFacebookId(){return facebookId;}
 
     //public Author getAuthor() {return author;}
 }

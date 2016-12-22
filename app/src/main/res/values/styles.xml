@@ -43,10 +43,10 @@
     </style>
 
     <style name="WelcomeScreenHeaderTextStyle">
-        <item name="android:textSize">55sp</item>
+        <item name="android:textSize">42sp</item>
         <item name="android:textColor">@android:color/white</item>
 
-        <item name="android:layout_marginTop">15dp</item>
+        <item name="android:layout_marginTop">7dp</item>
         <item name="android:layout_marginBottom">60dp</item>
     </style>
 

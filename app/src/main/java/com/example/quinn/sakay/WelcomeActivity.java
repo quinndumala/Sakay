@@ -13,6 +13,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.firebase.client.Firebase;
@@ -26,6 +27,8 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import static com.facebook.Profile.getCurrentProfile;
+
 
 public class WelcomeActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener,
@@ -36,12 +39,15 @@ public class WelcomeActivity extends BaseActivity implements
 //    private TextView profileName;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog mProgressDialog;
+
     Firebase mRef = new Firebase("https://sakay-2af91.firebaseio.com/users/");
 
     //FaceBook callbackManager
     private CallbackManager callbackManager;
 
     private static final int RC_SIGN_IN = 103;
+
+    String facebookUserId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,8 +177,12 @@ public class WelcomeActivity extends BaseActivity implements
                             String email=task.getResult().getUser().getEmail();
                             String image=task.getResult().getUser().getPhotoUrl().toString();
 
+                            Profile profile = getCurrentProfile();
+                            facebookUserId = profile.getId();
+                            String facebookId=facebookUserId;
+
                             //Create a new User and Save it in Firebase database
-                            User user = new User(uid,name,null,email,null);
+                            User user = new User(uid,name,null,email,facebookId);
 
                             mRef.child(uid).setValue(user);
 

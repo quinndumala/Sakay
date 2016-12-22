@@ -16,7 +16,6 @@ public class Post {
     public String date;
     public String time;
     public int starCount = 0;
-    public String authorPicture;
     public Map<String, Boolean> stars = new HashMap<>();
 
     public Post() {

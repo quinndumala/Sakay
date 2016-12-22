@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
@@ -25,7 +24,6 @@ import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,7 +68,6 @@ public class AccountFragment extends Fragment
 
     //test<...
     String facebookUserId = "";
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     Profile profile = getCurrentProfile();
     //..>
 
@@ -107,7 +104,11 @@ public class AccountFragment extends Fragment
                 mAuth.signOut();
                 LoginManager.getInstance().logOut();
                 Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
                 getActivity().startActivity(intent);
+                getActivity().finish();
             }
         });
 
@@ -124,14 +125,8 @@ public class AccountFragment extends Fragment
         String imageUrl = getActivity().getIntent().getExtras().getString("profile_picture");
 
         //test..
-//        for(UserInfo profile : user.getProviderData()) {
-//            // check if the provider id matches "facebook.com"
-//            if(profile.getProviderId().equals(getString(R.string.facebook_app_id))) {
-//                facebookUserId = profile.getUid();
-//            }
-//        }
         facebookUserId = profile.getId();
-        Toast.makeText(getApplicationContext(), facebookUserId, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), facebookUserId, Toast.LENGTH_LONG).show();
         String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
 
         //..>
