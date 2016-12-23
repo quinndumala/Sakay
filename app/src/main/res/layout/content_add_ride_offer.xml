@@ -43,14 +43,13 @@
             android:id="@+id/tv_flags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/divider"
             android:paddingTop="18dp"
             android:paddingLeft="4dp"
             android:text="Date and Time"
             android:textAppearance="?android:textAppearanceMedium"/>
 
         <com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker
-            android:id="@+id/date_picker"
+            android:id="@+id/offer_date_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

@@ -30,19 +30,19 @@
             android:hint="Destination"
             android:id="@+id/field_request_destination" />
 
-        <EditText
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Date"
-            android:inputType="date"
-            android:id="@+id/field_request_date" />
+            android:layout_below="@+id/request_divider"
+            android:paddingTop="18dp"
+            android:paddingLeft="4dp"
+            android:text="@string/date_and_time_info"
+            android:textAppearance="?android:textAppearanceMedium"/>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Time"
-            android:inputType="time"
-            android:id="@+id/field_request_time" />
+        <com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker
+            android:id="@+id/request_date_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </FrameLayout>

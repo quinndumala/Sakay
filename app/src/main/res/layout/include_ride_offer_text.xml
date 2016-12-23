@@ -27,12 +27,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="From: "/>
+            android:text="@string/start_info"/>
         <TextView
             android:id="@+id/offer_start_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Starting Point"/>
+            android:text="@string/sample_text"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,12 +40,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="To: "/>
+            android:text="@string/destination_info"/>
         <TextView
             android:id="@+id/offer_destination_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Destination"/>
+            android:text="@string/sample_text"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -53,12 +53,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Date and Time: "/>
+            android:text="@string/date_and_time_info"/>
         <TextView
             android:id="@+id/offer_dateAndTime_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="date and time"/>
+            android:text="@string/sample_text"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -66,12 +66,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vehicle: "/>
+            android:text="@string/vehicle_info"/>
         <TextView
             android:id="@+id/offer_vehicle_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vehicle Info"/>
+            android:text="@string/sample_text"/>
     </LinearLayout>
 
 </LinearLayout>

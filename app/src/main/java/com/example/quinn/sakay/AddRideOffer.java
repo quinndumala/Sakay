@@ -60,7 +60,7 @@ public class AddRideOffer extends BaseActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        datePicker = (ReminderDatePicker) findViewById(R.id.date_picker);
+        datePicker = (ReminderDatePicker) findViewById(R.id.offer_date_picker);
         datePicker.setOnDateSelectedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(Calendar date) {
@@ -121,13 +121,11 @@ public class AddRideOffer extends BaseActivity
         }
 
 
-        // Disable button so there are no multi-posts
         //setEditingEnabled(false);
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
 
         // [START single_value_read]
         final String userId = getUid();
-        final String profilePicture = getIntent().getExtras().getString("profile_picture");
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
@@ -169,7 +167,6 @@ public class AddRideOffer extends BaseActivity
         fStart.setEnabled(enabled);
         fDestination.setEnabled(enabled);
         fVehicle.setEnabled(enabled);
-
 
 //        if (enabled) {
 //            mSubmitButton.setVisibility(View.VISIBLE);

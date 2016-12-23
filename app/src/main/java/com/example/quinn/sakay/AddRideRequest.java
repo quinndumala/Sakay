@@ -13,21 +13,26 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quinn.sakay.Models.RideRequest;
+import com.facebook.Profile;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
+import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.facebook.Profile.getCurrentProfile;
 
 public class AddRideRequest extends BaseActivity
     implements ConnectivityReceiver.ConnectivityReceiverListener{
 
-//    FirebaseDatabase database;
-//    DatabaseReference myRef;
-//    EditText text;
     private static final String TAG = "NewPostActivity";
     private static final String REQUIRED = "Required";
 
@@ -37,9 +42,10 @@ public class AddRideRequest extends BaseActivity
 
     private EditText fStart;
     private EditText fDestination;
-    private EditText fDate;
-    private EditText fTime;
-
+    private ReminderDatePicker datePicker;
+    public String dateAndTime = "";
+    private String userFacebookId = "";
+    private Profile profile = getCurrentProfile();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +56,14 @@ public class AddRideRequest extends BaseActivity
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-//        // Connect to the Firebase database
-//        database = FirebaseDatabase.getInstance();
-//        // Get a reference to the todoItems child items it the database
-//        myRef = database.getReference("todoItems");
-//        text = (EditText) findViewById(R.id.addRideRequestStart);
+        datePicker = (ReminderDatePicker) findViewById(R.id.request_date_picker);
+        datePicker.setOnDateSelectedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(Calendar date) {
+                String selectedDate = getDateFormat().format(date.getTime());
+                dateAndTime = selectedDate;
+            }
+        });
 
         checkConnection();
 
@@ -64,41 +73,30 @@ public class AddRideRequest extends BaseActivity
 
         fStart = (EditText) findViewById(R.id.field_request_start);
         fDestination = (EditText) findViewById(R.id.field_request_destination);
-        fDate = (EditText) findViewById(R.id.field_request_date);
-        fTime = (EditText) findViewById(R.id.field_request_time);
+        userFacebookId = profile.getId();
+    }
+
+    private java.text.DateFormat savedFormat;
+    public java.text.DateFormat getDateFormat() {
+        if(savedFormat == null)
+            savedFormat = DateFormat.getDateTimeInstance();
+        return savedFormat;
     }
 
     private void submitPost() {
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
-        final String date = fDate.getText().toString();
-        final String time = fTime.getText().toString();
 
-        // Title is required
         if (TextUtils.isEmpty(start)) {
             fStart.setError(REQUIRED);
             return;
         }
 
-        // Body is required
         if (TextUtils.isEmpty(destination)) {
             fDestination.setError(REQUIRED);
             return;
         }
 
-        // Date
-        if (TextUtils.isEmpty(date)) {
-            fDate.setError(REQUIRED);
-            return;
-        }
-
-        // Time
-        if (TextUtils.isEmpty(time)){
-            fTime.setError(REQUIRED);
-            return;
-        }
-
-        // Disable button so there are no multi-posts
         //setEditingEnabled(false);
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
 
@@ -120,7 +118,8 @@ public class AddRideRequest extends BaseActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            writeNewPost(userId, user.getName(), start, destination, date, time);
+                            writeNewPost(userId, user.getName(), userFacebookId, start, destination,
+                                    dateAndTime);
                         }
 
                         // Finish this Activity, back to the stream
@@ -143,8 +142,6 @@ public class AddRideRequest extends BaseActivity
     private void setEditingEnabled(boolean enabled) {
         fStart.setEnabled(enabled);
         fDestination.setEnabled(enabled);
-        fDate.setEnabled(enabled);
-        fTime.setEnabled(enabled);
 //        if (enabled) {
 //            mSubmitButton.setVisibility(View.VISIBLE);
 //        } else {
@@ -153,13 +150,14 @@ public class AddRideRequest extends BaseActivity
     }
 
     // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String start, String destination,
-                              String date, String time) {
+    private void writeNewPost(String userId, String username, String userFacebookId, String start,
+                              String destination, String dateAndTime) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("posts").push().getKey();
-        Post post = new Post(userId, username, start, destination, date, time);
-        Map<String, Object> postValues = post.toMap();
+        RideRequest rideRequest = new RideRequest(userId, username, userFacebookId, start,
+                destination, dateAndTime);
+        Map<String, Object> postValues = rideRequest.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/rideRequests/" + key, postValues);

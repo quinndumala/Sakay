@@ -16,8 +16,9 @@ public class RideOffer {
     public String destination;
     public String dateAndTime;
     public String vehicle;
-    public int starCount = 0;
     public Map<String, Boolean> stars = new HashMap<>();
+
+    //public int starCount = 0;
 
     public RideOffer() {
     }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Sakay</string>
+    <string name="sample_text">Sample text sample text</string>
     <string name="googleMaps_key">AIzaSyCWltYFe6GS0NqtiWV8AmrNb-j1srhid38</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -52,5 +53,10 @@
     <string name="ride_request_added_message">Ride request added</string>
     <string name="selected_date_message">Selected Date: </string>
     <string name="title_activity_test">TestActivity</string>
+
+    <string name="start_info">From: </string>
+    <string name="destination_info">To: </string>
+    <string name="date_and_time_info">Date and Time: </string>
+    <string name="vehicle_info">Vehicle: </string>
 
 </resources>

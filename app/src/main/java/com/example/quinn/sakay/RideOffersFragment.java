@@ -11,7 +11,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,13 +22,9 @@ import com.example.quinn.sakay.Models.RideOffer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.Transaction;
 
 
 /**
@@ -37,7 +32,6 @@ import com.google.firebase.database.Transaction;
  */
 public class RideOffersFragment extends Fragment
     implements ConnectivityReceiver.ConnectivityReceiverListener{
-
     private static final String TAG = "RideOffersFragment";
 
     // [START define_database_reference]
@@ -48,6 +42,7 @@ public class RideOffersFragment extends Fragment
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private FloatingActionButton addRideOffer;
+
     public RideOffersFragment() {
         // Required empty public constructor
     }
@@ -139,18 +134,21 @@ public class RideOffersFragment extends Fragment
 //                }
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View starView) {
-                        // Need to write to both places the post is stored
-                        DatabaseReference globalPostRef = mDatabase.child("rideOffers").child(postRef.getKey());
-                        DatabaseReference userPostRef = mDatabase.child("user-rideOffers").child(model.uid).child(postRef.getKey());
+//                viewHolder.bindToPost(model, new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View starView) {
+//                        // Need to write to both places the post is stored
+//                        DatabaseReference globalPostRef = mDatabase.child("rideOffers").child(postRef.getKey());
+//                        DatabaseReference userPostRef = mDatabase.child("user-rideOffers").child(model.uid).child(postRef.getKey());
+//
+//                        // Run two transactions
+////                        onStarClicked(globalPostRef);
+////                        onStarClicked(userPostRef);
+//                    }
+//                });
 
-                        // Run two transactions
-//                        onStarClicked(globalPostRef);
-//                        onStarClicked(userPostRef);
-                    }
-                });
+                // Bind Post to ViewHolder, setting OnClickListener for the star button
+                viewHolder.bindToPost(model);
             }
         };
         mRecycler.setAdapter(mAdapter);
@@ -171,39 +169,39 @@ public class RideOffersFragment extends Fragment
 //
 //    }
 
-    // [START post_stars_transaction]
-    private void onStarClicked(DatabaseReference postRef) {
-        postRef.runTransaction(new Transaction.Handler() {
-            @Override
-            public Transaction.Result doTransaction(MutableData mutableData) {
-                RideOffer r = mutableData.getValue(RideOffer.class);
-                if (r == null) {
-                    return Transaction.success(mutableData);
-                }
-
-                if (r.stars.containsKey(getUid())) {
-                    // Unstar the post and remove self from stars
-                    r.starCount = r.starCount - 1;
-                    r.stars.remove(getUid());
-                } else {
-                    // Star the post and add self to stars
-                    r.starCount = r.starCount + 1;
-                    r.stars.put(getUid(), true);
-                }
-
-                // Set value and report transaction success
-                mutableData.setValue(r);
-                return Transaction.success(mutableData);
-            }
-
-            @Override
-            public void onComplete(DatabaseError databaseError, boolean b,
-                                   DataSnapshot dataSnapshot) {
-                // Transaction completed
-                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-            }
-        });
-    }
+//    // [START post_stars_transaction]
+//    private void onStarClicked(DatabaseReference postRef) {
+//        postRef.runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                RideOffer r = mutableData.getValue(RideOffer.class);
+//                if (r == null) {
+//                    return Transaction.success(mutableData);
+//                }
+//
+//                if (r.stars.containsKey(getUid())) {
+//                    // Unstar the post and remove self from stars
+//                    r.starCount = r.starCount - 1;
+//                    r.stars.remove(getUid());
+//                } else {
+//                    // Star the post and add self to stars
+//                    r.starCount = r.starCount + 1;
+//                    r.stars.put(getUid(), true);
+//                }
+//
+//                // Set value and report transaction success
+//                mutableData.setValue(r);
+//                return Transaction.success(mutableData);
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b,
+//                                   DataSnapshot dataSnapshot) {
+//                // Transaction completed
+//                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+//            }
+//        });
+//    }
     // [END post_stars_transaction]
 
     public void onResume(){
