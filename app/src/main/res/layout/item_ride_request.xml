@@ -17,17 +17,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true" />
 
-        <LinearLayout
-            android:id="@+id/star_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/post_author_layout"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/post_author_layout"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-        </LinearLayout>
 
         <include layout="@layout/include_ride_request_text"
             android:layout_width="match_parent"

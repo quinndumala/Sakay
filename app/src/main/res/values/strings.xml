@@ -58,5 +58,6 @@
     <string name="destination_info">To: </string>
     <string name="date_and_time_info">Date and Time: </string>
     <string name="vehicle_info">Vehicle: </string>
+    <string name="date_and_time">Date and Time</string>
 
 </resources>

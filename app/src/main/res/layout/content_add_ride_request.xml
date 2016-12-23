@@ -12,37 +12,44 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
+        android:orientation="vertical">
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Starting Point"
-            android:id="@+id/field_request_start" />
+            android:id="@+id/field_request_start"
+            android:maxLines="1"
+            style="@style/FullWidthEditText"/>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Destination"
-            android:id="@+id/field_request_destination" />
+            android:id="@+id/field_request_destination"
+            android:maxLines="1"
+            style="@style/FullWidthEditText"/>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/request_divider"
-            android:paddingTop="18dp"
-            android:paddingLeft="4dp"
-            android:text="@string/date_and_time_info"
-            android:textAppearance="?android:textAppearanceMedium"/>
+            android:text="@string/date_and_time"
+            android:textSize="@dimen/abc_text_size_subhead_material"
+            android:paddingTop="20dp"
+            android:paddingLeft="20dp"
+            android:paddingBottom="10dp"/>
 
         <com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker
             android:id="@+id/request_date_picker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"/>
 
     </LinearLayout>
 </FrameLayout>
