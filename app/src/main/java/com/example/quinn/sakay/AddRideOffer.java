@@ -1,5 +1,6 @@
 package com.example.quinn.sakay;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -33,7 +34,8 @@ import static com.facebook.Profile.getCurrentProfile;
 
 public class AddRideOffer extends BaseActivity
         implements CompoundButton.OnCheckedChangeListener,
-        ConnectivityReceiver.ConnectivityReceiverListener{
+        ConnectivityReceiver.ConnectivityReceiverListener,
+        View.OnClickListener{
 
 
     private static final String TAG = "NewPostActivity";
@@ -66,21 +68,22 @@ public class AddRideOffer extends BaseActivity
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
-                //Toast.makeText(AddRideOffer.this, "Selected date: "+ selectedDate, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(AddRideOffer.this, "Selected date: "+ getDateFormat().format(date.getTime()), Toast.LENGTH_SHORT).show();
             }
         });
 
         checkConnection();
 
-        // [START initialize_database_ref]
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        // [END initialize_database_ref]
 
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);
         fVehicle = (EditText) findViewById(R.id.field_offer_vehicle);
         userFacebookId = profile.getId();
+
+        fStart.setText("Your current location");
+        fDestination.requestFocus();
+
+        findViewById(R.id.field_offer_start).setOnClickListener(this);
 
     }
 
@@ -257,6 +260,17 @@ public class AddRideOffer extends BaseActivity
             TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
             textView.setTextColor(color);
             snackbar.show();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.field_offer_start:
+                Intent searchAddressIntent = new Intent(this, SearchAddressActivity.class);
+                startActivity(searchAddressIntent);
+                break;
         }
     }
 }

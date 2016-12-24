@@ -1,5 +1,6 @@
 package com.example.quinn.sakay;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -31,7 +32,8 @@ import java.util.Map;
 import static com.facebook.Profile.getCurrentProfile;
 
 public class AddRideRequest extends BaseActivity
-    implements ConnectivityReceiver.ConnectivityReceiverListener{
+    implements ConnectivityReceiver.ConnectivityReceiverListener,
+    View.OnClickListener{
 
     private static final String TAG = "NewPostActivity";
     private static final String REQUIRED = "Required";
@@ -74,6 +76,11 @@ public class AddRideRequest extends BaseActivity
         fStart = (EditText) findViewById(R.id.field_request_start);
         fDestination = (EditText) findViewById(R.id.field_request_destination);
         userFacebookId = profile.getId();
+
+        fStart.setText("Your current location");
+        fDestination.requestFocus();
+
+        findViewById(R.id.field_request_start).setOnClickListener(this);
     }
 
     private java.text.DateFormat savedFormat;
@@ -218,6 +225,17 @@ public class AddRideRequest extends BaseActivity
             TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
             textView.setTextColor(color);
             snackbar.show();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.field_request_start:
+                Intent searchAddressIntent = new Intent(this, SearchAddressActivity.class);
+                startActivity(searchAddressIntent);
+                break;
         }
     }
 }
