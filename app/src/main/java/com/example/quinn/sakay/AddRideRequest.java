@@ -1,5 +1,6 @@
 package com.example.quinn.sakay;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +17,11 @@ import android.widget.Toast;
 
 import com.example.quinn.sakay.Models.RideRequest;
 import com.facebook.Profile;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,17 +43,16 @@ public class AddRideRequest extends BaseActivity
 
     private static final String TAG = "NewPostActivity";
     private static final String REQUIRED = "Required";
+    private static final int REQUEST_PLACE_PICKER = 1;
 
-    // [START declare_database_ref]
     private DatabaseReference mDatabase;
-    // [END declare_database_ref]
-
     private EditText fStart;
     private EditText fDestination;
     private ReminderDatePicker datePicker;
     public String dateAndTime = "";
     private String userFacebookId = "";
     private Profile profile = getCurrentProfile();
+    public String startOrDestination = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +82,11 @@ public class AddRideRequest extends BaseActivity
         fDestination = (EditText) findViewById(R.id.field_request_destination);
         userFacebookId = profile.getId();
 
-        fStart.setText("Your current location");
-        fDestination.requestFocus();
+        fStart.setText(R.string.select_location);
+        fDestination.setText(R.string.select_location);
 
         findViewById(R.id.field_request_start).setOnClickListener(this);
+        findViewById(R.id.field_request_destination).setOnClickListener(this);
     }
 
     private java.text.DateFormat savedFormat;
@@ -172,7 +178,21 @@ public class AddRideRequest extends BaseActivity
 
         mDatabase.updateChildren(childUpdates);
     }
-    // [END write_fan_out]
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.field_request_start:
+                startOrDestination = "start";
+                launchPlacePicker();
+                break;
+            case R.id.field_request_destination:
+                startOrDestination = "destination";
+                launchPlacePicker();
+                break;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -228,14 +248,67 @@ public class AddRideRequest extends BaseActivity
         }
     }
 
+    public void launchPlacePicker(){
+        try {
+            PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+            Intent intent = intentBuilder.build(this);
+
+            startActivityForResult(intent, REQUEST_PLACE_PICKER);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            GooglePlayServicesUtil
+                    .getErrorDialog(e.getConnectionStatusCode(), this, 0);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, "Google Play Services is not available.",
+                    Toast.LENGTH_LONG)
+                    .show();
+        }
+
+    }
+
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        switch (id){
-            case R.id.field_request_start:
-                Intent searchAddressIntent = new Intent(this, SearchAddressActivity.class);
-                startActivity(searchAddressIntent);
-                break;
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PLACE_PICKER) {
+            if (resultCode == Activity.RESULT_OK) {
+                /* User has picked a place, extract data.
+                   Data is extracted from the returned intent by retrieving a Place object from
+                   the PlacePicker.
+                 */
+                final Place place = PlacePicker.getPlace(data, this);
+
+                /* A Place object contains details about that place, such as its name, address
+                and phone number. Extract the name, address, phone number, place ID and place types.
+                 */
+                final CharSequence name = place.getName();
+                final CharSequence address = place.getAddress();
+                final CharSequence phone = place.getPhoneNumber();
+                final String placeId = place.getId();
+                String attribution = PlacePicker.getAttributions(data);
+                if(attribution == null){
+                    attribution = "";
+                }
+
+                if(startOrDestination == "start"){
+                    fStart.setText(name.toString());
+                } else if(startOrDestination == "destination"){
+                    fDestination.setText(name.toString());
+                }
+
+//                // Update data on card.
+//                getCardStream().getCard(CARD_DETAIL)
+//                        .setTitle(name.toString())
+//                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
+//                                attribution));
+
+                Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
+
+            } else {
+                // User has not selected a place, hide the card.
+                //fStart.setText(R.string.select_location);
+            }
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 }

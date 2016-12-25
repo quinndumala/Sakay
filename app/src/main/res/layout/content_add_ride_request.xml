@@ -21,8 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Starting Point"
-                android:textSize="@dimen/abc_text_size_subhead_material"
-                android:padding="20dp"
+                style="@style/NoPaddingRight"
                 />
             <EditText
                 android:layout_width="match_parent"
@@ -43,14 +42,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Destination"
-                android:textSize="@dimen/abc_text_size_subhead_material"
-                android:padding="20dp"
+                style="@style/NoPaddingRight"
                 />
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/field_request_destination"
                 android:maxLines="1"
+                android:focusableInTouchMode="false"
                 style="@style/FullWidthEditText"/>
         </LinearLayout>
 

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Sakay</string>
     <string name="sample_text">Sample text sample text</string>
-    <string name="googleMaps_key">AIzaSyCWltYFe6GS0NqtiWV8AmrNb-j1srhid38</string>
+    <string name="googleMaps_key">AIzaSyD4JymsqJCjdEILxzAv7bhMVrEUYSuWUyQ</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
