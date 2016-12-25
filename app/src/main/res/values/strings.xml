@@ -29,6 +29,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_add_ride_offer">New Ride Offer</string>
     <string name="title_activity_add_ride_request">New Ride Request</string>
+    <string name="title_activity_ride_request_detail"> </string>
 
     <string name="wifi_connected">WiFi Connected</string>
     <string name="lost_connection">Lost Connection</string>

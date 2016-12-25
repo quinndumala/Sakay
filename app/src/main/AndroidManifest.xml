@@ -19,7 +19,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -27,7 +27,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -45,7 +45,7 @@
             android:name=".AddRideOffer"
             android:label="@string/title_activity_add_ride_offer"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />
@@ -54,7 +54,7 @@
             android:name=".AddRideRequest"
             android:label="@string/title_activity_add_ride_request"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />
@@ -85,7 +85,10 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".SearchAddressActivity"></activity>
+        <activity android:name=".SearchAddressActivity" />
+        <activity android:name=".RideRequestDetailActivity"
+            android:label="@string/title_activity_ride_request_detail">
+        </activity>
     </application>
 
 </manifest>

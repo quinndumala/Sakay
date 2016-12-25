@@ -288,10 +288,15 @@ public class AddRideRequest extends BaseActivity
                     attribution = "";
                 }
 
+                String location = name.toString();
+                if (location.contains("°")){
+                    location = address.toString();
+                }
+
                 if(startOrDestination == "start"){
-                    fStart.setText(name.toString());
+                    fStart.setText(location);
                 } else if(startOrDestination == "destination"){
-                    fDestination.setText(name.toString());
+                    fDestination.setText(location);
                 }
 
 //                // Update data on card.
