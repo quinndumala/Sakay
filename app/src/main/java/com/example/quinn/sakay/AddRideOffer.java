@@ -80,7 +80,7 @@ public class AddRideOffer extends BaseActivity
         fVehicle = (EditText) findViewById(R.id.field_offer_vehicle);
         userFacebookId = profile.getId();
 
-        fStart.setText("Your current location");
+        fStart.setText(R.string.select_location);
         fDestination.requestFocus();
 
         findViewById(R.id.field_offer_start).setOnClickListener(this);
