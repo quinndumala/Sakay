@@ -322,6 +322,7 @@ public class AddRideRequest extends BaseActivity
                 .title(R.string.ambiguous_location_title)
                 .content(R.string.ambiguous_location_body)
                 .positiveText("OK")
+                .cancelable(false)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

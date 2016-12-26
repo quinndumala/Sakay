@@ -7,17 +7,17 @@
     android:orientation="horizontal">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/comment_author_photo"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:id="@+id/post_author_photo_large"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
         android:src="@drawable/ic_profile_photo" />
 
     <TextView
-        android:id="@+id/comment_author"
-        style="@style/TextAppearance.AppCompat.Small"
+        android:id="@+id/post_author_large"
+        style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="11dp"
         android:gravity="center_vertical"
         tools:text="someauthor@email.com"
         android:textStyle="bold"/>

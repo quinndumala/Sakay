@@ -15,10 +15,16 @@
 
         <include
             android:id="@+id/ride_request_author_layout"
-            layout="@layout/include_post_author"
+            layout="@layout/include_post_author_large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true" />
+
+        <Space
+            android:id="@+id/request_detail_space"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_below="@id/ride_request_author_layout"/>
 
         <include
             android:id="@+id/ride_request_text_layout"
@@ -26,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/ride_request_author_layout"
+            android:layout_below="@id/request_detail_space"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp" />
 

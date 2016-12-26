@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quinn.sakay.Models.RideRequest;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -115,12 +114,10 @@ public class RideRequestsFragment extends Fragment
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Launch PostDetailActivity
-//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
-
-                        Toast.makeText(getActivity(), "Pressed", Toast.LENGTH_SHORT).show();
+                        // Launch RideRequestDetailActivity
+                        Intent intent = new Intent(getActivity(), RideRequestDetailActivity.class);
+                        intent.putExtra(RideRequestDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
                     }
                 });
 

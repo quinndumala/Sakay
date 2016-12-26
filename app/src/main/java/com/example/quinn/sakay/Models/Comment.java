@@ -16,30 +16,25 @@
 
 package com.example.quinn.sakay.Models;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
+// [START comment_class]
+@IgnoreExtraProperties
 public class Comment {
-    private Author author;
-    private String text;
-    private Object timestamp;
+
+    public String uid;
+    public String author;
+    public String facebookId;
 
     public Comment() {
-        // empty default constructor, necessary for Firebase to be able to deserialize comments
+        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
     }
 
-    public Comment(Author author, String text, Object timestamp) {
+    public Comment(String uid, String author, String facebookId) {
+        this.uid = uid;
         this.author = author;
-        this.text = text;
-        this.timestamp = timestamp;
+        this.facebookId = facebookId;
     }
 
-    public Author getAuthor() {
-        return author;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Object getTimestamp() {
-        return timestamp;
-    }
 }
+// [END comment_class]

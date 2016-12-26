@@ -217,6 +217,11 @@ public class AddRideOffer extends BaseActivity
     }
 
     @Override
+    public void onBackPressed() {
+        Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.add_ride_menu, menu);
         return true;
