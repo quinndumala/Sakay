@@ -54,6 +54,7 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.firebase:firebase-client-android:2.5.2'
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
     testCompile 'junit:junit:4.12'
 }
 

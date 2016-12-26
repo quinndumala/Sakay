@@ -73,6 +73,12 @@
         <item name="android:paddingRight">5dp</item>
     </style>
 
+    <style name="NoPaddingBottom">
+        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+    </style>
+
 
 
 </resources>

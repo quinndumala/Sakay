@@ -9,7 +9,10 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:clipToPadding="false"
+        style="@style/NoPaddingBottom"
+        >
+
         <include
             android:id="@+id/ride_request_author_layout"
             layout="@layout/include_post_author"
@@ -23,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/ride_request_author_layout"
+            android:layout_below="@id/ride_request_author_layout"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp" />
 
@@ -33,8 +36,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_below="@+id/ride_request_text_layout"
-            android:layout_marginTop="20dp"
-            >
+            android:layout_marginTop="20dp">
 
             <Button
                 android:id="@+id/button_sakay"
@@ -52,14 +54,21 @@
                 android:layout_height="wrap_content"
                 android:text="See Route"/>
         </LinearLayout>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp"
+            android:layout_below="@id/comment_form"
+            android:layout_marginLeft="-16dp"
+            android:layout_marginRight="-16dp"
+            />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_request_comment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/comment_form"
+            android:layout_below="@id/comment_form"
             tools:listitem="@layout/item_comment" />
     </RelativeLayout>
-
 
 
 </RelativeLayout>

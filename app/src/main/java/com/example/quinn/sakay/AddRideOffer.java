@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -16,6 +17,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.facebook.Profile;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -110,21 +113,17 @@ public class AddRideOffer extends BaseActivity
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
         final String vehicle = fVehicle.getText().toString();
-//        final String dateTIme = dateAndTime;
 
-        // Title is required
-        if (TextUtils.isEmpty(start)) {
-            fStart.setError(REQUIRED);
+        if (start.equals("Select Location")){
+            selectLocationAlert();
             return;
         }
 
-        // Body is required
-        if (TextUtils.isEmpty(destination)) {
-            fDestination.setError(REQUIRED);
+        if (destination.equals("Select Location")){
+            selectLocationAlert();
             return;
         }
 
-        // Vehicle
         if (TextUtils.isEmpty(vehicle)) {
             fVehicle.setError(REQUIRED);
             return;
@@ -169,8 +168,8 @@ public class AddRideOffer extends BaseActivity
                         setEditingEnabled(true);
                         // [END_EXCLUDE]
                     }
-                });
-        // [END single_value_read]
+                }
+        );
     }
 
     private void setEditingEnabled(boolean enabled) {
@@ -327,6 +326,7 @@ public class AddRideOffer extends BaseActivity
                 String location = name.toString();
                 if (location.contains("°")){
                     location = address.toString();
+                    launchAlertDialog();
                 }
 
                 if(startOrDestination == "start"){
@@ -351,6 +351,28 @@ public class AddRideOffer extends BaseActivity
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-        // END_INCLUDE(activity_result)
+    }
+
+    public void launchAlertDialog(){
+        MaterialDialog alertDialog = new MaterialDialog.Builder(this)
+                .title(R.string.ambiguous_location_title)
+                .content(R.string.ambiguous_location_body)
+                .positiveText("OK")
+                .cancelable(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        launchPlacePicker();
+                    }
+                })
+                .show();
+    }
+
+    public void selectLocationAlert(){
+        new MaterialDialog.Builder(this)
+                .content("Missing some information")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
     }
 }

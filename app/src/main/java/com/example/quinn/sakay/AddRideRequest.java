@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.RideRequest;
 import com.facebook.Profile;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -100,13 +102,13 @@ public class AddRideRequest extends BaseActivity
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
 
-        if (TextUtils.isEmpty(start)) {
-            fStart.setError(REQUIRED);
+        if (start.equals("Select Location")){
+            selectLocationAlert();
             return;
         }
 
-        if (TextUtils.isEmpty(destination)) {
-            fDestination.setError(REQUIRED);
+        if (destination.equals("Select Location")){
+            selectLocationAlert();
             return;
         }
 
@@ -276,9 +278,6 @@ public class AddRideRequest extends BaseActivity
                  */
                 final Place place = PlacePicker.getPlace(data, this);
 
-                /* A Place object contains details about that place, such as its name, address
-                and phone number. Extract the name, address, phone number, place ID and place types.
-                 */
                 final CharSequence name = place.getName();
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
@@ -291,6 +290,7 @@ public class AddRideRequest extends BaseActivity
                 String location = name.toString();
                 if (location.contains("°")){
                     location = address.toString();
+                    launchAlertDialog();
                 }
 
                 if(startOrDestination == "start"){
@@ -315,5 +315,27 @@ public class AddRideRequest extends BaseActivity
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public void launchAlertDialog(){
+        MaterialDialog alertDialog = new MaterialDialog.Builder(this)
+                .title(R.string.ambiguous_location_title)
+                .content(R.string.ambiguous_location_body)
+                .positiveText("OK")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        launchPlacePicker();
+                    }
+                })
+                .show();
+    }
+
+    public void selectLocationAlert(){
+        new MaterialDialog.Builder(this)
+                .content("Missing some information")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
     }
 }
