@@ -241,7 +241,7 @@ public class AddRideOffer extends BaseActivity
 //            Toast.makeText(getApplicationContext(), "Ride Offer Added", Toast.LENGTH_SHORT).show();
 //            finish();
             submitPost();
-        } else if (item.getItemId() == android.R.id.home){
+        } else if (id == android.R.id.home){
             Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
             finish();
             return true;

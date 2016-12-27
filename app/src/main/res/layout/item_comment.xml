@@ -4,22 +4,38 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/comment_author_photo"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/ic_profile_photo" />
-
-    <TextView
-        android:id="@+id/comment_author"
-        style="@style/TextAppearance.AppCompat.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+    <View style="@style/horizontal_divider"
+        android:layout_height="1dp"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center_vertical"
-        tools:text="someauthor@email.com"
-        android:textStyle="bold"/>
+        android:orientation="horizontal"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:paddingLeft="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_vertical_margin">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/comment_author_photo"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_profile_photo" />
+
+        <TextView
+            android:id="@+id/comment_author"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            tools:text="someauthor@email.com"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+
 
 </LinearLayout>

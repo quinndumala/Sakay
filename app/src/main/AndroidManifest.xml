@@ -86,8 +86,14 @@
         </receiver>
 
         <activity android:name=".SearchAddressActivity" />
-        <activity android:name=".RideRequestDetailActivity"
-            android:label="@string/title_activity_ride_request_detail">
+        <activity
+            android:name=".RideRequestDetailActivity"
+            android:label="@string/title_activity_ride_request_detail"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
         </activity>
     </application>
 
