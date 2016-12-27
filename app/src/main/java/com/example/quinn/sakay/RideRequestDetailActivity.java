@@ -51,7 +51,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView dateAndTimeView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
-
+    private final String userId = getUid();
     private String userFacebookId = "";
     private Profile profile = getCurrentProfile();
 
@@ -112,6 +112,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
                 RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+                if (!(rideRequest.uid.equals(userId))){
+                    sakaysViewRecycler.setVisibility(View.GONE);
+                }
                 // [START_EXCLUDE]
                 setPhoto(rideRequest.facebookId);
                 authorView.setText(rideRequest.author);
@@ -158,6 +161,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     @Override
     public void onClick(View view) {
         int id = view.getId();
+        DatabaseReference databaseReference = mCommentsReference.child(mPostKey);
         if (id == R.id.button_sakay) {
             postComment();
         }
