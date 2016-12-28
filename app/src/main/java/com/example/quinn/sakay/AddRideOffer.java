@@ -189,7 +189,7 @@ public class AddRideOffer extends BaseActivity
                               String destination, String vehicle, String dateAndTime) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
-        String key = mDatabase.child("posts").push().getKey();
+        String key = mDatabase.child("rideOffers").push().getKey();
         RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start,
                 destination, vehicle, dateAndTime);
         Map<String, Object> postValues = rideOffer.toMap();

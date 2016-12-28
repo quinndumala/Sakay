@@ -2,6 +2,7 @@ package com.example.quinn.sakay;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -14,18 +15,22 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.quinn.sakay.Models.RideRequest;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Comment;
+import com.example.quinn.sakay.Models.RideRequest;
 import com.facebook.Profile;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.ChildEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -38,6 +43,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
     public static final String EXTRA_POST_KEY = "post_key";
 
+    private DatabaseReference mRootRef;
     private DatabaseReference mPostReference;
     private DatabaseReference mCommentsReference;
     private ValueEventListener mPostListener;
@@ -49,10 +55,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
+    private TextView responsesTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
     private final String userId = getUid();
     private String userFacebookId = "";
+    public Boolean isAuthor = true;
     private Profile profile = getCurrentProfile();
 
     @Override
@@ -71,10 +79,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         }
 
         // Initialize Database
-        mPostReference = FirebaseDatabase.getInstance().getReference()
-                .child("rideRequests").child(mPostKey);
-        mCommentsReference = FirebaseDatabase.getInstance().getReference()
-                .child("rideRequests-comments").child(mPostKey);
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        mPostReference = mRootRef.child("rideRequests").child(mPostKey);
+        mCommentsReference = mRootRef.child("rideRequests-comments").child(mPostKey);
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
@@ -82,9 +89,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
         startView = (TextView) findViewById(R.id.request_start_view);
         destinationView = (TextView) findViewById(R.id.request_destination_view);
         dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
+        responsesTextView = (TextView) findViewById(R.id.request_responses_text);
         sakayButton = (Button) findViewById(R.id.button_sakay);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
+
         userFacebookId = profile.getId();
+        noResponses();
 
         sakayButton.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -113,7 +123,10 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 // Get Post object and use the values to update the UI
                 RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
                 if (!(rideRequest.uid.equals(userId))){
+                    isAuthor = false;
                     sakaysViewRecycler.setVisibility(View.GONE);
+                    responsesTextView.setVisibility(View.GONE);
+                    sakayButton.setVisibility(View.VISIBLE);
                 }
                 // [START_EXCLUDE]
                 setPhoto(rideRequest.facebookId);
@@ -161,10 +174,45 @@ public class RideRequestDetailActivity extends BaseActivity implements
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        DatabaseReference databaseReference = mCommentsReference.child(mPostKey);
+
         if (id == R.id.button_sakay) {
-            postComment();
+            alreadyExists();
         }
+    }
+
+    public void alreadyExists(){
+        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userId)){
+                    launchAlreadySentDialog();
+                } else {
+                    launchSakayDialog();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void noResponses(){
+        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren() && isAuthor){
+                    responsesTextView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void postComment() {
@@ -177,11 +225,15 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-
                         Comment comment = new Comment(uid, authorName, userFacebookId);
 
                         // Push the comment, it will appear in the list
-                        mCommentsReference.push().setValue(comment);
+                        Map<String, Object> postValues = comment.toMap();
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put("/rideRequests-comments/" + mPostKey + "/" + userId, postValues);
+
+                        mRootRef.updateChildren(childUpdates);
+                        noResponses();
 
                     }
 
@@ -189,7 +241,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-                });
+                }
+        );
     }
 
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -341,4 +394,28 @@ public class RideRequestDetailActivity extends BaseActivity implements
         String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
     }
+
+    public void launchSakayDialog(){
+        new MaterialDialog.Builder(this)
+                .content("Sakay this ride?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .cancelable(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postComment();
+                        //noResponses();
+                    }
+                })
+                .show();
+    }
+
+    public void launchAlreadySentDialog(){
+        new MaterialDialog.Builder(this)
+                .content("Sakay request already sent")
+                .positiveText("OK")
+                .show();
+    }
+
 }

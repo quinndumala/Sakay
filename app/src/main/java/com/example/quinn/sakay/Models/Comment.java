@@ -16,7 +16,11 @@
 
 package com.example.quinn.sakay.Models;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 // [START comment_class]
 @IgnoreExtraProperties
@@ -34,6 +38,16 @@ public class Comment {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("author", author);
+        result.put("facebookId", facebookId);
+
+        return result;
     }
 
 }

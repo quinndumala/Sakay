@@ -58,6 +58,7 @@
                 android:id="@+id/button_sakay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:text="Sakay"/>
         </LinearLayout>
 
@@ -70,6 +71,7 @@
             android:layout_marginLeft="4dp"
             android:paddingBottom="10dp"
             android:text="Responses"
+            android:visibility="gone"
             android:textSize="@dimen/ampm_label_size"/>
 
         <android.support.v7.widget.RecyclerView

@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
@@ -101,14 +103,7 @@ public class AccountFragment extends Fragment
         signOutFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAuth.signOut();
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(getActivity(), WelcomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                getActivity().startActivity(intent);
-                getActivity().finish();
+                launchSignOutDialog();
             }
         });
 
@@ -274,5 +269,26 @@ public class AccountFragment extends Fragment
             imageView.setImageBitmap(result);
         }
 
+    }
+
+    public void launchSignOutDialog(){
+        new MaterialDialog.Builder(getActivity())
+                .content("Sign Out of Sakay?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        mAuth.signOut();
+                        LoginManager.getInstance().logOut();
+                        Intent intent = new Intent(getActivity(), WelcomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                                Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getActivity().startActivity(intent);
+                        getActivity().finish();
+                    }
+                })
+                .show();
     }
 }

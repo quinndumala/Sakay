@@ -169,7 +169,7 @@ public class AddRideRequest extends BaseActivity
                               String destination, String dateAndTime) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
-        String key = mDatabase.child("posts").push().getKey();
+        String key = mDatabase.child("rideRequests").push().getKey();
         RideRequest rideRequest = new RideRequest(userId, username, userFacebookId, start,
                 destination, dateAndTime);
         Map<String, Object> postValues = rideRequest.toMap();

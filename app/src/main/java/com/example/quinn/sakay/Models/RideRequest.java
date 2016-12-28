@@ -18,7 +18,7 @@ public class RideRequest {
     public String start;
     public String destination;
     public String dateAndTime;
-    public Map<String, Boolean> stars = new HashMap<>();
+    public Map<String, Boolean> responses = new HashMap<>();
 
     public RideRequest(){}
 
@@ -41,6 +41,7 @@ public class RideRequest {
         result.put("start", start);
         result.put("destination", destination);
         result.put("dateAndTime", dateAndTime);
+        //result.put("responses", responses);
 
         return result;
     }
