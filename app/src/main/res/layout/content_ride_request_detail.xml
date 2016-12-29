@@ -62,26 +62,53 @@
                 android:text="Sakay"/>
         </LinearLayout>
 
-        <TextView
+        <Space
+            android:id="@+id/request_detail_space_view"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:layout_below="@id/request_detail_buttons"/>
+
+        <include
+            layout="@layout/include_responses_text"
             android:id="@+id/request_responses_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/request_detail_buttons"
-            android:paddingTop="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="4dp"
-            android:paddingBottom="10dp"
-            android:text="Responses"
+            android:layout_below="@id/request_detail_space_view"
+            android:layout_marginLeft="-16dp"
+            android:layout_marginRight="-16dp"
             android:visibility="gone"
-            android:textSize="@dimen/ampm_label_size"/>
+            />
+
+        <TextView
+            android:id="@+id/no_responses_yet_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingBottom="12dp"
+            android:paddingLeft="4dp"
+            android:layout_below="@id/request_detail_space_view"
+            android:text="No responses yet"
+            android:textSize="@dimen/ampm_label_size"
+            android:visibility="gone"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_request_comment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="-16dp"
+            android:layout_marginLeft="2dp"
             android:layout_marginRight="-16dp"
             android:layout_below="@id/request_responses_text"
             tools:listitem="@layout/item_comment" />
+
+        <!--<View style="@style/horizontal_divider_mid"-->
+            <!--android:layout_height="8dp"-->
+            <!--android:layout_marginRight="-16dp"-->
+            <!--android:layout_marginLeft="-16dp"-->
+            <!--android:layout_below="@id/recycler_request_comment"-->
+            <!--/>-->
     </RelativeLayout>
+
+
 
 </RelativeLayout>

@@ -55,7 +55,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
-    private TextView responsesTextView;
+    private ViewGroup responsesTextView;
+    private TextView noResponsesYetTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
     private final String userId = getUid();
@@ -89,7 +90,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
         startView = (TextView) findViewById(R.id.request_start_view);
         destinationView = (TextView) findViewById(R.id.request_destination_view);
         dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
-        responsesTextView = (TextView) findViewById(R.id.request_responses_text);
+        responsesTextView = (ViewGroup) findViewById(R.id.request_responses_text);
+        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text);
         sakayButton = (Button) findViewById(R.id.button_sakay);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
 
@@ -204,6 +206,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren() && isAuthor){
                     responsesTextView.setVisibility(View.VISIBLE);
+                } else {
+                    noResponsesYetTextView.setVisibility(View.VISIBLE);
                 }
             }
 
