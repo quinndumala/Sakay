@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quinn.sakay.Models.RideOffer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -117,12 +116,9 @@ public class RideOffersFragment extends Fragment
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Launch PostDetailActivity
-//                        Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-//                        intent.putExtra(PostDetailActivity.EXTRA_POST_KEY, postKey);
-//                        startActivity(intent);
-
-                        Toast.makeText(getActivity(), "Pressed", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), RideOfferDetailActivity.class);
+                        intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
                     }
                 });
 

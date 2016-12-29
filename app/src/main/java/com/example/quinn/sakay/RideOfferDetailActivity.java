@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Comment;
-import com.example.quinn.sakay.Models.RideRequest;
+import com.example.quinn.sakay.Models.RideOffer;
 import com.facebook.Profile;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -36,10 +36,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.facebook.Profile.getCurrentProfile;
 
-public class RideRequestDetailActivity extends BaseActivity implements
-        View.OnClickListener{
+public class RideOfferDetailActivity extends BaseActivity implements
+        View.OnClickListener {
 
-    private static final String TAG = "RideRequestDetail";
+    private static final String TAG = "RideOfferDetail";
 
     public static final String EXTRA_POST_KEY = "post_key";
 
@@ -48,12 +48,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private DatabaseReference mCommentsReference;
     private ValueEventListener mPostListener;
     private String mPostKey;
-    private CommentAdapter mAdapter;
+    private RideOfferDetailActivity.CommentAdapter mAdapter;
 
     private TextView authorView;
     private CircleImageView authorPhotoView;
     private TextView startView;
     private TextView destinationView;
+    private TextView vehicleView;
     private TextView dateAndTimeView;
     private ViewGroup responsesTextView;
     private TextView noResponsesYetTextView;
@@ -67,7 +68,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ride_request_detail);
+        setContentView(R.layout.activity_ride_offer_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -81,19 +82,20 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
-        mPostReference = mRootRef.child("rideRequests").child(mPostKey);
-        mCommentsReference = mRootRef.child("rideRequests-comments").child(mPostKey);
+        mPostReference = mRootRef.child("rideOffers").child(mPostKey);
+        mCommentsReference = mRootRef.child("rideOffers-comments").child(mPostKey);
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
         authorPhotoView = (CircleImageView) findViewById(R.id.post_author_photo_large);
-        startView = (TextView) findViewById(R.id.request_start_view);
-        destinationView = (TextView) findViewById(R.id.request_destination_view);
-        dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
-        responsesTextView = (ViewGroup) findViewById(R.id.request_responses_text);
-        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_request);
-        sakayButton = (Button) findViewById(R.id.button_sakay_request);
-        sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
+        startView = (TextView) findViewById(R.id.offer_start_view);
+        destinationView = (TextView) findViewById(R.id.offer_destination_view);
+        vehicleView = (TextView) findViewById(R.id.offer_vehicle_view);
+        dateAndTimeView = (TextView) findViewById(R.id.offer_dateAndTime_view);
+        responsesTextView = (ViewGroup) findViewById(R.id.offer_responses_text);
+        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_offer);
+        sakayButton = (Button) findViewById(R.id.button_sakay_offer);
+        sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_offer_comment);
 
         userFacebookId = profile.getId();
         noResponses();
@@ -123,28 +125,28 @@ public class RideRequestDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
-                if (!(rideRequest.uid.equals(userId))){
+                RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+                if (!(rideOffer.uid.equals(userId))){
                     isAuthor = false;
                     sakaysViewRecycler.setVisibility(View.GONE);
                     responsesTextView.setVisibility(View.GONE);
                     sakayButton.setVisibility(View.VISIBLE);
                 }
                 // [START_EXCLUDE]
-                setPhoto(rideRequest.facebookId);
-                authorView.setText(rideRequest.author);
-                startView.setText(rideRequest.start);
-                destinationView.setText(rideRequest.destination);
-                dateAndTimeView.setText(rideRequest.dateAndTime);
+                setPhoto(rideOffer.facebookId);
+                authorView.setText(rideOffer.author);
+                startView.setText(rideOffer.start);
+                destinationView.setText(rideOffer.destination);
+                vehicleView.setText(rideOffer.vehicle);
+                dateAndTimeView.setText(rideOffer.dateAndTime);
                 // [END_EXCLUDE]
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 // [START_EXCLUDE]
-                Toast.makeText(RideRequestDetailActivity.this, "Failed to load post.",
+                Toast.makeText(RideOfferDetailActivity.this, "Failed to load post.",
                         Toast.LENGTH_SHORT).show();
                 // [END_EXCLUDE]
             }
@@ -156,7 +158,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         mPostListener = postListener;
 
         // Listen for comments
-        mAdapter = new CommentAdapter(this, mCommentsReference);
+        mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
     }
 
@@ -177,7 +179,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public void onClick(View view) {
         int id = view.getId();
 
-        if (id == R.id.button_sakay_request) {
+        if (id == R.id.button_sakay_offer) {
             alreadyExists();
         }
     }
@@ -235,11 +237,10 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
                         Map<String, Object> childUpdates = new HashMap<>();
-                        childUpdates.put("/rideRequests-comments/" + mPostKey + "/" + userId, postValues);
+                        childUpdates.put("/rideOffers-comments/" + mPostKey + "/" + userId, postValues);
 
                         mRootRef.updateChildren(childUpdates);
                         noResponses();
-
                     }
 
                     @Override
@@ -251,7 +252,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
     }
 
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
-
         public TextView authorView;
         public CircleImageView authorPhotoView;
 
@@ -262,9 +262,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         }
     }
 
-
     private static class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
-
         private Context mContext;
         private DatabaseReference mDatabaseReference;
         private ChildEventListener mChildEventListener;
@@ -276,68 +274,49 @@ public class RideRequestDetailActivity extends BaseActivity implements
             mContext = context;
             mDatabaseReference = ref;
 
-            // Create child event listener
-            // [START child_event_listener_recycler]
             ChildEventListener childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                     Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
 
-                    // A new comment has been added, add it to the displayed list
                     Comment comment = dataSnapshot.getValue(Comment.class);
 
-                    // [START_EXCLUDE]
-                    // Update RecyclerView
                     mCommentIds.add(dataSnapshot.getKey());
                     mComments.add(comment);
                     notifyItemInserted(mComments.size() - 1);
-                    // [END_EXCLUDE]
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                     Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
 
-                    // A comment has changed, use the key to determine if we are displaying this
-                    // comment and if so displayed the changed comment.
                     Comment newComment = dataSnapshot.getValue(Comment.class);
                     String commentKey = dataSnapshot.getKey();
 
-                    // [START_EXCLUDE]
                     int commentIndex = mCommentIds.indexOf(commentKey);
                     if (commentIndex > -1) {
-                        // Replace with the new data
                         mComments.set(commentIndex, newComment);
-
-                        // Update the RecyclerView
                         notifyItemChanged(commentIndex);
                     } else {
                         Log.w(TAG, "onChildChanged:unknown_child:" + commentKey);
                     }
-                    // [END_EXCLUDE]
                 }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onChildRemoved:" + dataSnapshot.getKey());
 
-                    // A comment has changed, use the key to determine if we are displaying this
-                    // comment and if so remove it.
                     String commentKey = dataSnapshot.getKey();
 
-                    // [START_EXCLUDE]
                     int commentIndex = mCommentIds.indexOf(commentKey);
                     if (commentIndex > -1) {
-                        // Remove data from the list
                         mCommentIds.remove(commentIndex);
                         mComments.remove(commentIndex);
 
-                        // Update the RecyclerView
                         notifyItemRemoved(commentIndex);
                     } else {
                         Log.w(TAG, "onChildRemoved:unknown_child:" + commentKey);
                     }
-                    // [END_EXCLUDE]
                 }
 
                 @Override
@@ -360,9 +339,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 }
             };
             ref.addChildEventListener(childEventListener);
-            // [END child_event_listener_recycler]
-
-            // Store reference to listener so it can be removed on app stop
             mChildEventListener = childEventListener;
         }
 
@@ -409,7 +385,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         postComment();
-                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
+                        Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -422,5 +398,4 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .positiveText("OK")
                 .show();
     }
-
 }
