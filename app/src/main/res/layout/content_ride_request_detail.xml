@@ -50,16 +50,22 @@
 
             <Button
                 android:id="@+id/button_see_route_request"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="See Route"/>
+                android:layout_width="125dp"
+                android:layout_height="33dp"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:layout_marginLeft="6dp"
+                android:text="See on map"/>
 
             <Button
                 android:id="@+id/button_sakay_request"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="165dp"
+                android:layout_height="33dp"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/white"
+                android:layout_marginLeft="10dp"
                 android:visibility="gone"
-                android:text="Sakay"/>
+                android:text="Request to sakay"/>
         </LinearLayout>
 
         <Space
@@ -85,18 +91,17 @@
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
             android:paddingBottom="12dp"
-            android:paddingLeft="4dp"
+            android:layout_marginLeft="6dp"
             android:layout_below="@id/request_detail_space_view"
             android:text="No responses yet"
             android:textSize="@dimen/ampm_label_size"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_request_comment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
+            android:layout_marginLeft="6dp"
             android:layout_marginRight="-16dp"
             android:layout_below="@id/request_responses_text"
             tools:listitem="@layout/item_comment" />

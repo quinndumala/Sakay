@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
         android:paddingBottom="12dp"
-        android:layout_marginLeft="19dp"
+        android:layout_marginLeft="23dp"
         android:layout_marginRight="16dp"
         android:text="Responses"
         android:textSize="@dimen/ampm_label_size"

@@ -207,9 +207,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 if (dataSnapshot.hasChildren() && isAuthor){
                     responsesTextView.setVisibility(View.VISIBLE);
                 } else {
-                    if (isAuthor){
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
-                    }
+                    if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE);}
                 }
             }
 
@@ -239,7 +237,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
                         mRootRef.updateChildren(childUpdates);
                         noResponses();
-
                     }
 
                     @Override
