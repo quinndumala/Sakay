@@ -59,10 +59,24 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView noResponsesYetTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
-    private final String userId = getUid();
+
     private String userFacebookId = "";
     public Boolean isAuthor = true;
     private Profile profile = getCurrentProfile();
+
+    private final String userId = getUid();
+    private String userAuthorName;
+    private String start;
+    private String destination;
+    private String dateAndTime;
+
+    private String requesteeUid;
+    private String requesteefacebookId;
+    private String requesteeAuthorname;
+
+    public String getUserAuthorName(){
+        return userAuthorName;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +151,27 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 destinationView.setText(rideRequest.destination);
                 dateAndTimeView.setText(rideRequest.dateAndTime);
                 // [END_EXCLUDE]
+
+                mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(userId)){
+                            sakayButton.setText("\u2713" + " Sakay request sent");
+                        } else {
+                            //launchSakayDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                userAuthorName = rideRequest.author;
+                start = rideRequest.start;
+                destination = rideRequest.destination;
+                dateAndTime = rideRequest.dateAndTime;
             }
 
             @Override
@@ -251,16 +286,20 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         public TextView authorView;
         public CircleImageView authorPhotoView;
+        public Button buttonViewProfile;
+        public Button buttonSakay;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
             authorView = (TextView) itemView.findViewById(R.id.comment_author);
             authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo);
+            buttonViewProfile = (Button) itemView.findViewById(R.id.comment_button_view_profile);
+            buttonSakay = (Button) itemView.findViewById(R.id.comment_button_sakay);
         }
     }
 
 
-    private static class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
+    private class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
 
         private Context mContext;
         private DatabaseReference mDatabaseReference;
@@ -372,11 +411,21 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         @Override
         public void onBindViewHolder(CommentViewHolder holder, int position) {
-            Comment comment = mComments.get(position);
-            holder.authorView.setText(comment.author);
+            final Comment comment = mComments.get(position);
+            final String commentAuthor = comment.author;
+            final String commentFacebookId = comment.facebookId;
+            final String commentAuthorUid = comment.uid;
+            holder.authorView.setText(commentAuthor);
 
-            String imageUrl = "https://graph.facebook.com/" + comment.facebookId + "/picture?height=150";
+            String imageUrl = "https://graph.facebook.com/" + commentFacebookId + "/picture?height=150";
             GlideUtil.loadProfileIcon(imageUrl, holder.authorPhotoView);
+
+            holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId);
+                }
+            });
         }
 
         @Override
@@ -389,6 +438,30 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 mDatabaseReference.removeEventListener(mChildEventListener);
             }
         }
+
+        public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
+                                       final String commentFacebookId){
+            new MaterialDialog.Builder(mContext)
+                    .content("Confirm Sakay? This action is irreversible.")
+                    .positiveText("OK")
+                    .negativeText("CANCEL")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            getRequestInfo(commentAuthorId, commentAuthor, commentFacebookId);
+                        }
+                    })
+                    .show();
+        }
+
+        public void getRequestInfo(String commentAuthorId, String commentAuthor, String commentFacebookId){
+            String userName = getUserAuthorName();
+            Toast.makeText(mContext, "Sakay between " + commentAuthor + " and " + userName,
+                    Toast.LENGTH_SHORT).show();
+        }
+
+
+
     }
 
     public void setPhoto(final String fId) {
@@ -415,7 +488,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
     public void launchAlreadySentDialog(){
         new MaterialDialog.Builder(this)
-                .content("Sakay request already sent")
+                .content("Sakay request has already been sent for this ride request")
                 .positiveText("OK")
                 .show();
     }
