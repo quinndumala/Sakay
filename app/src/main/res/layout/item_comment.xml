@@ -20,8 +20,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comment_author_photo"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_alignParentTop="true"
             android:src="@drawable/ic_profile_photo" />
 
@@ -63,8 +63,4 @@
 
 
     </RelativeLayout>
-
-
-
-
 </LinearLayout>

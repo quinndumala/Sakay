@@ -17,8 +17,9 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.example.quinn.sakay.Models.Comment;
+import com.example.quinn.sakay.Models.CommentRequest;
 import com.example.quinn.sakay.Models.RideRequest;
+import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -105,10 +106,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         destinationView = (TextView) findViewById(R.id.request_destination_view);
         dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
         responsesTextView = (ViewGroup) findViewById(R.id.request_responses_text);
-        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_request);
         sakayButton = (Button) findViewById(R.id.button_sakay_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
-
+        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_request);
         userFacebookId = profile.getId();
         noResponses();
 
@@ -253,7 +253,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         });
     }
 
-    private void postComment() {
+    private void postComment(final String vehicle) {
         final String uid = getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -263,7 +263,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-                        Comment comment = new Comment(uid, authorName, userFacebookId);
+                        CommentRequest comment = new CommentRequest(uid, authorName, userFacebookId, vehicle);
 
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
@@ -285,16 +285,18 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
 
         public TextView authorView;
+        public TextView vehicleView;
         public CircleImageView authorPhotoView;
         public Button buttonViewProfile;
         public Button buttonSakay;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
-            authorView = (TextView) itemView.findViewById(R.id.comment_author);
-            authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo);
-            buttonViewProfile = (Button) itemView.findViewById(R.id.comment_button_view_profile);
-            buttonSakay = (Button) itemView.findViewById(R.id.comment_button_sakay);
+            authorView = (TextView) itemView.findViewById(R.id.comment_author_request);
+            vehicleView = (TextView) itemView.findViewById(R.id.comment_vehicle_request);
+            authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo_request);
+            buttonViewProfile = (Button) itemView.findViewById(R.id.comment_button_view_profile_request);
+            buttonSakay = (Button) itemView.findViewById(R.id.comment_button_sakay_request);
         }
     }
 
@@ -306,7 +308,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         private ChildEventListener mChildEventListener;
 
         private List<String> mCommentIds = new ArrayList<>();
-        private List<Comment> mComments = new ArrayList<>();
+        private List<CommentRequest> mComments = new ArrayList<>();
 
         public CommentAdapter(final Context context, DatabaseReference ref) {
             mContext = context;
@@ -320,7 +322,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
 
                     // A new comment has been added, add it to the displayed list
-                    Comment comment = dataSnapshot.getValue(Comment.class);
+                    CommentRequest comment = dataSnapshot.getValue(CommentRequest.class);
 
                     // [START_EXCLUDE]
                     // Update RecyclerView
@@ -336,7 +338,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
                     // A comment has changed, use the key to determine if we are displaying this
                     // comment and if so displayed the changed comment.
-                    Comment newComment = dataSnapshot.getValue(Comment.class);
+                    CommentRequest newComment = dataSnapshot.getValue(CommentRequest.class);
                     String commentKey = dataSnapshot.getKey();
 
                     // [START_EXCLUDE]
@@ -382,7 +384,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
                     // A comment has changed position, use the key to determine if we are
                     // displaying this comment and if so move it.
-                    Comment movedComment = dataSnapshot.getValue(Comment.class);
+                    CommentRequest movedComment = dataSnapshot.getValue(CommentRequest.class);
                     String commentKey = dataSnapshot.getKey();
 
                     // ...
@@ -405,17 +407,20 @@ public class RideRequestDetailActivity extends BaseActivity implements
         @Override
         public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            View view = inflater.inflate(R.layout.item_comment, parent, false);
+            View view = inflater.inflate(R.layout.item_comment_request, parent, false);
             return new CommentViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(CommentViewHolder holder, int position) {
-            final Comment comment = mComments.get(position);
+            final CommentRequest comment = mComments.get(position);
             final String commentAuthor = comment.author;
             final String commentFacebookId = comment.facebookId;
             final String commentAuthorUid = comment.uid;
+            final String commentVehicle = comment.vehicle;
+
             holder.authorView.setText(commentAuthor);
+            holder.vehicleView.setText(commentVehicle);
 
             String imageUrl = "https://graph.facebook.com/" + commentFacebookId + "/picture?height=150";
             GlideUtil.loadProfileIcon(imageUrl, holder.authorPhotoView);
@@ -448,7 +453,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            getRequestInfo(commentAuthorId, commentAuthor, commentFacebookId);
+                            //getRequestInfo(commentAuthorId, commentAuthor, commentFacebookId);
+                            Toast.makeText(mContext, "pressed", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .show();
@@ -460,7 +466,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     Toast.LENGTH_SHORT).show();
         }
 
-
+        private void newSakay(String userId, String userName, String userFacebookId, String start,
+                              String destination, String dateAndTime, String otherId, String otherName,
+                              String otherFacebookId){
+            String key = mRootRef.child("user-sakays").push().getKey();
+            Sakay sakay = new Sakay();
+        }
 
     }
 
@@ -478,9 +489,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        postComment();
-                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
-                                Toast.LENGTH_SHORT).show();
+                        launchInputVehicle();
                     }
                 })
                 .show();
@@ -492,5 +501,22 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .positiveText("OK")
                 .show();
     }
+
+    public void launchInputVehicle(){
+        new MaterialDialog.Builder(this)
+                .title("Input Vehicle")
+                .positiveText("submit")
+                .cancelable(false)
+                .input(null, null, false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                        postComment(input.toString());
+                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+    }
+
+
 
 }
