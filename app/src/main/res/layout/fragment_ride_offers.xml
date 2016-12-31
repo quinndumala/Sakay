@@ -18,10 +18,10 @@
         android:layout_marginBottom="12dp"
         android:layout_marginRight="16dp"
         app:fab_elevationCompat="4dp"
+        fab:fab_hideAnimation="@anim/hide_to_bottom"
         android:src="@drawable/ic_add"
         fab:fab_colorNormal="@color/colorPrimary"
-        fab:fab_colorPressed="@color/colorPrimaryDark"
-        />
+        fab:fab_colorPressed="@color/colorPrimaryDark" />
 
 
     <android.support.v7.widget.RecyclerView

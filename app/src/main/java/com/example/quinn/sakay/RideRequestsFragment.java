@@ -69,7 +69,6 @@ public class RideRequestsFragment extends Fragment
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AddRideRequest.class);
-                //intent.putExtra("user_id",uid);
                 getActivity().startActivity(intent);
             }
         });
@@ -90,6 +89,22 @@ public class RideRequestsFragment extends Fragment
                 addRideRequest.setHideAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.hide_to_bottom));
             }
         }, 300);
+
+        mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0 && addRideRequest.isShown())
+                    addRideRequest.hide(true);
+                else if (dy<0)
+                    addRideRequest.show(true);
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                //super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());

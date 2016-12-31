@@ -32,12 +32,11 @@
             android:layout_toRightOf="@id/comment_author_photo_offer">
             <TextView
                 android:id="@+id/comment_author_offer"
-                style="@style/TextAppearance.AppCompat.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:gravity="center_vertical"
-                tools:text="someauthor@email.com"
+                tools:text="Username Username"
                 android:textStyle="bold"/>
             <LinearLayout
                 android:layout_width="wrap_content"

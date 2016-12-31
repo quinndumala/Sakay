@@ -93,6 +93,23 @@ public class RideOffersFragment extends Fragment
             }
         }, 300);
 
+        mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if (dy > 0 && addRideOffer.isShown())
+                    addRideOffer.hide(true);
+                else if (dy<0)
+                    addRideOffer.show(true);
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+
+                //super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
+
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
