@@ -428,7 +428,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
             holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId);
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentVehicle);
                 }
             });
         }
@@ -445,7 +445,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         }
 
         public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
-                                       final String commentFacebookId){
+                                       final String commentFacebookId, final String commentVehicle){
             new MaterialDialog.Builder(mContext)
                     .content("Confirm Sakay? This action is irreversible.")
                     .positiveText("OK")
@@ -453,24 +453,31 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            //getRequestInfo(commentAuthorId, commentAuthor, commentFacebookId);
-                            Toast.makeText(mContext, "pressed", Toast.LENGTH_SHORT).show();
+                            String sakayKey = mRootRef.child("user-sakays").push().getKey();
+                            newSakay(userId, userAuthorName, userFacebookId, start, destination, dateAndTime,
+                                    commentVehicle, commentAuthorId, commentAuthor, commentFacebookId,
+                                    sakayKey);
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, start, destination,
+                                    dateAndTime, commentVehicle, userId, userAuthorName, userFacebookId,
+                                    sakayKey);
+                            Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .show();
         }
 
-        public void getRequestInfo(String commentAuthorId, String commentAuthor, String commentFacebookId){
-            String userName = getUserAuthorName();
-            Toast.makeText(mContext, "Sakay between " + commentAuthor + " and " + userName,
-                    Toast.LENGTH_SHORT).show();
-        }
-
         private void newSakay(String userId, String userName, String userFacebookId, String start,
-                              String destination, String dateAndTime, String otherId, String otherName,
-                              String otherFacebookId){
-            String key = mRootRef.child("user-sakays").push().getKey();
-            Sakay sakay = new Sakay();
+                              String destination, String dateAndTime, String vehicle,
+                              String otherId, String otherName, String otherFacebookId,
+                              String sakayKey){
+            //String key = mRootRef.child("user-sakays").push().getKey();
+            Sakay sakay = new Sakay(userId, userName, userFacebookId, start, destination, dateAndTime,
+                    vehicle, otherId, otherName, otherFacebookId);
+            Map<String, Object> sakayValues = sakay.toMap();
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/user-sakays/" + userId + "/" + sakayKey, sakayValues);
+            mRootRef.updateChildren(childUpdates);
         }
 
     }
