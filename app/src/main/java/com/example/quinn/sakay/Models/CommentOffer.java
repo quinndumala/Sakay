@@ -24,17 +24,17 @@ import java.util.Map;
 
 // [START comment_class]
 @IgnoreExtraProperties
-public class Comment {
+public class CommentOffer {
 
     public String uid;
     public String author;
     public String facebookId;
 
-    public Comment() {
-        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
+    public CommentOffer() {
+        // Default constructor required for calls to DataSnapshot.getValue(CommentOffer.class)
     }
 
-    public Comment(String uid, String author, String facebookId) {
+    public CommentOffer(String uid, String author, String facebookId) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;

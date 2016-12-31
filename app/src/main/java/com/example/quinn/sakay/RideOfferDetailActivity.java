@@ -17,8 +17,9 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.example.quinn.sakay.Models.Comment;
+import com.example.quinn.sakay.Models.CommentOffer;
 import com.example.quinn.sakay.Models.RideOffer;
+import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -54,16 +55,23 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private CircleImageView authorPhotoView;
     private TextView startView;
     private TextView destinationView;
-    private TextView vehicleView;
     private TextView dateAndTimeView;
+    private TextView vehicleView;
     private ViewGroup responsesTextView;
     private TextView noResponsesYetTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
-    private final String userId = getUid();
+
     private String userFacebookId = "";
     public Boolean isAuthor = true;
     private Profile profile = getCurrentProfile();
+
+    private final String userId = getUid();
+    private String userAuthorName;
+    private String start;
+    private String destination;
+    private String dateAndTime;
+    private String vehicle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +148,28 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 vehicleView.setText(rideOffer.vehicle);
                 dateAndTimeView.setText(rideOffer.dateAndTime);
                 // [END_EXCLUDE]
+
+                mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(userId)){
+                            sakayButton.setText("\u2713" + " Sakay request sent");
+                        } else {
+                            //launchSakayDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                userAuthorName = rideOffer.author;
+                start = rideOffer.start;
+                destination = rideOffer.destination;
+                dateAndTime = rideOffer.dateAndTime;
+                vehicle = rideOffer.vehicle;
             }
 
             @Override
@@ -232,7 +262,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-                        Comment comment = new Comment(uid, authorName, userFacebookId);
+                        CommentOffer comment = new CommentOffer(uid, authorName, userFacebookId);
 
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
@@ -254,21 +284,25 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView authorView;
         public CircleImageView authorPhotoView;
+        public Button buttonViewProfile;
+        public Button buttonSakay;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
-            authorView = (TextView) itemView.findViewById(R.id.comment_author);
-            authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo);
+            authorView = (TextView) itemView.findViewById(R.id.comment_author_offer);
+            authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo_offer);
+            buttonSakay = (Button) itemView.findViewById(R.id.comment_button_sakay_offer);
+            buttonViewProfile = (Button) itemView.findViewById(R.id.comment_button_view_profile_offer);
         }
     }
 
-    private static class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
+    private class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         private Context mContext;
         private DatabaseReference mDatabaseReference;
         private ChildEventListener mChildEventListener;
 
         private List<String> mCommentIds = new ArrayList<>();
-        private List<Comment> mComments = new ArrayList<>();
+        private List<CommentOffer> mComments = new ArrayList<>();
 
         public CommentAdapter(final Context context, DatabaseReference ref) {
             mContext = context;
@@ -279,7 +313,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                     Log.d(TAG, "onChildAdded:" + dataSnapshot.getKey());
 
-                    Comment comment = dataSnapshot.getValue(Comment.class);
+                    CommentOffer comment = dataSnapshot.getValue(CommentOffer.class);
 
                     mCommentIds.add(dataSnapshot.getKey());
                     mComments.add(comment);
@@ -290,7 +324,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
                     Log.d(TAG, "onChildChanged:" + dataSnapshot.getKey());
 
-                    Comment newComment = dataSnapshot.getValue(Comment.class);
+                    CommentOffer newComment = dataSnapshot.getValue(CommentOffer.class);
                     String commentKey = dataSnapshot.getKey();
 
                     int commentIndex = mCommentIds.indexOf(commentKey);
@@ -325,7 +359,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                     // A comment has changed position, use the key to determine if we are
                     // displaying this comment and if so move it.
-                    Comment movedComment = dataSnapshot.getValue(Comment.class);
+                    CommentOffer movedComment = dataSnapshot.getValue(CommentOffer.class);
                     String commentKey = dataSnapshot.getKey();
 
                     // ...
@@ -345,17 +379,28 @@ public class RideOfferDetailActivity extends BaseActivity implements
         @Override
         public CommentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            View view = inflater.inflate(R.layout.item_comment, parent, false);
+            View view = inflater.inflate(R.layout.item_comment_offer, parent, false);
             return new CommentViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(CommentViewHolder holder, int position) {
-            Comment comment = mComments.get(position);
-            holder.authorView.setText(comment.author);
+            final CommentOffer comment = mComments.get(position);
+            final String commentAuthor = comment.author;
+            final String commentFacebookId = comment.facebookId;
+            final String commentAuthorUid = comment.uid;
+
+            holder.authorView.setText(commentAuthor);
 
             String imageUrl = "https://graph.facebook.com/" + comment.facebookId + "/picture?height=150";
             GlideUtil.loadProfileIcon(imageUrl, holder.authorPhotoView);
+
+            holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId);
+                }
+            });
         }
 
         @Override
@@ -367,6 +412,42 @@ public class RideOfferDetailActivity extends BaseActivity implements
             if (mChildEventListener != null) {
                 mDatabaseReference.removeEventListener(mChildEventListener);
             }
+        }
+
+        public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
+                                       final String commentFacebookId){
+            new MaterialDialog.Builder(mContext)
+                    .content("Confirm Sakay? This action is irreversible.")
+                    .positiveText("OK")
+                    .negativeText("CANCEL")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            String sakayKey = mRootRef.child("user-sakays").push().getKey();
+                            newSakay(userId, userAuthorName, userFacebookId, start, destination, dateAndTime,
+                                    vehicle, commentAuthorId, commentAuthor, commentFacebookId,
+                                    sakayKey);
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, start, destination,
+                                    dateAndTime, vehicle, userId, userAuthorName, userFacebookId,
+                                    sakayKey);
+                            Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .show();
+        }
+
+        private void newSakay(String userId, String userName, String userFacebookId, String start,
+                              String destination, String dateAndTime, String vehicle,
+                              String otherId, String otherName, String otherFacebookId,
+                              String sakayKey){
+            //String key = mRootRef.child("user-sakays").push().getKey();
+            Sakay sakay = new Sakay(userId, userName, userFacebookId, start, destination, dateAndTime,
+                    vehicle, otherId, otherName, otherFacebookId);
+            Map<String, Object> sakayValues = sakay.toMap();
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/user-sakays/" + userId + "/" + sakayKey, sakayValues);
+            mRootRef.updateChildren(childUpdates);
         }
     }
 

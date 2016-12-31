@@ -19,7 +19,7 @@
         >
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/comment_author_photo"
+            android:id="@+id/comment_author_photo_offer"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentTop="true"
@@ -29,9 +29,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_toRightOf="@id/comment_author_photo">
+            android:layout_toRightOf="@id/comment_author_photo_offer">
             <TextView
-                android:id="@+id/comment_author"
+                android:id="@+id/comment_author_offer"
                 style="@style/TextAppearance.AppCompat.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,14 +43,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <Button
-                    android:id="@+id/comment_button_view_profile"
+                    android:id="@+id/comment_button_view_profile_offer"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:text="View Profile"
                     android:textColor="@color/colorPrimary"
                     style="@style/Base.Widget.AppCompat.Button.Borderless"/>
                 <Button
-                    android:id="@+id/comment_button_sakay"
+                    android:id="@+id/comment_button_sakay_offer"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:text="Sakay"

@@ -100,7 +100,7 @@
             android:layout_marginLeft="2dp"
             android:layout_marginRight="-16dp"
             android:layout_below="@id/offer_responses_text"
-            tools:listitem="@layout/item_comment" />
+            tools:listitem="@layout/item_comment_offer" />
     </RelativeLayout>
 
 </RelativeLayout>

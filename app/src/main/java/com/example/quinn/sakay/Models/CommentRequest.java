@@ -16,7 +16,7 @@ public class CommentRequest {
     public String vehicle;
 
     public CommentRequest() {
-        // Default constructor required for calls to DataSnapshot.getValue(Comment.class)
+        // Default constructor required for calls to DataSnapshot.getValue(CommentOffer.class)
     }
 
     public CommentRequest(String uid, String author, String facebookId, String vehicle) {
