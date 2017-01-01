@@ -11,7 +11,7 @@
         android:padding="10dp">
 
         <TextView
-            android:id="@+id/sakay_date_view"
+            android:id="@+id/sakay_date_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
@@ -22,7 +22,7 @@
             android:layout_height="1dp"
             android:layout_marginStart="-10dp"
             android:layout_marginEnd="-10dp"
-            android:layout_below="@id/sakay_date_view"/>
+            android:layout_below="@id/sakay_date_time"/>
         <LinearLayout
             android:id="@+id/sakay_with_text"
             android:layout_width="match_parent"
@@ -33,6 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Sakay with "
+                android:textColor="@color/black"
                 android:textSize="18sp"
                 />
             <TextView
@@ -40,39 +41,49 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Username Username"
+                android:textColor="@color/black"
                 android:textSize="18sp"/>
         </LinearLayout>
-        <LinearLayout
+        <TextView
             android:id="@+id/sakay_places"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
-            android:layout_below="@id/sakay_with_text">
-            <TextView
-                android:id="@+id/sakay_starting_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Starting point"
-                android:textSize="15sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" to "
-                android:textSize="15sp"/>
-            <TextView
-                android:id="@+id/sakay_destination"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Destination"
-                android:textSize="15sp"/>
-        </LinearLayout>
+            android:layout_below="@id/sakay_with_text"
+            android:text="From start to destination"/>
+        <!--<LinearLayout-->
+            <!--android:id="@+id/sakay_places"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:paddingTop="8dp"-->
+            <!--android:layout_below="@id/sakay_with_text">-->
+            <!--<TextView-->
+                <!--android:id="@+id/sakay_starting_point"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Starting point"-->
+                <!--android:textSize="15sp"/>-->
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text=" to "-->
+                <!--android:textSize="15sp"/>-->
+            <!--<TextView-->
+                <!--android:id="@+id/sakay_destination"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Destination"-->
+                <!--android:textSize="15sp"/>-->
+        <!--</LinearLayout>-->
         <Button
+            android:id="@+id/sakay_button_view_details"
             android:layout_marginStart="-12dp"
-            android:paddingTop="18dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="-10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/sakay_places"
-            android:text="more detail"
+            android:text="view details"
             android:textColor="@color/colorPrimary"
             style="@style/Base.Widget.AppCompat.Button.Borderless"/>
     </RelativeLayout>

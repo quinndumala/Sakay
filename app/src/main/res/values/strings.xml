@@ -66,6 +66,7 @@
     <string name="ambiguous_location_title">Ambiguous Location</string>
     <string name="ambiguous_location_body">The location you have chosen seems to be ambiguous. Consider selecting a place nearby instead.</string>
     <string name="title_activity_ride_offer_detail">RideOfferDetailActivity</string>
+    <string name="title_activity_sakay_detail">SakayDetailActivity</string>
 
 
 </resources>

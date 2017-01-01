@@ -13,6 +13,7 @@ public class Sakay {
     public String uid;
     public String author;
     public String facebookId;
+    public String role;
     public String start;
     public String destination;
     public String dateAndTime;
@@ -23,8 +24,9 @@ public class Sakay {
 
     public Sakay(){}
 
-    public Sakay(String uid, String author, String facebookId, String start, String destination,
-                 String dateAndTime, String vehicle, String otherUid, String otherAuthor, String otherFacbookId){
+    public Sakay(String uid, String author, String facebookId, String role, String start, String destination,
+                 String dateAndTime, String vehicle, String otherUid, String otherAuthor,
+                 String otherFacbookId){
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
@@ -32,6 +34,7 @@ public class Sakay {
         this.destination = destination;
         this.dateAndTime = dateAndTime;
         this.vehicle = vehicle;
+        this.role = role;
         this.otherUid = otherUid;
         this.otherAuthor = otherAuthor;
         this.otherFacbookId = otherFacbookId;
@@ -43,6 +46,7 @@ public class Sakay {
         result.put("uid", uid);
         result.put("author", author);
         result.put("facebookId", facebookId);
+        result.put("role", role);
         result.put("start", start);
         result.put("destination", destination);
         result.put("dateAndTime", dateAndTime);

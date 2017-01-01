@@ -3,17 +3,20 @@
     android:id="@+id/fragment_sakays_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.quinn.sakay.SakaysFragment">
+    tools:context="com.example.quinn.sakay.SakaysFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/sakays_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Sakays" />
+        android:layout_alignParentTop="true"
+        android:clipToPadding="false"
+        android:padding="5dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/item_sakay"
+        />
+
 
 
 </android.support.design.widget.CoordinatorLayout>

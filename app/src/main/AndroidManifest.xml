@@ -104,6 +104,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />
         </activity>
+        <activity
+            android:name=".SakayDetailActivity"
+            android:label="@string/title_activity_sakay_detail"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

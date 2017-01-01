@@ -454,24 +454,24 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             String sakayKey = mRootRef.child("user-sakays").push().getKey();
-                            newSakay(userId, userAuthorName, userFacebookId, start, destination, dateAndTime,
-                                    commentVehicle, commentAuthorId, commentAuthor, commentFacebookId,
+                            newSakay(userId, userAuthorName, userFacebookId, "rider", start, destination,
+                                    dateAndTime, commentVehicle, commentAuthorId, commentAuthor, commentFacebookId,
                                     sakayKey);
-                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, start, destination,
-                                    dateAndTime, commentVehicle, userId, userAuthorName, userFacebookId,
-                                    sakayKey);
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "driver", start,
+                                    destination, dateAndTime, commentVehicle, userId, userAuthorName,
+                                    userFacebookId, sakayKey);
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .show();
         }
 
-        private void newSakay(String userId, String userName, String userFacebookId, String start,
-                              String destination, String dateAndTime, String vehicle,
+        private void newSakay(String userId, String userName, String userFacebookId, String userRole,
+                              String start, String destination, String dateAndTime, String vehicle,
                               String otherId, String otherName, String otherFacebookId,
                               String sakayKey){
             //String key = mRootRef.child("user-sakays").push().getKey();
-            Sakay sakay = new Sakay(userId, userName, userFacebookId, start, destination, dateAndTime,
+            Sakay sakay = new Sakay(userId, userName, userFacebookId, userRole, start, destination, dateAndTime,
                     vehicle, otherId, otherName, otherFacebookId);
             Map<String, Object> sakayValues = sakay.toMap();
 
