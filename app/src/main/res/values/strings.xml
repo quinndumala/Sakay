@@ -67,6 +67,13 @@
     <string name="ambiguous_location_body">The location you have chosen seems to be ambiguous. Consider selecting a place nearby instead.</string>
     <string name="title_activity_ride_offer_detail">RideOfferDetailActivity</string>
     <string name="title_activity_sakay_detail">SakayDetailActivity</string>
+    <string name="choose_on_map_text">Choose on Map</string>
+
+    <string-array name="offer_select_pickup_location">
+        <item>Choose on Map</item>
+    </string-array>
+    <string name="title_activity_notifications">Notifications</string>
+    <string name="title_activity_settings">Settings</string>
 
 
 </resources>

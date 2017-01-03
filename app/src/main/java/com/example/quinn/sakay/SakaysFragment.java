@@ -1,6 +1,7 @@
 package com.example.quinn.sakay;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.quinn.sakay.Models.Sakay;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -85,11 +85,13 @@ public class SakaysFragment extends Fragment
             protected void populateViewHolder(final SakaysViewHolder viewHolder, final Sakay model,
                                               final int position) {
                 final DatabaseReference postRef = getRef(position);
-
+                final String postKey = postRef.getKey();
                 viewHolder.bindToPost(model, new View.OnClickListener() {
                     @Override
                     public void onClick(View starView) {
-                        Toast.makeText(getActivity(), "Pressed sakay with date: ..", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), SakayDetailActivity.class);
+                        intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
                     }
                 });
 

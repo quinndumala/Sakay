@@ -13,94 +13,122 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        style="@style/NoPaddingBottom"
         >
 
-        <include
-            android:id="@+id/ride_offer_author_layout"
-            layout="@layout/include_post_author_large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true" />
-
-        <Space
-            android:id="@+id/offer_detail_space"
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            android:layout_below="@id/ride_offer_author_layout"/>
-
-        <include
-            android:id="@+id/ride_offer_text_layout"
-            layout="@layout/include_ride_offer_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/offer_detail_space"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp" />
-
-        <LinearLayout
-            android:id="@+id/offer_detail_buttons"
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@+id/ride_offer_text_layout"
-            android:layout_marginTop="20dp"
-            android:weightSum="1.0">
+            android:id="@+id/offer_detail_view"
+            android:layout_marginBottom="10dp">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/NoPaddingBottom">
+                <include
+                    android:id="@+id/ride_offer_author_layout"
+                    layout="@layout/include_post_author_large"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true" />
 
-            <Button
-                android:id="@+id/button_see_route_offer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:text="See in map" />
+                <Space
+                    android:id="@+id/offer_detail_space"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_below="@id/ride_offer_author_layout"/>
 
-            <Button
-                android:id="@+id/button_sakay_offer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:visibility="gone"
-                android:text="Request to sakay"/>
-        </LinearLayout>
+                <include
+                    android:id="@+id/ride_offer_text_layout"
+                    layout="@layout/include_ride_offer_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/offer_detail_space"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="10dp" />
 
-        <Space
-            android:id="@+id/offer_detail_space_view"
+                <LinearLayout
+                    android:id="@+id/offer_detail_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_below="@+id/ride_offer_text_layout"
+                    android:layout_marginTop="20dp"
+                    android:weightSum="1.0">
+
+                    <Button
+                        android:id="@+id/button_see_route_offer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="1dp"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:text="See in map" />
+
+                    <Button
+                        android:id="@+id/button_sakay_offer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.Button.Colored"
+                        android:visibility="gone"
+                        android:text="Request to sakay"/>
+                </LinearLayout>
+                <Space
+                    android:id="@+id/offer_detail_space_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:layout_below="@id/offer_detail_buttons"/>
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
-            android:layout_below="@id/offer_detail_buttons"/>
-
-        <include
-            layout="@layout/include_responses_text"
-            android:id="@+id/offer_responses_text"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/offer_detail_space_view"
-            android:layout_marginLeft="-16dp"
-            android:layout_marginRight="-16dp"
-            android:visibility="gone" />
+            android:id="@+id/offer_responses_text_view"
+            android:layout_below="@id/offer_detail_view"
+            android:visibility="gone">
+            <TextView
+                android:paddingLeft="20dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Responses"
+                android:textSize="@dimen/ampm_label_size"/>
+        </android.support.v7.widget.CardView>
 
         <TextView
-            android:id="@+id/no_responses_yet_text_offer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/no_responses_text_view_offer"
             android:paddingTop="16dp"
-            android:paddingBottom="12dp"
-            android:paddingLeft="6dp"
-            android:layout_below="@id/offer_detail_space_view"
+            android:paddingBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_below="@id/offer_detail_view"
             android:text="No responses yet"
             android:textSize="@dimen/ampm_label_size"
             android:visibility="gone"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_offer_comment"
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="-16dp"
-            android:layout_below="@id/offer_responses_text"
-            tools:listitem="@layout/item_comment_offer" />
+            android:layout_height="wrap_content"
+            android:id="@+id/responses_view_offer"
+            android:layout_below="@id/offer_responses_text_view"
+            android:visibility="gone">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_offer_comment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="36dp"
+                android:layout_marginLeft="-16dp"
+                android:layout_marginRight="-16dp"
+                android:layout_below="@id/offer_responses_text_view"
+                tools:listitem="@layout/item_comment_offer" />
+        </android.support.v7.widget.CardView>
+
+
     </RelativeLayout>
 
 </RelativeLayout>

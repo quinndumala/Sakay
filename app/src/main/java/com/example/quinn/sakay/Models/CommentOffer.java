@@ -29,15 +29,17 @@ public class CommentOffer {
     public String uid;
     public String author;
     public String facebookId;
+    public String pickUp;
 
     public CommentOffer() {
         // Default constructor required for calls to DataSnapshot.getValue(CommentOffer.class)
     }
 
-    public CommentOffer(String uid, String author, String facebookId) {
+    public CommentOffer(String uid, String author, String facebookId, String pickUp) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
+        this.pickUp = pickUp;
     }
 
     @Exclude
@@ -46,6 +48,7 @@ public class CommentOffer {
         result.put("uid", uid);
         result.put("author", author);
         result.put("facebookId", facebookId);
+        result.put("pickUp", pickUp);
 
         return result;
     }

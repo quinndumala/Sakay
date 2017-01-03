@@ -16,6 +16,7 @@ public class SakaysViewHolder extends RecyclerView.ViewHolder {
     public TextView sakayWithView;
 //    public TextView startView;
 //    public TextView destinationView;
+    public String sakayWithString;
     public String placesString;
     public TextView placesView;
     public Button viewDetails;
@@ -33,9 +34,8 @@ public class SakaysViewHolder extends RecyclerView.ViewHolder {
 
     public void bindToPost(Sakay sakay, View.OnClickListener detailClickListener){
         dateAndTimeView.setText(sakay.dateAndTime);
-        sakayWithView.setText(sakay.otherAuthor);
-//        startView.setText(sakay.start);
-//        destinationView.setText(sakay.destination);
+        sakayWithString = "Sakay with " + sakay.otherAuthor;
+        sakayWithView.setText(sakayWithString);
         placesString = sakay.start + " to " + sakay.destination;
         placesView.setText(placesString);
 

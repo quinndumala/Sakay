@@ -3,6 +3,7 @@ package com.example.quinn.sakay;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -56,10 +57,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
-    private ViewGroup responsesTextView;
-    private TextView noResponsesYetTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
+
+    private CardView responsesTextView;
+    private TextView noResponsesYetTextView;
+    private CardView responsesView;
 
     private String userFacebookId = "";
     public Boolean isAuthor = true;
@@ -105,10 +108,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
         startView = (TextView) findViewById(R.id.request_start_view);
         destinationView = (TextView) findViewById(R.id.request_destination_view);
         dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
-        responsesTextView = (ViewGroup) findViewById(R.id.request_responses_text);
+
+        responsesTextView = (CardView) findViewById(R.id.request_responses_text_view);
+        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_text_view_request);
+        responsesView = (CardView) findViewById(R.id.responses_view_request);
+
         sakayButton = (Button) findViewById(R.id.button_sakay_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
-        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_request);
         userFacebookId = profile.getId();
         noResponses();
 
@@ -140,8 +146,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
                 if (!(rideRequest.uid.equals(userId))){
                     isAuthor = false;
-                    sakaysViewRecycler.setVisibility(View.GONE);
-                    responsesTextView.setVisibility(View.GONE);
                     sakayButton.setVisibility(View.VISIBLE);
                 }
                 // [START_EXCLUDE]
@@ -241,6 +245,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren() && isAuthor){
                     responsesTextView.setVisibility(View.VISIBLE);
+                    responsesView.setVisibility(View.VISIBLE);
                 } else {
                     if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE);}
                 }

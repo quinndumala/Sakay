@@ -18,6 +18,14 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.White" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/midGray</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
+
     <style name="horizontal_divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
@@ -64,7 +72,7 @@
     <style name="WelcomeScreenHeaderTextStyle">
         <item name="android:textSize">42sp</item>
         <item name="android:textColor">@color/lightGray</item>
-
+        <item name="android:textStyle"></item>
         <item name="android:layout_marginTop">7dp</item>
         <item name="android:layout_marginBottom">60dp</item>
     </style>
@@ -101,6 +109,11 @@
     <style name="NegativeMargins">
         <item name="android:layout_marginLeft">-16dp</item>
         <item name="android:layout_marginRight">-16dp</item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+        <item name="colorPrimaryDark">@color/midGray</item>
     </style>
 
 

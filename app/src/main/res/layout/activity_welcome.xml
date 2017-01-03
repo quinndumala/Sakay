@@ -25,20 +25,21 @@
             <!--android:textAlignment="center"-->
             <!--android:text="Welcome \nto Sakay"-->
             <!--style="@style/WelcomeScreenHeaderTextStyle"/>-->
+
         <ImageView
-            android:layout_width="170dp"
-            android:layout_height="170dp"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_app_icon"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:text="Sakay"
-            style="@style/WelcomeScreenHeaderTextStyle"/>
+            android:src="@drawable/ic_launch_screen_bitmap"/>
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textAlignment="center"-->
+            <!--android:text="Sakay"-->
+            <!--style="@style/WelcomeScreenHeaderTextStyle"/>-->
         <Space
             android:layout_width="1dp"
-            android:layout_height="20dp" />
+            android:layout_height="95dp" />
         <com.facebook.login.widget.LoginButton
             android:id="@+id/sign_in_button_facebook"
             android:layout_width="230dp"

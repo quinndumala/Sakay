@@ -4,8 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
 
     <View style="@style/horizontal_divider"
         android:layout_height="1dp" />
@@ -14,8 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingTop="12dp"
-        >
+        android:paddingTop="12dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comment_author_photo_request"
@@ -53,8 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/comment_request_text_request"
-            android:layout_marginStart="36dp"
-            >
+            android:layout_marginStart="36dp">
             <Button
                 android:id="@+id/comment_button_view_profile_request"
                 android:layout_width="wrap_content"

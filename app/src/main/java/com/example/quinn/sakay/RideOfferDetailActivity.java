@@ -1,8 +1,11 @@
 package com.example.quinn.sakay;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +24,11 @@ import com.example.quinn.sakay.Models.CommentOffer;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,6 +51,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private static final String TAG = "RideOfferDetail";
 
     public static final String EXTRA_POST_KEY = "post_key";
+    private static final int REQUEST_PLACE_PICKER = 1;
 
     private DatabaseReference mRootRef;
     private DatabaseReference mPostReference;
@@ -57,10 +66,14 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private TextView destinationView;
     private TextView dateAndTimeView;
     private TextView vehicleView;
-    private ViewGroup responsesTextView;
-    private TextView noResponsesYetTextView;
+//    private ViewGroup responsesTextView;
+    //private TextView noResponsesYetTextView;
     private Button sakayButton;
     private RecyclerView sakaysViewRecycler;
+
+    private CardView responsesTextView;
+    private TextView noResponsesYetTextView;
+    private CardView responsesView;
 
     private String userFacebookId = "";
     public Boolean isAuthor = true;
@@ -100,8 +113,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
         destinationView = (TextView) findViewById(R.id.offer_destination_view);
         vehicleView = (TextView) findViewById(R.id.offer_vehicle_view);
         dateAndTimeView = (TextView) findViewById(R.id.offer_dateAndTime_view);
-        responsesTextView = (ViewGroup) findViewById(R.id.offer_responses_text);
-        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_yet_text_offer);
+
+        responsesTextView = (CardView) findViewById(R.id.offer_responses_text_view);
+        noResponsesYetTextView = (TextView) findViewById(R.id.no_responses_text_view_offer);
+        responsesView = (CardView) findViewById(R.id.responses_view_offer);
+
         sakayButton = (Button) findViewById(R.id.button_sakay_offer);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_offer_comment);
 
@@ -136,8 +152,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
                 if (!(rideOffer.uid.equals(userId))){
                     isAuthor = false;
-                    sakaysViewRecycler.setVisibility(View.GONE);
-                    responsesTextView.setVisibility(View.GONE);
+//                    sakaysViewRecycler.setVisibility(View.GONE);
+//                    responsesTextView.setVisibility(View.GONE);
                     sakayButton.setVisibility(View.VISIBLE);
                 }
                 // [START_EXCLUDE]
@@ -221,7 +237,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 if (dataSnapshot.hasChild(userId)){
                     launchAlreadySentDialog();
                 } else {
-                    launchSakayDialog();
+                    launchPickupLocationPicker();
+                    //launchSakayDialog();
                 }
             }
 
@@ -238,6 +255,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren() && isAuthor){
                     responsesTextView.setVisibility(View.VISIBLE);
+                    responsesView.setVisibility(View.VISIBLE);
                 } else {
                     if (isAuthor){
                         noResponsesYetTextView.setVisibility(View.VISIBLE);
@@ -252,7 +270,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         });
     }
 
-    private void postComment() {
+    private void postComment(final String location) {
         final String uid = getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -262,7 +280,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-                        CommentOffer comment = new CommentOffer(uid, authorName, userFacebookId);
+                        CommentOffer comment = new CommentOffer(uid, authorName, userFacebookId, location);
 
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
@@ -283,6 +301,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView authorView;
+        public TextView pickUpView;
         public CircleImageView authorPhotoView;
         public Button buttonViewProfile;
         public Button buttonSakay;
@@ -290,6 +309,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         public CommentViewHolder(View itemView) {
             super(itemView);
             authorView = (TextView) itemView.findViewById(R.id.comment_author_offer);
+            pickUpView = (TextView) itemView.findViewById(R.id.comment_pickup_offer);
             authorPhotoView = (CircleImageView) itemView.findViewById(R.id.comment_author_photo_offer);
             buttonSakay = (Button) itemView.findViewById(R.id.comment_button_sakay_offer);
             buttonViewProfile = (Button) itemView.findViewById(R.id.comment_button_view_profile_offer);
@@ -387,18 +407,19 @@ public class RideOfferDetailActivity extends BaseActivity implements
         public void onBindViewHolder(CommentViewHolder holder, int position) {
             final CommentOffer comment = mComments.get(position);
             final String commentAuthor = comment.author;
+            final String commentPickup = comment.pickUp;
             final String commentFacebookId = comment.facebookId;
             final String commentAuthorUid = comment.uid;
 
             holder.authorView.setText(commentAuthor);
-
+            holder.pickUpView.setText(commentPickup);
             String imageUrl = "https://graph.facebook.com/" + comment.facebookId + "/picture?height=150";
             GlideUtil.loadProfileIcon(imageUrl, holder.authorPhotoView);
 
             holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId);
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentPickup);
                 }
             });
         }
@@ -415,7 +436,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         }
 
         public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
-                                       final String commentFacebookId){
+                                       final String commentFacebookId, final String commentPickup){
             new MaterialDialog.Builder(mContext)
                     .content("Confirm Sakay? This action is irreversible.")
                     .positiveText("OK")
@@ -424,10 +445,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             String sakayKey = mRootRef.child("user-sakays").push().getKey();
-                            newSakay(userId, userAuthorName, userFacebookId, "driver", start, destination,
-                                    dateAndTime, vehicle, commentAuthorId, commentAuthor, commentFacebookId,
+                            newSakay(userId, userAuthorName, userFacebookId, "driver", commentPickup,
+                                    destination, dateAndTime, vehicle, commentAuthorId, commentAuthor,
+                                    commentFacebookId,
                                     sakayKey);
-                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "rider", start,
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "rider", commentPickup,
                                     destination, dateAndTime, vehicle, userId, userAuthorName, userFacebookId,
                                     sakayKey);
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
@@ -456,16 +478,16 @@ public class RideOfferDetailActivity extends BaseActivity implements
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
     }
 
-    public void launchSakayDialog(){
+    public void launchSakayDialog(final String location){
         new MaterialDialog.Builder(this)
-                .content("Sakay this ride?")
+                .content("Pickup location has been set to " + location + ". Send sakay request?")
                 .positiveText("OK")
                 .negativeText("CANCEL")
                 .cancelable(false)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        postComment();
+                        postComment(location);
                         Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -478,5 +500,104 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .content("Sakay request already sent")
                 .positiveText("OK")
                 .show();
+    }
+
+    public void launchPickupLocationPicker(){
+        new MaterialDialog.Builder(this)
+                .title("Choose a pickup location")
+                .items(R.array.offer_select_pickup_location)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        if(text.equals("Choose on Map")){
+                            launchPlacePicker();
+                        }
+                    }
+                })
+                .positiveText("cancel")
+                .show();
+
+    }
+
+    public void launchAlertDialog(){
+        MaterialDialog alertDialog = new MaterialDialog.Builder(this)
+                .title(R.string.ambiguous_location_title)
+                .content(R.string.ambiguous_location_body)
+                .positiveText("OK")
+                .cancelable(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        launchPlacePicker();
+                    }
+                })
+                .show();
+    }
+
+    public void launchPlacePicker(){
+        try {
+            PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+            Intent intent = intentBuilder.build(this);
+
+            startActivityForResult(intent, REQUEST_PLACE_PICKER);
+
+        } catch (GooglePlayServicesRepairableException e) {
+            GooglePlayServicesUtil
+                    .getErrorDialog(e.getConnectionStatusCode(), this, 0);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, "Google Play Services is not available.",
+                    Toast.LENGTH_LONG)
+                    .show();
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PLACE_PICKER) {
+            if (resultCode == Activity.RESULT_OK) {
+                /* User has picked a place, extract data.
+                   Data is extracted from the returned intent by retrieving a Place object from
+                   the PlacePicker.
+                 */
+                final Place place = PlacePicker.getPlace(data, this);
+
+                /* A Place object contains details about that place, such as its name, address
+                and phone number. Extract the name, address, phone number, place ID and place types.
+                 */
+                final CharSequence name = place.getName();
+                final CharSequence address = place.getAddress();
+                final CharSequence phone = place.getPhoneNumber();
+                final String placeId = place.getId();
+                String attribution = PlacePicker.getAttributions(data);
+                if(attribution == null){
+                    attribution = "";
+                }
+
+                String location = name.toString();
+                if (location.contains("°")){
+                    location = address.toString();
+                    launchAlertDialog();
+                } else {
+                    launchSakayDialog(location);
+                    //Toast.makeText(this, "Chosen Location: " + location, Toast.LENGTH_SHORT).show();
+                }
+
+//                // Update data on card.
+//                getCardStream().getCard(CARD_DETAIL)
+//                        .setTitle(name.toString())
+//                        .setDescription(getString(R.string.detail_text, placeId, address, phone,
+//                                attribution));
+
+                Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
+
+            } else {
+                // User has not selected a place, hide the card.
+                //fStart.setText(R.string.select_location);
+            }
+
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }
