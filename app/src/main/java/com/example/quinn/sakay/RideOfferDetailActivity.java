@@ -133,6 +133,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         sakayButton.setOnClickListener(this);
         buttonDelete.setOnClickListener(this);
+        authorPhotoView.setOnClickListener(this);
+        authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -251,7 +253,14 @@ public class RideOfferDetailActivity extends BaseActivity implements
         } else if (id == R.id.button_offer_detail_delete) {
             Log.d(TAG, "delete clicked");
             launchConfirmDelete();
+        } else if (id == R.id.post_author_photo_large){
+            Intent intent = new Intent(this, ViewProfileActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.post_author_large){
+            Intent intent = new Intent(this, ViewProfileActivity.class);
+            startActivity(intent);
         }
+
     }
 
     public void alreadyExists(){
