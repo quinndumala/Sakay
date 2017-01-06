@@ -178,45 +178,6 @@ public class RideOffersFragment extends Fragment
         return recentPostsQuery;
     }
 
-//    public boolean isEmpty(DataSnapshot dataSnapshot){
-//
-//    }
-
-//    // [START post_stars_transaction]
-//    private void onStarClicked(DatabaseReference postRef) {
-//        postRef.runTransaction(new Transaction.Handler() {
-//            @Override
-//            public Transaction.Result doTransaction(MutableData mutableData) {
-//                RideOffer r = mutableData.getValue(RideOffer.class);
-//                if (r == null) {
-//                    return Transaction.success(mutableData);
-//                }
-//
-//                if (r.stars.containsKey(getUid())) {
-//                    // Unstar the post and remove self from stars
-//                    r.starCount = r.starCount - 1;
-//                    r.stars.remove(getUid());
-//                } else {
-//                    // Star the post and add self to stars
-//                    r.starCount = r.starCount + 1;
-//                    r.stars.put(getUid(), true);
-//                }
-//
-//                // Set value and report transaction success
-//                mutableData.setValue(r);
-//                return Transaction.success(mutableData);
-//            }
-//
-//            @Override
-//            public void onComplete(DatabaseError databaseError, boolean b,
-//                                   DataSnapshot dataSnapshot) {
-//                // Transaction completed
-//                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
-//            }
-//        });
-//    }
-    // [END post_stars_transaction]
-
     public void onResume(){
         super.onResume();
 

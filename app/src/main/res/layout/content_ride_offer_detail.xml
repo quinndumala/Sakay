@@ -25,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 style="@style/NoPaddingBottom">
+
                 <include
                     android:id="@+id/ride_offer_author_layout"
                     layout="@layout/include_post_author_large"
@@ -32,21 +33,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true" />
 
-                <Space
-                    android:id="@+id/offer_detail_space"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_below="@id/ride_offer_author_layout"/>
-
                 <include
                     android:id="@+id/ride_offer_text_layout"
                     layout="@layout/include_ride_offer_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/offer_detail_space"
+                    android:layout_below="@id/ride_offer_author_layout"
                     android:layout_marginLeft="5dp"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="18dp" />
 
                 <LinearLayout
                     android:id="@+id/offer_detail_buttons"
@@ -78,6 +73,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:layout_below="@id/offer_detail_buttons"/>
+
+                <ImageView
+                    android:id="@+id/button_offer_detail_delete"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_delete"
+                    android:layout_alignParentRight="true"
+                    android:focusable="true"
+                    android:visibility="gone"/>
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 

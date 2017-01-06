@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,7 +55,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private static final int REQUEST_PLACE_PICKER = 1;
 
     private DatabaseReference mRootRef;
+    private DatabaseReference mRideOffersRef;
     private DatabaseReference mPostReference;
+    private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
     private ValueEventListener mPostListener;
     private String mPostKey;
@@ -62,6 +65,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     private TextView authorView;
     private CircleImageView authorPhotoView;
+    private ImageView buttonDelete;
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
@@ -103,12 +107,15 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
+        mRideOffersRef = mRootRef.child("rideOffers");
         mPostReference = mRootRef.child("rideOffers").child(mPostKey);
+        mUserPostReference = mRootRef.child("user-rideOffers").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideOffers-comments").child(mPostKey);
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
         authorPhotoView = (CircleImageView) findViewById(R.id.post_author_photo_large);
+        buttonDelete = (ImageView) findViewById(R.id.button_offer_detail_delete);
         startView = (TextView) findViewById(R.id.offer_start_view);
         destinationView = (TextView) findViewById(R.id.offer_destination_view);
         vehicleView = (TextView) findViewById(R.id.offer_vehicle_view);
@@ -125,6 +132,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         noResponses();
 
         sakayButton.setOnClickListener(this);
+        buttonDelete.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -145,25 +153,35 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         // Add value event listener to the post
         // [START post_value_event_listener]
+
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
-                if (!(rideOffer.uid.equals(userId))){
-                    isAuthor = false;
-//                    sakaysViewRecycler.setVisibility(View.GONE);
-//                    responsesTextView.setVisibility(View.GONE);
-                    sakayButton.setVisibility(View.VISIBLE);
+                if (dataSnapshot.exists()) {
+                    // Get Post object and use the values to update the UI
+                    RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+                    if (!(rideOffer.uid.equals(userId))){
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    } else {
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    }
+                    // [START_EXCLUDE]
+                    setPhoto(rideOffer.facebookId);
+                    authorView.setText(rideOffer.author);
+                    startView.setText(rideOffer.start);
+                    destinationView.setText(rideOffer.destination);
+                    vehicleView.setText(rideOffer.vehicle);
+                    dateAndTimeView.setText(rideOffer.dateAndTime);
+                    // [END_EXCLUDE]
+
+                    userAuthorName = rideOffer.author;
+                    start = rideOffer.start;
+                    destination = rideOffer.destination;
+                    dateAndTime = rideOffer.dateAndTime;
+                    vehicle = rideOffer.vehicle;
                 }
-                // [START_EXCLUDE]
-                setPhoto(rideOffer.facebookId);
-                authorView.setText(rideOffer.author);
-                startView.setText(rideOffer.start);
-                destinationView.setText(rideOffer.destination);
-                vehicleView.setText(rideOffer.vehicle);
-                dateAndTimeView.setText(rideOffer.dateAndTime);
-                // [END_EXCLUDE]
+
 
                 mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -177,15 +195,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        finish();
                     }
                 });
 
-                userAuthorName = rideOffer.author;
-                start = rideOffer.start;
-                destination = rideOffer.destination;
-                dateAndTime = rideOffer.dateAndTime;
-                vehicle = rideOffer.vehicle;
+
             }
 
             @Override
@@ -197,6 +211,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 // [END_EXCLUDE]
             }
         };
+
         mPostReference.addValueEventListener(postListener);
         // [END post_value_event_listener]
 
@@ -206,6 +221,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
         // Listen for comments
         mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
+
+
     }
 
     @Override
@@ -227,6 +244,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         if (id == R.id.button_sakay_offer) {
             alreadyExists();
+        } else if (id == R.id.button_offer_detail_delete) {
+            Log.d(TAG, "delete clicked");
+            launchConfirmDelete();
         }
     }
 
@@ -268,6 +288,17 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
             }
         });
+    }
+
+    public void deletePost(){
+
+//        mPostReference.setValue(null);
+
+        finish();
+        mUserPostReference.removeValue();
+        mPostReference.removeValue();
+        Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
+        //DeletePost.DeleteThis(mPostReference, mUserPostReference);
     }
 
     private void postComment(final String location) {
@@ -529,6 +560,20 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         launchPlacePicker();
+                    }
+                })
+                .show();
+    }
+
+    public void launchConfirmDelete(){
+        new MaterialDialog.Builder(this)
+                .content("Do you want to delete this ride offer?")
+                .positiveText("OK")
+                .negativeText("Cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        deletePost();
                     }
                 })
                 .show();

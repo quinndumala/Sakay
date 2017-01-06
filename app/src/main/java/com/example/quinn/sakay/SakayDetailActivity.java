@@ -82,7 +82,7 @@ public class SakayDetailActivity extends BaseActivity implements
 
 
         userFacebookId = profile.getId();
-
+        trackLocationButton.setOnClickListener(this);
 
     }
 
