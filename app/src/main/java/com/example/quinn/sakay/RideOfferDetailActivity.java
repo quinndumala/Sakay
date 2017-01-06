@@ -55,7 +55,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private static final int REQUEST_PLACE_PICKER = 1;
 
     private DatabaseReference mRootRef;
-    private DatabaseReference mRideOffersRef;
     private DatabaseReference mPostReference;
     private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
@@ -81,6 +80,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     private String userFacebookId = "";
     public Boolean isAuthor = true;
+    public Boolean rideExists = false;
     private Profile profile = getCurrentProfile();
 
     private final String userId = getUid();
@@ -89,6 +89,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private String destination;
     private String dateAndTime;
     private String vehicle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +108,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
-        mRideOffersRef = mRootRef.child("rideOffers");
         mPostReference = mRootRef.child("rideOffers").child(mPostKey);
         mUserPostReference = mRootRef.child("user-rideOffers").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideOffers-comments").child(mPostKey);
@@ -180,6 +180,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     destination = rideOffer.destination;
                     dateAndTime = rideOffer.dateAndTime;
                     vehicle = rideOffer.vehicle;
+
+
+                    rideExists = true;
                 }
 
 
@@ -188,8 +191,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(userId)){
                             sakayButton.setText("\u2713" + " Sakay request sent");
-                        } else {
-                            //launchSakayDialog();
                         }
                     }
 
@@ -219,6 +220,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mPostListener = postListener;
 
         // Listen for comments
+//        if (rideExists){
+//            mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
+//        }
         mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
 
@@ -291,9 +295,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
     }
 
     public void deletePost(){
-
-//        mPostReference.setValue(null);
-
         finish();
         mUserPostReference.removeValue();
         mPostReference.removeValue();

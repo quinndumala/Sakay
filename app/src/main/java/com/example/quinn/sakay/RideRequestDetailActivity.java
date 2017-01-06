@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +48,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
     private DatabaseReference mRootRef;
     private DatabaseReference mPostReference;
+    private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
     private ValueEventListener mPostListener;
     private String mPostKey;
@@ -54,6 +56,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
     private TextView authorView;
     private CircleImageView authorPhotoView;
+    private ImageView buttonDelete;
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
@@ -100,11 +103,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
         // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mPostReference = mRootRef.child("rideRequests").child(mPostKey);
+        mUserPostReference = mRootRef.child("user-rideRequests").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideRequests-comments").child(mPostKey);
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
         authorPhotoView = (CircleImageView) findViewById(R.id.post_author_photo_large);
+        buttonDelete = (ImageView) findViewById(R.id.button_request_detail_delete);
         startView = (TextView) findViewById(R.id.request_start_view);
         destinationView = (TextView) findViewById(R.id.request_destination_view);
         dateAndTimeView = (TextView) findViewById(R.id.request_dateAndTime_view);
@@ -119,6 +124,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         noResponses();
 
         sakayButton.setOnClickListener(this);
+        buttonDelete.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -142,27 +148,33 @@ public class RideRequestDetailActivity extends BaseActivity implements
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
-                if (!(rideRequest.uid.equals(userId))){
-                    isAuthor = false;
-                    sakayButton.setVisibility(View.VISIBLE);
+                if (dataSnapshot.exists()) {
+                    RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+                    if (!(rideRequest.uid.equals(userId))){
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    } else {
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    }
+                    // [START_EXCLUDE]
+                    setPhoto(rideRequest.facebookId);
+                    authorView.setText(rideRequest.author);
+                    startView.setText(rideRequest.start);
+                    destinationView.setText(rideRequest.destination);
+                    dateAndTimeView.setText(rideRequest.dateAndTime);
+                    // [END_EXCLUDE]
+
+                    userAuthorName = rideRequest.author;
+                    start = rideRequest.start;
+                    destination = rideRequest.destination;
+                    dateAndTime = rideRequest.dateAndTime;
                 }
-                // [START_EXCLUDE]
-                setPhoto(rideRequest.facebookId);
-                authorView.setText(rideRequest.author);
-                startView.setText(rideRequest.start);
-                destinationView.setText(rideRequest.destination);
-                dateAndTimeView.setText(rideRequest.dateAndTime);
-                // [END_EXCLUDE]
 
                 mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(userId)){
                             sakayButton.setText("\u2713" + " Sakay request sent");
-                        } else {
-                            //launchSakayDialog();
                         }
                     }
 
@@ -172,10 +184,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     }
                 });
 
-                userAuthorName = rideRequest.author;
-                start = rideRequest.start;
-                destination = rideRequest.destination;
-                dateAndTime = rideRequest.dateAndTime;
             }
 
             @Override
@@ -218,6 +226,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         if (id == R.id.button_sakay_request) {
             alreadyExists();
+        } else if (id == R.id.button_request_detail_delete){
+            launchConfirmDelete();
         }
     }
 
@@ -256,6 +266,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
             }
         });
+    }
+
+    public void deletePost(){
+        finish();
+        mUserPostReference.removeValue();
+        mPostReference.removeValue();
+        Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
     }
 
     private void postComment(final String vehicle) {
@@ -527,6 +544,20 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                 Toast.LENGTH_SHORT).show();
                     }
                 }).show();
+    }
+
+    public void launchConfirmDelete(){
+        new MaterialDialog.Builder(this)
+                .content("Do you want to delete this ride request?")
+                .positiveText("OK")
+                .negativeText("Cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        deletePost();
+                    }
+                })
+                .show();
     }
 
 
