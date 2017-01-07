@@ -8,37 +8,55 @@
     tools:context="com.example.quinn.sakay.ViewProfileActivity"
     tools:showIn="@layout/activity_view_profile">
 
+
+
     <!--<TextView-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_margin="@dimen/text_margin"-->
         <!--android:text="@string/large_text" />-->
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/view_proflie_ratings"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginBottom="16dp" >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
                 <TextView
+                    android:id="@+id/view_profile_rating_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="User Rating"
-                    android:layout_margin="10dp"
+                    android:text="No ratings yet"
+                    android:layout_marginTop="16dp"
                     android:textSize="15sp"/>
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/view_profile_rating_number"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="4"
-                    android:textSize="15sp"/>
+                    android:gravity="center"
+                    android:text="0.0"
+                    android:textSize="25sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="3dp"/>
+                <ImageView
+                    android:id="@+id/view_profile_rating_stars"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ratings_none"
+                    android:layout_marginBottom="16dp"/>
+
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
@@ -67,27 +85,58 @@
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"/>
                     <TextView
+                        android:id="@+id/view_profile_phone_num_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="2dp"
                         android:text="0123456789"
-                        android:textSize="20dp"
+                        android:textSize="19sp"
                         android:textColor="@color/black"/>
                 </LinearLayout>
+
                 <View style="@style/horizontal_divider"
-                    android:id="@+id/view_profile_divider"
+                    android:id="@+id/view_profile_mobile_divider"
                     android:layout_height="1dp"
                     android:layout_marginTop="8dp"
                     android:layout_below="@id/view_profile_phone_num"/>
+
+                <LinearLayout
+                    android:id="@+id/view_profile_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/view_profile_mobile_divider"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textSize="15sp"
+                        android:layout_marginTop="10dp"/>
+                    <TextView
+                        android:id="@+id/view_profile_email_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="email@address.com"
+                        android:textSize="19sp"
+                        android:textColor="@color/black"/>
+
+                </LinearLayout>
+
+                <View style="@style/horizontal_divider"
+                    android:id="@+id/view_profile_facebook_divider"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/view_profile_email"/>
 
                 <LinearLayout
                     android:id="@+id/view_profile_facebook"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_below="@id/view_profile_divider"
+                    android:layout_below="@id/view_profile_facebook_divider"
                     android:layout_marginStart="16dp"
-                    android:layout_marginBottom="10dp">
+                    android:layout_marginBottom="16dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -95,11 +144,11 @@
                         android:textSize="15sp"
                         android:layout_marginTop="10dp"/>
                     <TextView
+                        android:id="@+id/view_profile_facebook_name_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingTop="2dp"
                         android:text="Facebook Name"
-                        android:textSize="20dp"
+                        android:textSize="19sp"
                         android:textColor="@color/black"/>
                 </LinearLayout>
             </RelativeLayout>

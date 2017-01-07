@@ -84,7 +84,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private Profile profile = getCurrentProfile();
 
     private final String userId = getUid();
+    private String userAuthorId;
     private String userAuthorName;
+    private String userAuthorFacebookId;
     private String start;
     private String destination;
     private String dateAndTime;
@@ -177,7 +179,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     dateAndTimeView.setText(rideOffer.dateAndTime);
                     // [END_EXCLUDE]
 
+                    userAuthorId = rideOffer.uid;
                     userAuthorName = rideOffer.author;
+                    userAuthorFacebookId = rideOffer.facebookId;
                     start = rideOffer.start;
                     destination = rideOffer.destination;
                     dateAndTime = rideOffer.dateAndTime;
@@ -230,10 +234,10 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
 
     }
-
     @Override
     public void onStop() {
         super.onStop();
+
 
         // Remove post value event listener
         if (mPostListener != null) {
@@ -254,13 +258,17 @@ public class RideOfferDetailActivity extends BaseActivity implements
             Log.d(TAG, "delete clicked");
             launchConfirmDelete();
         } else if (id == R.id.post_author_photo_large){
-            Intent intent = new Intent(this, ViewProfileActivity.class);
-            startActivity(intent);
+            viewProfile();
         } else if (id == R.id.post_author_large){
-            Intent intent = new Intent(this, ViewProfileActivity.class);
-            startActivity(intent);
+            viewProfile();
         }
 
+    }
+
+    public void viewProfile(){
+        Intent intent = new Intent(this, ViewProfileActivity.class);
+        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userAuthorId);
+        startActivity(intent);
     }
 
     public void alreadyExists(){
