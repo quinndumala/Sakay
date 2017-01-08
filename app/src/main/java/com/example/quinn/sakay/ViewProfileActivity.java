@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,13 +54,14 @@ public class ViewProfileActivity extends AppCompatActivity implements
 
     private ViewGroup viewProfileContent;
     private ProgressBar progressbar;
-    private FloatingActionButton ButtonRateUser;
+    private FloatingActionButton buttonRateUser;
     private ViewGroup mobileNumberView;
     private ViewGroup emailView;
     private ViewGroup facebookPageView;
 
     public String USER_FACEBOOK_ID;
     public String USER_EMAIL_ADDRESS;
+
     //final ProgressBar progressBar = (ProgressBar) findViewById(R.id.view_profile_progress);
 
     @Override
@@ -98,7 +100,7 @@ public class ViewProfileActivity extends AppCompatActivity implements
         userPhoneNoRef = mUserRef.child("phoneNo");
 
         viewProfileContent = (ViewGroup) findViewById(R.id.view_profile_content);
-        ButtonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
+        buttonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
 
         userNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -161,6 +163,7 @@ public class ViewProfileActivity extends AppCompatActivity implements
         mobileNumberView.setOnClickListener(this);
         emailView.setOnClickListener(this);
         facebookPageView.setOnClickListener(this);
+        buttonRateUser.setOnClickListener(this);
 
     }
 
@@ -208,6 +211,8 @@ public class ViewProfileActivity extends AppCompatActivity implements
             } catch (android.content.ActivityNotFoundException ex) {
                 Toast.makeText(ViewProfileActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
+        } else if (id == R.id.view_profile_rate_button){
+            launchRateDialog();
         }
     }
 
@@ -242,6 +247,27 @@ public class ViewProfileActivity extends AppCompatActivity implements
             return url; //normal web url
         }
     }
+
+    public void launchRateDialog() {
+        new MaterialDialog.Builder(this)
+                .title("Rate this user")
+                .items(R.array.offer_select_rating_score)
+                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        showToast();
+                        return true;
+                    }
+                })
+                .positiveText("OK")
+                .show();
+    }
+
+    public void showToast(){
+        Toast.makeText(this, "User Rating submitted", Toast.LENGTH_SHORT).show();
+    }
+
+
 
 //    public void loadProfileImage(String url, ImageView imageView){
 //        Context context = imageView.getContext();

@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity
             fragmentClass = BlankFragment.class;
             Toast.makeText(this, "Help and Support", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_aboutSakay) {
-            fragmentClass = SettingsFragment.class;
+            fragmentClass = BlankFragment.class;
         }
 
         try {

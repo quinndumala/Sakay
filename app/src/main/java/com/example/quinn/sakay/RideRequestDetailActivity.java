@@ -1,6 +1,7 @@
 package com.example.quinn.sakay;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -72,6 +73,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private Profile profile = getCurrentProfile();
 
     private final String userId = getUid();
+    private String userAuthorId;
+    private String userAuthorFacebookId;
     private String userAuthorName;
     private String start;
     private String destination;
@@ -125,6 +128,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         sakayButton.setOnClickListener(this);
         buttonDelete.setOnClickListener(this);
+        authorPhotoView.setOnClickListener(this);
+        authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
     }
 
@@ -164,7 +169,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     dateAndTimeView.setText(rideRequest.dateAndTime);
                     // [END_EXCLUDE]
 
+                    userAuthorId = rideRequest.uid;
                     userAuthorName = rideRequest.author;
+                    userAuthorFacebookId = rideRequest.facebookId;
                     start = rideRequest.start;
                     destination = rideRequest.destination;
                     dateAndTime = rideRequest.dateAndTime;
@@ -228,7 +235,17 @@ public class RideRequestDetailActivity extends BaseActivity implements
             alreadyExists();
         } else if (id == R.id.button_request_detail_delete){
             launchConfirmDelete();
+        } else if (id == R.id.post_author_photo_large){
+            viewProfile();
+        } else if (id == R.id.post_author_large){
+            viewProfile();
         }
+    }
+
+    public void viewProfile(){
+        Intent intent = new Intent(this, ViewProfileActivity.class);
+        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userAuthorId);
+        startActivity(intent);
     }
 
     public void alreadyExists(){
@@ -451,6 +468,15 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 @Override
                 public void onClick(View view) {
                     launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentVehicle);
+                }
+            });
+
+            holder.buttonViewProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(mContext, ViewProfileActivity.class);
+                    intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, commentAuthorUid);
+                    startActivity(intent);
                 }
             });
         }

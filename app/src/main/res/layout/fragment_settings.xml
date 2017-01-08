@@ -1,9 +1,123 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.quinn.sakay.SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:id="@+id/settings_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mobile Number"
+            android:textSize="17sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/settings_phone_number_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="not set"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+    <View style="@style/horizontal_divider"
+        android:id="@+id/settings_divider_one"
+        android:layout_height="1dp"
+        android:layout_below="@id/settings_phone_number"/>
+    <LinearLayout
+        android:id="@+id/settings_home_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        android:layout_below="@id/settings_phone_number"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home Address"
+            android:textSize="17sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/settings_home_address_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="not set"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+    <View style="@style/horizontal_divider"
+        android:id="@+id/settings_divider_two"
+        android:layout_height="1dp"
+        android:layout_below="@id/settings_home_address"/>
+    <LinearLayout
+        android:id="@+id/settings_work_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        android:layout_below="@id/settings_divider_two"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Work Address"
+            android:textSize="17sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/settings_work_address_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="not set"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+    <View style="@style/horizontal_divider"
+        android:id="@+id/settings_divider_three"
+        android:layout_height="1dp"
+        android:layout_below="@id/settings_work_address"/>
+    <LinearLayout
+        android:id="@+id/settings_vehicle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="12dp"
+        android:layout_below="@id/settings_divider_three"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vehicle"
+            android:textSize="17sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/settings_vehicle_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="no vehicles set"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
 
-</FrameLayout>
+</RelativeLayout>
