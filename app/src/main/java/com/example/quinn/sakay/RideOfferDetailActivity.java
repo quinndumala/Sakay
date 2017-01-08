@@ -471,6 +471,15 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentPickup);
                 }
             });
+
+            holder.buttonViewProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(mContext, ViewProfileActivity.class);
+                    intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, commentAuthorUid);
+                    startActivity(intent);
+                }
+            });
         }
 
         @Override
