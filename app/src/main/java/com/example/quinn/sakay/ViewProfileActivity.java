@@ -1,5 +1,9 @@
 package com.example.quinn.sakay;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -43,12 +48,18 @@ public class ViewProfileActivity extends AppCompatActivity implements
     private ImageView userRatingStarView;
 
     private TextView phoneNumberView;
-    private TextView emailView;
+    private TextView emailTextView;
     private TextView facebookNameView;
 
     private ViewGroup viewProfileContent;
     private ProgressBar progressbar;
     private FloatingActionButton ButtonRateUser;
+    private ViewGroup mobileNumberView;
+    private ViewGroup emailView;
+    private ViewGroup facebookPageView;
+
+    public String USER_FACEBOOK_ID;
+    public String USER_EMAIL_ADDRESS;
     //final ProgressBar progressBar = (ProgressBar) findViewById(R.id.view_profile_progress);
 
     @Override
@@ -72,13 +83,19 @@ public class ViewProfileActivity extends AppCompatActivity implements
         userRatingStarView = (ImageView) findViewById(R.id.view_profile_rating_stars);
 
         phoneNumberView = (TextView) findViewById(R.id.view_profile_phone_num_text);
-        emailView = (TextView) findViewById(R.id.view_profile_email_text);
+        emailTextView = (TextView) findViewById(R.id.view_profile_email_text);
         facebookNameView = (TextView) findViewById(R.id.view_profile_facebook_name_text);
+
+        mobileNumberView = (ViewGroup) findViewById(R.id.view_profile_phone_num);
+        emailView = (ViewGroup) findViewById(R.id.view_profile_email);
+        facebookPageView = (ViewGroup) findViewById(R.id.view_profile_facebook);
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mUserRef = mRootRef.child("users").child(mUserKey);
         userNameRef = mUserRef.child("name");
         userFacebookIdRef = mUserRef.child("facebookId");
+        userEmailRef = mUserRef.child("email");
+        userPhoneNoRef = mUserRef.child("phoneNo");
 
         viewProfileContent = (ViewGroup) findViewById(R.id.view_profile_content);
         ButtonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
@@ -102,6 +119,7 @@ public class ViewProfileActivity extends AppCompatActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
                 setPhoto(data);
+                USER_FACEBOOK_ID = data;
             }
 
             @Override
@@ -110,11 +128,39 @@ public class ViewProfileActivity extends AppCompatActivity implements
             }
         });
 
+        userEmailRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+                emailTextView.setText(data);
+                USER_EMAIL_ADDRESS = data;
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "Read failed: " + databaseError.getCode());
+            }
+        });
 
-//        viewProfileContent.setVisibility(View.VISIBLE);
-//        ButtonRateUser.setVisibility(View.VISIBLE);
+        userPhoneNoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    String data = dataSnapshot.getValue(String.class);
+                    phoneNumberView.setText(data);
+                    mobileNumberView.setVisibility(View.VISIBLE);
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        mobileNumberView.setOnClickListener(this);
+        emailView.setOnClickListener(this);
+        facebookPageView.setOnClickListener(this);
 
     }
 
@@ -143,7 +189,26 @@ public class ViewProfileActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(View view) {
+        int id = view.getId();
 
+        if (id == R.id.view_profile_facebook) {
+//            Intent facebookIntent = getOpenFacebookIntent(this);
+//            startActivity(facebookIntent);
+
+            Intent facebookIntent = new Intent(Intent.ACTION_VIEW);
+            String facebookUrl = getFacebookPageURL(this);
+            facebookIntent.setData(Uri.parse(facebookUrl));
+            startActivity(facebookIntent);
+        } else if (id == R.id.view_profile_email) {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{USER_EMAIL_ADDRESS});
+            try {
+                startActivity(Intent.createChooser(intent, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(ViewProfileActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 
@@ -151,6 +216,31 @@ public class ViewProfileActivity extends AppCompatActivity implements
     public void setPhoto(final String fId) {
         String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=350";
         GlideUtil.loadProfileIcon(imageUrl, userPhotoView);
+    }
+
+//    public Intent getOpenFacebookIntent(Context context) {
+//        String url = "https://www.facebook.com/"+USER_FACEBOOK_ID;
+//        try {
+//            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
+//            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href="+url));
+//        } catch (Exception e) {
+//            return new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.facebook.com/" + USER_FACEBOOK_ID));
+//        }
+//    }
+
+    public String getFacebookPageURL(Context context) {
+        String url = "https://www.facebook.com/"+USER_FACEBOOK_ID;
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            int versionCode = packageManager.getPackageInfo("com.facebook.katana", 0).versionCode;
+            if (versionCode >= 3002850) { //newer versions of fb app
+                return "fb://facewebmodal/f?href=" + url;
+            } else { //older versions of fb app
+                return "fb://page/" + USER_FACEBOOK_ID;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            return url; //normal web url
+        }
     }
 
 //    public void loadProfileImage(String url, ImageView imageView){
