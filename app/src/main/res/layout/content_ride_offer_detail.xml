@@ -65,7 +65,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.AppCompat.Button.Colored"
                         android:visibility="gone"
-                        android:text="Request to sakay"/>
+                        android:text="request sakay"/>
                 </LinearLayout>
                 <Space
                     android:id="@+id/offer_detail_space_view"

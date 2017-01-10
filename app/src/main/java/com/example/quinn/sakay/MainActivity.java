@@ -283,6 +283,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
+
     public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
 
         private String url;
@@ -318,9 +323,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onNetworkConnectionChanged(boolean isConnected) {
-        showSnack(isConnected);
-    }
+
 }
 

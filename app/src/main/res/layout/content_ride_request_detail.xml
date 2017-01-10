@@ -70,7 +70,7 @@
                         android:layout_height="wrap_content"
                         style="@style/Widget.AppCompat.Button.Colored"
                         android:visibility="gone"
-                        android:text="Request to sakay"/>
+                        android:text="offer sakay"/>
                 </LinearLayout>
 
                 <Space

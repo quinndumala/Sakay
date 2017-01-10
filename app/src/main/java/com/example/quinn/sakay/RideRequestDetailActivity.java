@@ -181,7 +181,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(userId)){
-                            sakayButton.setText("\u2713" + " Sakay request sent");
+                            sakayButton.setText("\u2713" + " Sakay offer sent");
                         }
                     }
 
