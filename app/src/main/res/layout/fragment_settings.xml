@@ -8,6 +8,7 @@
     tools:context="com.example.quinn.sakay.SettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
     <LinearLayout
         android:id="@+id/settings_phone_number"
         android:layout_width="match_parent"
@@ -108,16 +109,54 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Vehicle"
+            android:text="My Vehicle"
             android:textSize="17sp"
             android:textColor="@color/black"/>
         <TextView
             android:id="@+id/settings_vehicle_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="no vehicles set"
+            android:text="not set"
             android:textSize="14sp"
             />
     </LinearLayout>
+
+    <!--<Button-->
+        <!--android:text="change"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/button5"-->
+        <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
+        <!--android:layout_alignBottom="@+id/settings_phone_number"-->
+        <!--android:layout_alignParentEnd="true" />-->
+
+
+    <!--<Button-->
+        <!--android:text="change"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/button3"-->
+        <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
+        <!--android:layout_alignBottom="@+id/settings_home_address"-->
+        <!--android:layout_alignParentEnd="true" />-->
+
+    <!--<Button-->
+        <!--android:text="change"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/button4"-->
+        <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
+        <!--android:layout_alignBottom="@+id/settings_vehicle"-->
+        <!--android:layout_alignParentEnd="true" />-->
+
+    <!--<Button-->
+        <!--android:text="change"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/settings_change_number"-->
+        <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
+        <!--android:layout_alignBottom="@+id/settings_work_address"-->
+        <!--android:layout_alignParentEnd="true" />-->
+
 
 </RelativeLayout>
