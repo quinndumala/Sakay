@@ -131,11 +131,11 @@
         <!--android:layout_alignParentEnd="true" />-->
 
 
-    <!--<Button-->
+    <!--<Button -->
         <!--android:text="change"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/button3"-->
+        <!--android:id="@+id/settings_home_address_button"-->
         <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
         <!--android:layout_alignBottom="@+id/settings_home_address"-->
         <!--android:layout_alignParentEnd="true" />-->
@@ -144,16 +144,7 @@
         <!--android:text="change"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/button4"-->
-        <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
-        <!--android:layout_alignBottom="@+id/settings_vehicle"-->
-        <!--android:layout_alignParentEnd="true" />-->
-
-    <!--<Button-->
-        <!--android:text="change"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/settings_change_number"-->
+        <!--android:id="@+id/settings_work_address_button"-->
         <!--style="@style/Base.Widget.AppCompat.Button.Borderless"-->
         <!--android:layout_alignBottom="@+id/settings_work_address"-->
         <!--android:layout_alignParentEnd="true" />-->

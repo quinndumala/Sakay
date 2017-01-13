@@ -91,7 +91,7 @@ public class RideOffersFragment extends Fragment
                 addRideOffer.setShowAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.show_from_bottom));
                 addRideOffer.setHideAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.hide_to_bottom));
             }
-        }, 300);
+        }, 450);
 
         mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override

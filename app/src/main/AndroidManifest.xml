@@ -54,7 +54,8 @@
             android:name=".AddRideOffer"
             android:label="@string/title_activity_add_ride_offer"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />

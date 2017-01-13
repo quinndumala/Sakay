@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -56,6 +57,8 @@ public class AddRideRequest extends BaseActivity
     private Profile profile = getCurrentProfile();
     public String startOrDestination = "";
 
+    public MaterialDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +92,12 @@ public class AddRideRequest extends BaseActivity
 
         findViewById(R.id.field_request_start).setOnClickListener(this);
         findViewById(R.id.field_request_destination).setOnClickListener(this);
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading map")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
     }
 
     private java.text.DateFormat savedFormat;
@@ -186,11 +195,13 @@ public class AddRideRequest extends BaseActivity
         int id = view.getId();
         switch (id){
             case R.id.field_request_start:
+                progressDialog.show();
                 startOrDestination = "start";
                 launchPlacePicker();
                 break;
             case R.id.field_request_destination:
                 startOrDestination = "destination";
+                progressDialog.show();
                 launchPlacePicker();
                 break;
         }
@@ -265,6 +276,12 @@ public class AddRideRequest extends BaseActivity
                     Toast.LENGTH_LONG)
                     .show();
         }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 300);
 
     }
 

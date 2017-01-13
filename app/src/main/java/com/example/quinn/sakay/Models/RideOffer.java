@@ -16,6 +16,9 @@ public class RideOffer {
     public String destination;
     public String dateAndTime;
     public String vehicle;
+    public String vehicleModel;
+    public String vehicleColor;
+    public String vehiclePlateNo;
     public Map<String, Boolean> stars = new HashMap<>();
 
     //public int starCount = 0;
@@ -24,13 +27,17 @@ public class RideOffer {
     }
 
     public RideOffer(String uid, String author, String facebookId, String start, String destination,
-                     String vehicle, String dateAndTime) {
+                     String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
+                     String dateAndTime) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.start = start;
         this.destination = destination;
         this.vehicle = vehicle;
+        this.vehicleModel = vehicleModel;
+        this.vehicleColor = vehicleColor;
+        this.vehiclePlateNo = vehiclePlateNo;
         this.dateAndTime = dateAndTime;
     }
 
@@ -43,6 +50,9 @@ public class RideOffer {
         result.put("start", start);
         result.put("destination", destination);
         result.put("vehicle", vehicle);
+        result.put("vehicleModel", vehicleModel);
+        result.put("vehicleColor", vehicleColor);
+        result.put("vehiclePlateNo", vehiclePlateNo);
         result.put("dateAndTime", dateAndTime);
 
         return result;

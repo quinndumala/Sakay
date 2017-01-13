@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -56,10 +57,15 @@ public class AddRideOffer extends BaseActivity
     private EditText fDestination;
     private ReminderDatePicker datePicker;
     public String dateAndTime = "";
-    private EditText fVehicle;
+    private EditText fVehicleType;
+    private EditText fVehicleModel;
+    private EditText fVehicleColor;
+    private EditText fVehiclePlateNo;
     private String userFacebookId = "";
     private Profile profile = getCurrentProfile();
     public String startOrDestination = "";
+
+    public MaterialDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,15 +91,24 @@ public class AddRideOffer extends BaseActivity
 
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);
-        fVehicle = (EditText) findViewById(R.id.field_offer_vehicle);
+        fVehicleType = (EditText) findViewById(R.id.field_offer_vehicle_type);
+        fVehicleModel = (EditText) findViewById(R.id.field_offer_vehicle_model);
+        fVehicleColor = (EditText) findViewById(R.id.field_offer_vehicle_color);
+        fVehiclePlateNo = (EditText) findViewById(R.id.field_offer_vehicle_plate_no);
         userFacebookId = profile.getId();
 
         fStart.setText(R.string.select_location);
         fDestination.setText(R.string.select_location);
-        fVehicle.requestFocus();
+        fVehicleType.requestFocus();
 
         findViewById(R.id.field_offer_start).setOnClickListener(this);
         findViewById(R.id.field_offer_destination).setOnClickListener(this);
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading map")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
 
     }
 
@@ -112,7 +127,10 @@ public class AddRideOffer extends BaseActivity
     private void submitPost() {
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
-        final String vehicle = fVehicle.getText().toString();
+        final String vehicle = fVehicleType.getText().toString();
+        final String vehicleModel = fVehicleModel.getText().toString();
+        final String vehicleColor = fVehicleColor.getText().toString();
+        final String vehiclePlateNo = fVehiclePlateNo.getText().toString();
 
         if (start.equals("Select Location")){
             selectLocationAlert();
@@ -125,7 +143,22 @@ public class AddRideOffer extends BaseActivity
         }
 
         if (TextUtils.isEmpty(vehicle)) {
-            fVehicle.setError(REQUIRED);
+            fVehicleType.setError(REQUIRED);
+            return;
+        }
+
+        if (TextUtils.isEmpty(vehicle)) {
+            fVehicleModel.setError(REQUIRED);
+            return;
+        }
+
+        if (TextUtils.isEmpty(vehicle)) {
+            fVehicleColor.setError(REQUIRED);
+            return;
+        }
+
+        if (TextUtils.isEmpty(vehicle)) {
+            fVehiclePlateNo.setError(REQUIRED);
             return;
         }
 
@@ -152,7 +185,7 @@ public class AddRideOffer extends BaseActivity
                         } else {
                             // Write new post
                             writeNewPost(userId, user.getName(), userFacebookId, start, destination,
-                                    vehicle, dateAndTime);
+                                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo, dateAndTime);
                         }
 
                         // Finish this Activity, back to the stream
@@ -175,7 +208,7 @@ public class AddRideOffer extends BaseActivity
     private void setEditingEnabled(boolean enabled) {
         fStart.setEnabled(enabled);
         fDestination.setEnabled(enabled);
-        fVehicle.setEnabled(enabled);
+        fVehicleModel.setEnabled(enabled);
 
 //        if (enabled) {
 //            mSubmitButton.setVisibility(View.VISIBLE);
@@ -186,12 +219,13 @@ public class AddRideOffer extends BaseActivity
 
     // [START write_fan_out]
     private void writeNewPost(String userId, String username, String userFacebookId, String start,
-                              String destination, String vehicle, String dateAndTime) {
+                              String destination, String vehicle, String vehicelModel, String vehicelColor,
+                              String vehiclePlateNo, String dateAndTime) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideOffers").push().getKey();
-        RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start,
-                destination, vehicle, dateAndTime);
+        RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start, destination,
+                vehicle, vehicelModel, vehicelColor, vehiclePlateNo, dateAndTime);
         Map<String, Object> postValues = rideOffer.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -207,10 +241,12 @@ public class AddRideOffer extends BaseActivity
         switch (id){
             case R.id.field_offer_start:
                 startOrDestination = "start";
+                progressDialog.show();
                 launchPlacePicker();
                 break;
             case R.id.field_offer_destination:
                 startOrDestination = "destination";
+                progressDialog.show();
                 launchPlacePicker();
                 break;
         }
@@ -298,7 +334,12 @@ public class AddRideOffer extends BaseActivity
                     Toast.LENGTH_LONG)
                     .show();
         }
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 450);
     }
 
     @Override

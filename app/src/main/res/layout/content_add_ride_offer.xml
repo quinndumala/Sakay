@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content_add_ride_offer"
@@ -57,13 +57,80 @@
         <View style="@style/horizontal_divider"
             android:layout_height="1dp" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vehicle Information"
+                android:textSize="@dimen/abc_text_size_subhead_material"
+                android:textColor="@color/black"
+                android:padding="20dp"/>
+
+            <Button style="@style/Base.Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Use my vehicle"
+                android:textColor="@color/colorPrimary"
+                android:id="@+id/offer_my_vehicle_button"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp" />
+
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Vehicle Information"
-            android:id="@+id/field_offer_vehicle"
+            android:hint="Vehicle Type"
+            android:id="@+id/field_offer_vehicle_type"
             android:maxLines="1"
             style="@style/FullWidthEditText"/>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Manufacturer and model"
+            android:id="@+id/field_offer_vehicle_model"
+            android:maxLines="1"
+            style="@style/FullWidthEditText"/>
+
+        <View style="@style/horizontal_divider"
+            android:layout_height="1dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1.0"
+            >
+            <EditText style="@style/FullWidthEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:layout_weight="0.6"
+                android:hint="Vehicle color"
+                android:id="@+id/field_offer_vehicle_color"/>
+            <View style="@style/vertical_divider"
+                android:layout_width="1dp" />
+            <EditText style="@style/FullWidthEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:layout_weight="0.4"
+                android:hint="Plate number"
+                android:id="@+id/field_offer_vehicle_plate_no"/>
+
+        </LinearLayout>
 
 
         <!--<View style="@style/horizontal_divider"-->
@@ -79,7 +146,8 @@
             android:layout_height="wrap_content"
             android:text="Date and Time"
             android:textSize="@dimen/abc_text_size_subhead_material"
-            android:paddingTop="20dp"
+            android:textColor="@color/black"
+            android:paddingTop="32dp"
             android:paddingLeft="20dp"
             android:paddingBottom="10dp"/>
 
@@ -93,4 +161,4 @@
     </LinearLayout>
 
 
-</FrameLayout>
+</android.support.v4.widget.NestedScrollView>

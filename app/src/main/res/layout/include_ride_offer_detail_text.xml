@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="@string/start_info"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_start_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="@string/destination_info"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_destination_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="@string/date_and_time_info"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_dateAndTime_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/midGray"
+        android:text="Vehicle Details"
+        android:textSize="14sp"
+        android:layout_marginTop="6dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="Vehicle type:"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_vehicle_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="Manufacturer and Model:"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_vehicle_model_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="Color:"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_vehicle_color_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/midGray"
+            android:text="Plate number:"/>
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="match_parent" />
+        <TextView
+            android:id="@+id/offer_vehicle_plate_no_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sample_text"/>
+    </LinearLayout>
+
+</LinearLayout>
