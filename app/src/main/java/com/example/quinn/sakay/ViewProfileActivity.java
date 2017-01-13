@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -61,8 +62,10 @@ public class ViewProfileActivity extends AppCompatActivity implements
 
     public String USER_FACEBOOK_ID;
     public String USER_EMAIL_ADDRESS;
+    public String USER_PHONE_NO;
 
     //final ProgressBar progressBar = (ProgressBar) findViewById(R.id.view_profile_progress);
+    public MaterialDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +100,17 @@ public class ViewProfileActivity extends AppCompatActivity implements
         userNameRef = mUserRef.child("name");
         userFacebookIdRef = mUserRef.child("facebookId");
         userEmailRef = mUserRef.child("email");
-        userPhoneNoRef = mUserRef.child("phoneNo");
+        userPhoneNoRef = mUserRef.child("phone");
 
         viewProfileContent = (ViewGroup) findViewById(R.id.view_profile_content);
         buttonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading profile")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
+
 
         userNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -148,8 +158,8 @@ public class ViewProfileActivity extends AppCompatActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
-                    String data = dataSnapshot.getValue(String.class);
-                    phoneNumberView.setText(data);
+                    USER_PHONE_NO = dataSnapshot.getValue(String.class);
+                    phoneNumberView.setText(USER_PHONE_NO);
                     mobileNumberView.setVisibility(View.VISIBLE);
                 }
             }
@@ -164,6 +174,13 @@ public class ViewProfileActivity extends AppCompatActivity implements
         emailView.setOnClickListener(this);
         facebookPageView.setOnClickListener(this);
         buttonRateUser.setOnClickListener(this);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 550);
 
     }
 
@@ -213,6 +230,10 @@ public class ViewProfileActivity extends AppCompatActivity implements
             }
         } else if (id == R.id.view_profile_rate_button){
             launchRateDialog();
+        } else if (id == R.id.view_profile_phone_num){
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:" + USER_PHONE_NO));
+            startActivity(intent);
         }
     }
 

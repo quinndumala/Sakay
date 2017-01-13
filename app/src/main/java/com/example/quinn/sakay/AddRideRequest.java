@@ -111,16 +111,18 @@ public class AddRideRequest extends BaseActivity
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
 
-        if (start.equals("Select Location")){
+        if (start.equals("Select Location") || destination.equals("Select Location")){
             selectLocationAlert();
             return;
+        } else {
+            confirmPost(start, destination);
         }
 
-        if (destination.equals("Select Location")){
-            selectLocationAlert();
-            return;
-        }
 
+
+    }
+
+    private void postPost(final String start, final String destination){
         //setEditingEnabled(false);
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
 
@@ -161,6 +163,21 @@ public class AddRideRequest extends BaseActivity
                     }
                 });
         // [END single_value_read]
+
+    }
+
+    public void confirmPost(final String start, final String destination){
+        new MaterialDialog.Builder(this)
+                .title("Post this ride request?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postPost(start, destination);
+                    }
+                })
+                .show();
     }
 
     private void setEditingEnabled(boolean enabled) {

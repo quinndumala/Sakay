@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.RideOffer;
+import com.example.quinn.sakay.Models.Vehicle;
 import com.facebook.Profile;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -52,7 +54,10 @@ public class AddRideOffer extends BaseActivity
     private static final String REQUIRED = "Required";
     private static final int REQUEST_PLACE_PICKER = 1;
 
+    public final String userId = getUid();
+
     private DatabaseReference mDatabase;
+    private DatabaseReference vehicleRef;
     private EditText fStart;
     private EditText fDestination;
     private ReminderDatePicker datePicker;
@@ -66,6 +71,15 @@ public class AddRideOffer extends BaseActivity
     public String startOrDestination = "";
 
     public MaterialDialog progressDialog;
+    public Button myVehicle;
+
+    public String currentVehicleType;
+    public String currentVehicleModel;
+    public String currentVehicleColor;
+    public String currentVehiclePlateNo;
+
+    public Boolean vehicleExists = false;
+    public Boolean doPost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +102,7 @@ public class AddRideOffer extends BaseActivity
         checkConnection();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        vehicleRef = mDatabase.child("users").child(userId).child("vehicle");
 
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);
@@ -95,20 +110,15 @@ public class AddRideOffer extends BaseActivity
         fVehicleModel = (EditText) findViewById(R.id.field_offer_vehicle_model);
         fVehicleColor = (EditText) findViewById(R.id.field_offer_vehicle_color);
         fVehiclePlateNo = (EditText) findViewById(R.id.field_offer_vehicle_plate_no);
+        myVehicle = (Button) findViewById(R.id.offer_my_vehicle_button);
+
         userFacebookId = profile.getId();
 
         fStart.setText(R.string.select_location);
         fDestination.setText(R.string.select_location);
-        fVehicleType.requestFocus();
 
-        findViewById(R.id.field_offer_start).setOnClickListener(this);
-        findViewById(R.id.field_offer_destination).setOnClickListener(this);
 
-        progressDialog = new MaterialDialog.Builder(this)
-                .title("Loading map")
-                .content("Please wait")
-                .progress(true, 0)
-                .build();
+        checkForVehicle();
 
     }
 
@@ -124,6 +134,22 @@ public class AddRideOffer extends BaseActivity
 //
 //    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading map")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
+
+        findViewById(R.id.field_offer_start).setOnClickListener(this);
+        findViewById(R.id.field_offer_destination).setOnClickListener(this);
+        findViewById(R.id.offer_my_vehicle_button).setOnClickListener(this);
+
+    }
+
     private void submitPost() {
         final String start = fStart.getText().toString();
         final String destination = fDestination.getText().toString();
@@ -132,42 +158,29 @@ public class AddRideOffer extends BaseActivity
         final String vehicleColor = fVehicleColor.getText().toString();
         final String vehiclePlateNo = fVehiclePlateNo.getText().toString();
 
-        if (start.equals("Select Location")){
-            selectLocationAlert();
+        if (start.equals("Select Location")
+                || destination.equals("Select Location")
+                || TextUtils.isEmpty(vehicle)
+                || TextUtils.isEmpty(vehicleModel)
+                || TextUtils.isEmpty(vehicleColor)
+                || TextUtils.isEmpty(vehiclePlateNo) ){
+            missingInformationAlert();
             return;
-        }
+        } else {
+            confirmPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
 
-        if (destination.equals("Select Location")){
-            selectLocationAlert();
-            return;
         }
-
-        if (TextUtils.isEmpty(vehicle)) {
-            fVehicleType.setError(REQUIRED);
-            return;
-        }
-
-        if (TextUtils.isEmpty(vehicle)) {
-            fVehicleModel.setError(REQUIRED);
-            return;
-        }
-
-        if (TextUtils.isEmpty(vehicle)) {
-            fVehicleColor.setError(REQUIRED);
-            return;
-        }
-
-        if (TextUtils.isEmpty(vehicle)) {
-            fVehiclePlateNo.setError(REQUIRED);
-            return;
-        }
-
 
         //setEditingEnabled(false);
+
+    }
+
+    private void postPost(final String start, final String destination, final String vehicle, final String vehicleModel,
+                          final String vehicleColor, final String vehiclePlateNo){
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
 
         // [START single_value_read]
-        final String userId = getUid();
+        //final String userId = getUid();
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
@@ -249,6 +262,10 @@ public class AddRideOffer extends BaseActivity
                 progressDialog.show();
                 launchPlacePicker();
                 break;
+            case R.id.offer_my_vehicle_button:
+                fillVehicleInfo();
+                break;
+
         }
     }
 
@@ -409,12 +426,56 @@ public class AddRideOffer extends BaseActivity
                 .show();
     }
 
-    public void selectLocationAlert(){
+    public void missingInformationAlert(){
         new MaterialDialog.Builder(this)
                 .content("Missing some information")
                 .positiveText("OK")
                 .cancelable(false)
                 .show();
+    }
+
+    public void confirmPost(final String start, final String destination, final String vehicle, final String vehicleModel,
+                            final String vehicleColor, final String vehiclePlateNo){
+        new MaterialDialog.Builder(this)
+                .title("Post this ride offer?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
+                    }
+                })
+                .show();
+    }
+
+    public void checkForVehicle(){
+        vehicleRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    myVehicle.setVisibility(View.VISIBLE);
+                    Vehicle vehicle = dataSnapshot.getValue(Vehicle.class);
+                    currentVehicleType = vehicle.vehicleType;
+                    currentVehicleColor = vehicle.vehicleColor;
+                    currentVehicleModel = vehicle.vehicleModel;
+                    currentVehiclePlateNo = vehicle.plateNo;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void fillVehicleInfo(){
+        Toast.makeText(this, "Vehicle set!", Toast.LENGTH_SHORT).show();
+        fVehicleType.setText(currentVehicleType);
+        fVehicleModel.setText(currentVehicleModel);
+        fVehicleColor.setText(currentVehicleColor);
+        fVehiclePlateNo.setText(currentVehiclePlateNo);
     }
 
 }
