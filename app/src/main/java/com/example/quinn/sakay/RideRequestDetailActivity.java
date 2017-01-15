@@ -495,7 +495,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
                                        final String commentFacebookId, final String commentVehicle){
             new MaterialDialog.Builder(mContext)
-                    .content("Confirm Sakay? This action is irreversible.")
+                    .content("Confirm Sakay?")
                     .positiveText("OK")
                     .negativeText("CANCEL")
                     .onPositive(new MaterialDialog.SingleButtonCallback() {

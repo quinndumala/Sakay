@@ -80,8 +80,8 @@
     <string-array name="offer_select_rating_score">
         <item>"5  Excellent"</item>
         <item>"4  Great"</item>
-        <item>"3  Indifferent"</item>
-        <item>"2  Fair"</item>
+        <item>"3  Satisfactory"</item>
+        <item>"2  Unsatisfied"</item>
         <item>"1  Poor"</item>
     </string-array>
     <string name="large_text">

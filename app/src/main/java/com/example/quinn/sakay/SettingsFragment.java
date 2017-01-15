@@ -96,12 +96,12 @@ public class SettingsFragment extends Fragment
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        phoneRef = mDatabase.child("users").child(userId).child("phone");
-        homeAddressRef = mDatabase.child("users").child(userId).child("home");
-        homeAddressIdRef = mDatabase.child("users").child(userId).child("homeId");
-        workAddressRef = mDatabase.child("users").child(userId).child("work");
-        workAddressIdRef = mDatabase.child("users").child(userId).child("workId");
-        vehicleRef = mDatabase.child("users").child(userId).child("vehicle");
+        phoneRef = mDatabase.child("users-settings").child(userId).child("phone");
+        homeAddressRef = mDatabase.child("users-settings").child(userId).child("home");
+        homeAddressIdRef = mDatabase.child("users-settings").child(userId).child("homeId");
+        workAddressRef = mDatabase.child("users-settings").child(userId).child("work");
+        workAddressIdRef = mDatabase.child("users-settings").child(userId).child("workId");
+        vehicleRef = mDatabase.child("users-settings").child(userId).child("vehicle");
 
         mobileNumberView = (ViewGroup) rootView.findViewById(R.id.settings_phone_number);
         homeAddressView = (ViewGroup) rootView.findViewById(R.id.settings_home_address);

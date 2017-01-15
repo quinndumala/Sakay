@@ -78,9 +78,6 @@ public class AddRideOffer extends BaseActivity
     public String currentVehicleColor;
     public String currentVehiclePlateNo;
 
-    public Boolean vehicleExists = false;
-    public Boolean doPost = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +99,7 @@ public class AddRideOffer extends BaseActivity
         checkConnection();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        vehicleRef = mDatabase.child("users").child(userId).child("vehicle");
+        vehicleRef = mDatabase.child("users-settings").child(userId).child("vehicle");
 
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);

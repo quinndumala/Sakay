@@ -40,6 +40,7 @@
                     android:layout_height="wrap_content"
                     android:text="No ratings yet"
                     android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
                     android:textSize="15sp"/>
                 <TextView
                     android:id="@+id/view_profile_rating_number"
@@ -47,15 +48,16 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="0.0"
-                    android:textSize="25sp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="3dp"/>
+                    android:textSize="34sp"
+                    android:layout_marginBottom="10dp"
+                    android:visibility="gone"/>
                 <ImageView
                     android:id="@+id/view_profile_rating_stars"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ratings_none"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

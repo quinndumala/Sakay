@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -23,9 +22,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
-public class ViewProfileActivity extends AppCompatActivity implements
+import java.util.HashMap;
+import java.util.Map;
+
+public class ViewProfileActivity extends BaseActivity implements
         View.OnClickListener{
 
     private static final String TAG = "ViewProfile";
@@ -42,6 +46,9 @@ public class ViewProfileActivity extends AppCompatActivity implements
     private DatabaseReference userEmailRef;
     private DatabaseReference userPhoneNoRef;
     private DatabaseReference userRatingsRef;
+    private DatabaseReference userRatingRef;
+    private DatabaseReference ratingsCountRef;
+    private DatabaseReference ratingsRef;
 
     private ImageView userPhotoView;
 
@@ -63,6 +70,11 @@ public class ViewProfileActivity extends AppCompatActivity implements
     public String USER_FACEBOOK_ID;
     public String USER_EMAIL_ADDRESS;
     public String USER_PHONE_NO;
+    public final String MY_USER_ID = getUid();
+
+    public Boolean notYetRated = true;
+    public Long aveRating = 0L;
+    public Long numOfRatings;
 
     //final ProgressBar progressBar = (ProgressBar) findViewById(R.id.view_profile_progress);
     public MaterialDialog progressDialog;
@@ -100,7 +112,13 @@ public class ViewProfileActivity extends AppCompatActivity implements
         userNameRef = mUserRef.child("name");
         userFacebookIdRef = mUserRef.child("facebookId");
         userEmailRef = mUserRef.child("email");
-        userPhoneNoRef = mUserRef.child("phone");
+        userPhoneNoRef = mRootRef.child("users-settings").child(mUserKey).child("phone");
+
+        userRatingsRef = mRootRef.child("users-ratings").child(mUserKey);
+        userRatingRef = userRatingsRef.child("rating");
+        ratingsCountRef = userRatingsRef.child("ratingsCount");
+        ratingsRef = userRatingsRef.child("ratings");
+
 
         viewProfileContent = (ViewGroup) findViewById(R.id.view_profile_content);
         buttonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
@@ -111,6 +129,62 @@ public class ViewProfileActivity extends AppCompatActivity implements
                 .progress(true, 0)
                 .show();
 
+        userFacebookIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String data = dataSnapshot.getValue(String.class);
+                setPhoto(data);
+                USER_FACEBOOK_ID = data;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "Read failed: " + databaseError.getCode());
+            }
+        });
+
+        userRatingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    String value = String.valueOf(dataSnapshot.getValue());
+                    loadStars(value);
+                    loadNumbers(value);
+                    userRatingTextView.setText("User Rating");
+                    userRatingNumView.setVisibility(View.VISIBLE);
+                    userRatingStarView.setVisibility(View.VISIBLE);
+
+//                    userRatingNumView.setText(value);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 550);
+        buttonRateUser.hide(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                buttonRateUser.show(true);
+            }
+        }, 500);
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         userNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -126,19 +200,7 @@ public class ViewProfileActivity extends AppCompatActivity implements
             }
         });
 
-        userFacebookIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                setPhoto(data);
-                USER_FACEBOOK_ID = data;
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "Read failed: " + databaseError.getCode());
-            }
-        });
 
         userEmailRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -170,23 +232,13 @@ public class ViewProfileActivity extends AppCompatActivity implements
             }
         });
 
+        //hasRated();
+        //listenToRatings();
+
         mobileNumberView.setOnClickListener(this);
         emailView.setOnClickListener(this);
         facebookPageView.setOnClickListener(this);
         buttonRateUser.setOnClickListener(this);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-            }
-        }, 550);
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
 
     }
@@ -212,9 +264,6 @@ public class ViewProfileActivity extends AppCompatActivity implements
         int id = view.getId();
 
         if (id == R.id.view_profile_facebook) {
-//            Intent facebookIntent = getOpenFacebookIntent(this);
-//            startActivity(facebookIntent);
-
             Intent facebookIntent = new Intent(Intent.ACTION_VIEW);
             String facebookUrl = getFacebookPageURL(this);
             facebookIntent.setData(Uri.parse(facebookUrl));
@@ -244,15 +293,6 @@ public class ViewProfileActivity extends AppCompatActivity implements
         GlideUtil.loadProfileIcon(imageUrl, userPhotoView);
     }
 
-//    public Intent getOpenFacebookIntent(Context context) {
-//        String url = "https://www.facebook.com/"+USER_FACEBOOK_ID;
-//        try {
-//            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
-//            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://facewebmodal/f?href="+url));
-//        } catch (Exception e) {
-//            return new Intent(Intent.ACTION_VIEW,Uri.parse("https://www.facebook.com/" + USER_FACEBOOK_ID));
-//        }
-//    }
 
     public String getFacebookPageURL(Context context) {
         String url = "https://www.facebook.com/"+USER_FACEBOOK_ID;
@@ -276,7 +316,8 @@ public class ViewProfileActivity extends AppCompatActivity implements
                 .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        showToast();
+                        submitRating(text);
+                        //showToast();
                         return true;
                     }
                 })
@@ -284,11 +325,116 @@ public class ViewProfileActivity extends AppCompatActivity implements
                 .show();
     }
 
-    public void showToast(){
-        Toast.makeText(this, "User Rating submitted", Toast.LENGTH_SHORT).show();
+    public void loadStars(String value){
+        if (value == "1"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_one));
+        } else if (value == "2"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_two));
+        } else if (value == "3"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_three));
+        } else if (value == "4"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_four));
+        } else if (value == "5"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_five));
+        }
+    }
+
+    public void loadNumbers(String value){
+        if (value == "1"){
+            userRatingNumView.setText("1.0");
+        } else if (value == "2"){
+            userRatingNumView.setText("2.0");
+        } else if (value == "3"){
+            userRatingNumView.setText("3.0");
+        } else if (value == "4"){
+            userRatingNumView.setText("4.0");
+        } else if (value == "5"){
+            userRatingNumView.setText("5.0");
+        }
+    }
+
+    public void updateRatings(){
+        Log.d(TAG, "on listenToRatings");
+        ratingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    ratingsCountRef.setValue(dataSnapshot.getChildrenCount());
+
+                    for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                        int value = snapshot.getValue(int.class);
+                        aveRating = aveRating + value;
+                    }
+
+                    aveRating = aveRating/dataSnapshot.getChildrenCount();
+                    userRatingRef.setValue(aveRating);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
+    public void submitRating(CharSequence text){
+        Log.d(TAG, "on submitRating");
+        int score;
+
+        String rating = text.toString();
+        if (rating.equals("5  Excellent")){
+            score = 5;
+        } else if (rating.equals("4  Great")) {
+            score = 4;
+        } else if (rating.equals("3  Satisfactory")){
+            score = 3;
+        } else if (rating.equals("2  Unsatisfied")){
+            score = 2;
+        } else {
+            score = 1;
+        }
+
+
+        //String key = ratingsRef.child(MY_USER_ID).push().getKey();
+//        if (notYetRated) {
+//            addRatingsCount();
+//        }
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/users-ratings/" + mUserKey + "/ratings/" + MY_USER_ID, score);
+        mRootRef.updateChildren(childUpdates);
+        updateRatings();
+
+        showToast();
+
+    }
+
+    public void addRatingsCount() {
+        ratingsCountRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData currentData) {
+                Long value = currentData.getValue(Long.class);
+                if(value == null) {
+                    currentData.setValue(1);
+                } else {
+                    currentData.setValue(value + 1);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                //This method will be called once with the results of the transaction.
+                Log.d(TAG, "transaction:onComplete:" + databaseError);
+            }
+        });
+    }
+
+    public void showToast(){
+        Toast.makeText(this, "User Rating submitted", Toast.LENGTH_SHORT).show();
+    }
 
 //    public void loadProfileImage(String url, ImageView imageView){
 //        Context context = imageView.getContext();

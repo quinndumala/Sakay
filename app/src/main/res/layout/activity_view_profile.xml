@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="12dp"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="16dp"
         app:fab_elevationCompat="4dp"
         fab:fab_hideAnimation="@anim/hide_to_bottom"
         android:src="@drawable/ic_star_empty"
