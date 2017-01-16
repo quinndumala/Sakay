@@ -133,7 +133,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
         seeRouteButton = (Button) findViewById(R.id.button_see_route_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
         userFacebookId = profile.getId();
-        noResponses();
 
         sakayButton.setOnClickListener(this);
         seeRouteButton.setOnClickListener(this);
@@ -141,6 +140,26 @@ public class RideRequestDetailActivity extends BaseActivity implements
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+                    if ((rideRequest.uid.equals(userId))){
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    } else {
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -157,6 +176,22 @@ public class RideRequestDetailActivity extends BaseActivity implements
     @Override
     public void onStart() {
         super.onStart();
+
+        noResponses();
+
+        mCommentsReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userId)){
+                    sakayButton.setText("\u2713" + " Sakay offer sent");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         // Add value event listener to the post
         // [START post_value_event_listener]
@@ -195,19 +230,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     timeStamp = rideRequest.timeStamp;
                 }
 
-                mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(userId)){
-                            sakayButton.setText("\u2713" + " Sakay offer sent");
-                        }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
 
             }
 
@@ -290,7 +313,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     }
 
     public void noResponses(){
-        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren() && isAuthor){
@@ -333,7 +356,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         childUpdates.put("/rideRequests-comments/" + mPostKey + "/" + userId, postValues);
 
                         mRootRef.updateChildren(childUpdates);
-                        noResponses();
+//                        noResponses();
                     }
 
                     @Override

@@ -147,7 +147,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_offer_comment);
 
         userFacebookId = profile.getId();
-        noResponses();
+        //noResponses();
 
         sakayButton.setOnClickListener(this);
         seeRouteButton.setOnClickListener(this);
@@ -155,6 +155,26 @@ public class RideOfferDetailActivity extends BaseActivity implements
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+                    if ((rideOffer.uid.equals(userId))){
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    } else {
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -174,6 +194,21 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         // Add value event listener to the post
         // [START post_value_event_listener]
+        noResponses();
+
+        mCommentsReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userId)){
+                    sakayButton.setText("\u2713" + " Sakay request sent");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                finish();
+            }
+        });
 
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -181,12 +216,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 if (dataSnapshot.exists()) {
                     // Get Post object and use the values to update the UI
                     RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
-                    if (!(rideOffer.uid.equals(userId))){
-                        isAuthor = false;
-                        sakayButton.setVisibility(View.VISIBLE);
-                    } else {
-                        buttonDelete.setVisibility(View.VISIBLE);
-                    }
+
                     // [START_EXCLUDE]
                     setPhoto(rideOffer.facebookId);
                     authorView.setText(rideOffer.author);
@@ -220,19 +250,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 }
 
 
-                mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(userId)){
-                            sakayButton.setText("\u2713" + " Sakay request sent");
-                        }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        finish();
-                    }
-                });
 
 
             }
@@ -324,7 +342,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     }
 
     public void noResponses(){
-        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren() && isAuthor){
@@ -370,7 +388,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         childUpdates.put("/rideOffers-comments/" + mPostKey + "/" + userId, postValues);
 
                         mRootRef.updateChildren(childUpdates);
-                        noResponses();
+//                        noResponses();
                     }
 
                     @Override
