@@ -216,7 +216,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     vehicleColor = rideOffer.vehicleColor;
                     vehiclePlateNo = rideOffer.vehiclePlateNo;
 
-
                     rideExists = true;
                 }
 

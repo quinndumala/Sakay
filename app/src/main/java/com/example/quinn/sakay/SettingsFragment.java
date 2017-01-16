@@ -28,6 +28,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,11 +49,18 @@ public class SettingsFragment extends Fragment
 
     // [START define_database_reference]
     private DatabaseReference mDatabase;
+    private DatabaseReference settingsRef;
+
     private DatabaseReference phoneRef;
+
     private DatabaseReference homeAddressRef;
-    private DatabaseReference homeAddressIdRef;
+    private DatabaseReference homeAddressLatRef;
+    private DatabaseReference homeAddressLongRef;
+
     private DatabaseReference workAddressRef;
-    private DatabaseReference workAddressIdRef;
+    private DatabaseReference workAddressLatRef;
+    private DatabaseReference workAddressLongRef;
+
     private DatabaseReference vehicleRef;
 
     private ValueEventListener mPhoneListener;
@@ -83,6 +91,11 @@ public class SettingsFragment extends Fragment
     public String currentVehicleColor;
     public String currentVehiclePlateNo;
 
+    public Double homeLat;
+    public Double homeLong;
+    public Double workLat;
+    public Double workLong;
+
     public MaterialDialog progressDialog;
 
     public SettingsFragment() {
@@ -96,12 +109,18 @@ public class SettingsFragment extends Fragment
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        phoneRef = mDatabase.child("users-settings").child(userId).child("phone");
-        homeAddressRef = mDatabase.child("users-settings").child(userId).child("home");
-        homeAddressIdRef = mDatabase.child("users-settings").child(userId).child("homeId");
-        workAddressRef = mDatabase.child("users-settings").child(userId).child("work");
-        workAddressIdRef = mDatabase.child("users-settings").child(userId).child("workId");
-        vehicleRef = mDatabase.child("users-settings").child(userId).child("vehicle");
+        settingsRef = mDatabase.child("users-settings").child(userId);
+        phoneRef = settingsRef.child("phone");
+
+        homeAddressRef = settingsRef.child("home");
+        homeAddressLatRef = settingsRef.child("homeLat");
+        homeAddressLongRef = settingsRef.child("homeLong");
+
+        workAddressRef = settingsRef.child("work");
+        workAddressLatRef = settingsRef.child("workLat");
+        workAddressLongRef = settingsRef.child("workLong");
+
+        vehicleRef = settingsRef.child("vehicle");
 
         mobileNumberView = (ViewGroup) rootView.findViewById(R.id.settings_phone_number);
         homeAddressView = (ViewGroup) rootView.findViewById(R.id.settings_home_address);
@@ -399,6 +418,8 @@ public class SettingsFragment extends Fragment
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final LatLng placeLatLng = place.getLatLng();
+
                 String attribution = PlacePicker.getAttributions(data);
                 if(attribution == null){
                     attribution = "";
@@ -411,10 +432,12 @@ public class SettingsFragment extends Fragment
                 } else {
                     if(homeOrWork == "home"){
                         homeAddressRef.setValue(location);
-                        homeAddressIdRef.setValue(placeId);
+                        homeAddressLatRef.setValue(placeLatLng.latitude);
+                        homeAddressLongRef.setValue(placeLatLng.longitude);
                     } else if(homeOrWork == "work"){
                         workAddressRef.setValue(location);
-                        workAddressIdRef.setValue(placeId);
+                        workAddressLatRef.setValue(placeLatLng.latitude);
+                        workAddressLongRef.setValue(placeLatLng.longitude);
                     }
 
                     Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");

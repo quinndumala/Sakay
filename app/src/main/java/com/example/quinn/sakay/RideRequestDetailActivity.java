@@ -2,6 +2,7 @@ package com.example.quinn.sakay;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -61,7 +62,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
+
     private Button sakayButton;
+    private Button seeRouteButton;
     private RecyclerView sakaysViewRecycler;
 
     private CardView responsesTextView;
@@ -76,13 +79,18 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private String userAuthorId;
     private String userAuthorFacebookId;
     private String userAuthorName;
-    private String start;
-    private String destination;
-    private String dateAndTime;
 
-    private String requesteeUid;
-    private String requesteefacebookId;
-    private String requesteeAuthorname;
+    private String start;
+    private String startLat;
+    private String startLong;
+
+    private String destination;
+    private String destinationLat;
+    private String destinationLong;
+
+    private String dateAndTime;
+    private String timeStamp;
+
 
     public String getUserAuthorName(){
         return userAuthorName;
@@ -122,11 +130,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
         responsesView = (CardView) findViewById(R.id.responses_view_request);
 
         sakayButton = (Button) findViewById(R.id.button_sakay_request);
+        seeRouteButton = (Button) findViewById(R.id.button_see_route_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
         userFacebookId = profile.getId();
         noResponses();
 
         sakayButton.setOnClickListener(this);
+        seeRouteButton.setOnClickListener(this);
         buttonDelete.setOnClickListener(this);
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
@@ -172,9 +182,17 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     userAuthorId = rideRequest.uid;
                     userAuthorName = rideRequest.author;
                     userAuthorFacebookId = rideRequest.facebookId;
+
                     start = rideRequest.start;
+                    startLat = rideRequest.startLat.toString();
+                    startLong = rideRequest.startLong.toString();
+
                     destination = rideRequest.destination;
+                    destinationLat = rideRequest.destinationLat.toString();
+                    destinationLong = rideRequest.destinationLong.toString();
+
                     dateAndTime = rideRequest.dateAndTime;
+                    timeStamp = rideRequest.timeStamp;
                 }
 
                 mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -233,6 +251,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         if (id == R.id.button_sakay_request) {
             alreadyExists();
+        } else if(id == R.id.button_see_route_request) {
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
+                            "&daddr=" + destinationLat + "," + destinationLong));
+            startActivity(intent);
         } else if (id == R.id.button_request_detail_delete){
             launchConfirmDelete();
         } else if (id == R.id.post_author_photo_large){
