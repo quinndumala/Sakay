@@ -172,14 +172,9 @@ public class ViewProfileActivity extends BaseActivity implements
                 progressDialog.dismiss();
             }
         }, 550);
-        buttonRateUser.hide(false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                buttonRateUser.show(true);
-            }
-        }, 500);
-
+        if (!(mUserKey.equals(MY_USER_ID))){
+            buttonRateUser.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

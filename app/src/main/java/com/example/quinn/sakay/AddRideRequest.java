@@ -25,6 +25,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -57,6 +59,12 @@ public class AddRideRequest extends BaseActivity
     private Profile profile = getCurrentProfile();
     public String startOrDestination = "";
 
+    public Double startLat;
+    public Double startLong;
+    public Double destinationLat;
+    public Double destinationLong;
+    public Timestamp time;
+
     public MaterialDialog progressDialog;
 
     @Override
@@ -74,6 +82,7 @@ public class AddRideRequest extends BaseActivity
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
+                time = new Timestamp(date.getTime().getTime());
             }
         });
 
@@ -122,6 +131,21 @@ public class AddRideRequest extends BaseActivity
 
     }
 
+
+    public void confirmPost(final String start, final String destination){
+        new MaterialDialog.Builder(this)
+                .title("Post this ride request?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postPost(start, destination);
+                    }
+                })
+                .show();
+    }
+
     private void postPost(final String start, final String destination){
         //setEditingEnabled(false);
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
@@ -144,8 +168,8 @@ public class AddRideRequest extends BaseActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            writeNewPost(userId, user.getName(), userFacebookId, start, destination,
-                                    dateAndTime);
+                            writeNewPost(userId, user.getName(), userFacebookId, start, startLat, startLong,
+                                    destination, destinationLat, destinationLong, dateAndTime, time.toString());
                         }
 
                         // Finish this Activity, back to the stream
@@ -166,20 +190,6 @@ public class AddRideRequest extends BaseActivity
 
     }
 
-    public void confirmPost(final String start, final String destination){
-        new MaterialDialog.Builder(this)
-                .title("Post this ride request?")
-                .positiveText("OK")
-                .negativeText("CANCEL")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        postPost(start, destination);
-                    }
-                })
-                .show();
-    }
-
     private void setEditingEnabled(boolean enabled) {
         fStart.setEnabled(enabled);
         fDestination.setEnabled(enabled);
@@ -191,13 +201,14 @@ public class AddRideRequest extends BaseActivity
     }
 
     // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String userFacebookId, String start,
-                              String destination, String dateAndTime) {
+    private void writeNewPost(String userId, String username, String userFacebookId, String start, Double startLat,
+                              Double startLong, String destination, Double destinationLat, Double destinationLong,
+                              String dateAndTime, String timeStamp) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideRequests").push().getKey();
-        RideRequest rideRequest = new RideRequest(userId, username, userFacebookId, start,
-                destination, dateAndTime);
+        RideRequest rideRequest = new RideRequest(userId, username, userFacebookId, start, startLat, startLong,
+                destination, destinationLat, destinationLong, dateAndTime, timeStamp);
         Map<String, Object> postValues = rideRequest.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -316,6 +327,8 @@ public class AddRideRequest extends BaseActivity
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final LatLng placeLatLong = place.getLatLng();
+
                 String attribution = PlacePicker.getAttributions(data);
                 if(attribution == null){
                     attribution = "";
@@ -329,8 +342,12 @@ public class AddRideRequest extends BaseActivity
 
                 if(startOrDestination == "start"){
                     fStart.setText(location);
+                    startLat = placeLatLong.latitude;
+                    startLong = placeLatLong.longitude;
                 } else if(startOrDestination == "destination"){
                     fDestination.setText(location);
+                    destinationLat = placeLatLong.latitude;
+                    destinationLong = placeLatLong.longitude;
                 }
 
 //                // Update data on card.

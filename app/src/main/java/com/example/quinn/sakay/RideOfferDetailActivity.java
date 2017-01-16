@@ -3,6 +3,7 @@ package com.example.quinn.sakay;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -72,6 +73,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 //    private ViewGroup responsesTextView;
     //private TextView noResponsesYetTextView;
     private Button sakayButton;
+    private Button seeRouteButton;
     private RecyclerView sakaysViewRecycler;
 
     private CardView responsesTextView;
@@ -87,10 +89,23 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private String userAuthorId;
     private String userAuthorName;
     private String userAuthorFacebookId;
+
     private String start;
+    private String startLat;
+    private String startLong;
+
     private String destination;
+    private String destinationLat;
+    private String destinationLong;
+
     private String dateAndTime;
+    private String timeStamp;
+
     private String vehicle;
+    private String vehicleModel;
+    private String vehicleColor;
+    private String vehiclePlateNo;
+
 
 
     @Override
@@ -128,12 +143,14 @@ public class RideOfferDetailActivity extends BaseActivity implements
         responsesView = (CardView) findViewById(R.id.responses_view_offer);
 
         sakayButton = (Button) findViewById(R.id.button_sakay_offer);
+        seeRouteButton = (Button) findViewById(R.id.button_see_route_offer);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_offer_comment);
 
         userFacebookId = profile.getId();
         noResponses();
 
         sakayButton.setOnClickListener(this);
+        seeRouteButton.setOnClickListener(this);
         buttonDelete.setOnClickListener(this);
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
@@ -182,10 +199,22 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     userAuthorId = rideOffer.uid;
                     userAuthorName = rideOffer.author;
                     userAuthorFacebookId = rideOffer.facebookId;
+
                     start = rideOffer.start;
+                    startLat = rideOffer.startLat.toString();
+                    startLong = rideOffer.startLong.toString();
+
                     destination = rideOffer.destination;
+                    destinationLat = rideOffer.destinationLat.toString();
+                    destinationLong = rideOffer.destinationLong.toString();
+
                     dateAndTime = rideOffer.dateAndTime;
+                    timeStamp = rideOffer.timeStamp;
+
                     vehicle = rideOffer.vehicle;
+                    vehicleModel = rideOffer.vehicleModel;
+                    vehicleColor = rideOffer.vehicleColor;
+                    vehiclePlateNo = rideOffer.vehiclePlateNo;
 
 
                     rideExists = true;
@@ -254,6 +283,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         if (id == R.id.button_sakay_offer) {
             alreadyExists();
+        } else if(id == R.id.button_see_route_offer) {
+            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
+                                "&daddr=" + destinationLat + "," + destinationLong));
+            startActivity(intent);
         } else if (id == R.id.button_offer_detail_delete) {
             Log.d(TAG, "delete clicked");
             launchConfirmDelete();

@@ -16,20 +16,31 @@ public class RideRequest {
     public String author;
     public String facebookId;
     public String start;
+    public Double startLat;
+    public Double startLong;
     public String destination;
+    public Double destinationLat;
+    public Double destinationLong;
     public String dateAndTime;
+    public String timeStamp;
     public Map<String, Boolean> responses = new HashMap<>();
 
     public RideRequest(){}
 
-    public RideRequest(String uid, String author, String facebookId, String start, String destination,
-                       String dateAndTime) {
+    public RideRequest(String uid, String author, String facebookId, String start, Double startLat, Double startLong,
+                       String destination, Double destinationLat, Double destinationLong, String dateAndTime,
+                       String timeStamp) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.start = start;
+        this.startLat = startLat;
+        this.startLong = startLong;
         this.destination = destination;
+        this.destinationLat = destinationLat;
+        this.destinationLong = destinationLong;
         this.dateAndTime = dateAndTime;
+        this.timeStamp = timeStamp;
     }
 
     @Exclude
@@ -39,8 +50,13 @@ public class RideRequest {
         result.put("author", author);
         result.put("facebookId", facebookId);
         result.put("start", start);
+        result.put("startLat", startLat);
+        result.put("startLong", startLong);
         result.put("destination", destination);
+        result.put("destinationLat", destinationLat);
+        result.put("destinationLong", destinationLong);
         result.put("dateAndTime", dateAndTime);
+        result.put("timeStamp", timeStamp);
         //result.put("responses", responses);
 
         return result;

@@ -16,6 +16,13 @@
         android:scrollbars="vertical"
         tools:listitem="@layout/item_sakay"
         />
+    <TextView android:id="@+id/no_sakays_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No Sakays"
+        android:textSize="18sp"
+        android:visibility="gone"/>
 
 
 

@@ -18,9 +18,12 @@ import android.widget.TextView;
 import com.example.quinn.sakay.Models.Sakay;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 /**
@@ -34,11 +37,13 @@ public class SakaysFragment extends Fragment
     // [START define_database_reference]
     private DatabaseReference mDatabase;
     // [END define_database_reference]
+    private DatabaseReference userSakaysRef;
 
     private FirebaseRecyclerAdapter<Sakay, SakaysViewHolder> mAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private final String userId = getUid();
+    private TextView noSakays;
 
     public SakaysFragment() {
         // Required empty public constructor
@@ -50,10 +55,10 @@ public class SakaysFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_sakays, container, false);
+        noSakays = (TextView) rootView.findViewById(R.id.no_sakays_text);
 
-        // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        // [END create_database_reference]
+        userSakaysRef = mDatabase.child("user-sakays").child(userId);
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.sakays_list);
         mRecycler.setHasFixedSize(true);
@@ -70,6 +75,22 @@ public class SakaysFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        userSakaysRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    noSakays.setVisibility(View.GONE);
+                } else {
+                    noSakays.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());

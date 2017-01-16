@@ -29,6 +29,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,10 +38,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
+//import java.security.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.Timestamp;
+
 
 import static com.facebook.Profile.getCurrentProfile;
 
@@ -78,6 +82,12 @@ public class AddRideOffer extends BaseActivity
     public String currentVehicleColor;
     public String currentVehiclePlateNo;
 
+    public Double startLat;
+    public Double startLong;
+    public Double destinationLat;
+    public Double destinationLong;
+    public Timestamp time;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +103,9 @@ public class AddRideOffer extends BaseActivity
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
+                time = new Timestamp(date.getTime().getTime());
+                Log.d(TAG, "Selected date: " + selectedDate);
+                Log.d(TAG, "Timestamp: " + time.toString());
             }
         });
 
@@ -172,6 +185,21 @@ public class AddRideOffer extends BaseActivity
 
     }
 
+    public void confirmPost(final String start, final String destination, final String vehicle, final String vehicleModel,
+                            final String vehicleColor, final String vehiclePlateNo){
+        new MaterialDialog.Builder(this)
+                .title("Post this ride offer?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
+                    }
+                })
+                .show();
+    }
+
     private void postPost(final String start, final String destination, final String vehicle, final String vehicleModel,
                           final String vehicleColor, final String vehiclePlateNo){
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
@@ -194,8 +222,10 @@ public class AddRideOffer extends BaseActivity
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            writeNewPost(userId, user.getName(), userFacebookId, start, destination,
-                                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo, dateAndTime);
+                            writeNewPost(userId, user.getName(), userFacebookId, start, startLat, startLong,
+                                    destination, destinationLat, destinationLong,
+                                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
+                                    dateAndTime, time.toString());
                         }
 
                         // Finish this Activity, back to the stream
@@ -228,14 +258,16 @@ public class AddRideOffer extends BaseActivity
     }
 
     // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String userFacebookId, String start,
-                              String destination, String vehicle, String vehicelModel, String vehicelColor,
-                              String vehiclePlateNo, String dateAndTime) {
+    private void writeNewPost(String userId, String username, String userFacebookId, String start, Double startLat,
+                              Double startLong, String destination, Double destinationLat, Double destinationLong,
+                              String vehicle, String vehicleModel, String vehicleColor,
+                              String vehiclePlateNo, String dateAndTime, String timeStamp) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideOffers").push().getKey();
-        RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start, destination,
-                vehicle, vehicelModel, vehicelColor, vehiclePlateNo, dateAndTime);
+        RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start, startLat, startLong,
+                destination, destinationLat, destinationLong,
+                vehicle, vehicleModel, vehicleColor, vehiclePlateNo, dateAndTime, timeStamp);
         Map<String, Object> postValues = rideOffer.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
@@ -373,6 +405,10 @@ public class AddRideOffer extends BaseActivity
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final LatLng placeLatLong = place.getLatLng();
+
+
+
                 String attribution = PlacePicker.getAttributions(data);
                 if(attribution == null){
                     attribution = "";
@@ -384,10 +420,15 @@ public class AddRideOffer extends BaseActivity
                     launchAlertDialog();
                 }
 
-                if(startOrDestination == "start"){
+                if(startOrDestination.equals("start")){
                     fStart.setText(location);
-                } else if(startOrDestination == "destination"){
+                    startLat = placeLatLong.latitude;
+                    startLong = placeLatLong.longitude;
+
+                } else if(startOrDestination.equals("destination")){
                     fDestination.setText(location);
+                    destinationLat = placeLatLong.latitude;
+                    destinationLong = placeLatLong.longitude;
                 }
 
 //                // Update data on card.
@@ -397,6 +438,8 @@ public class AddRideOffer extends BaseActivity
 //                                attribution));
 
                 Log.d(TAG, "Place selected: " + placeId + " (" + name.toString() + ")");
+                Log.d(TAG, "latitude: " + placeLatLong.latitude);
+                Log.d(TAG, "longitude: " + placeLatLong.longitude);
 
             } else {
                 // User has not selected a place, hide the card.
@@ -431,20 +474,7 @@ public class AddRideOffer extends BaseActivity
                 .show();
     }
 
-    public void confirmPost(final String start, final String destination, final String vehicle, final String vehicleModel,
-                            final String vehicleColor, final String vehiclePlateNo){
-        new MaterialDialog.Builder(this)
-                .title("Post this ride offer?")
-                .positiveText("OK")
-                .negativeText("CANCEL")
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        postPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
-                    }
-                })
-                .show();
-    }
+
 
     public void checkForVehicle(){
         vehicleRef.addListenerForSingleValueEvent(new ValueEventListener() {

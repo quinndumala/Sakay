@@ -13,8 +13,14 @@ public class RideOffer {
     public String author;
     public String facebookId;
     public String start;
+    public Double startLat;
+    public Double startLong;
     public String destination;
+    public Double destinationLat;
+    public Double destinationLong;
     public String dateAndTime;
+    public String timeStamp;
+
     public String vehicle;
     public String vehicleModel;
     public String vehicleColor;
@@ -26,19 +32,25 @@ public class RideOffer {
     public RideOffer() {
     }
 
-    public RideOffer(String uid, String author, String facebookId, String start, String destination,
-                     String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
-                     String dateAndTime) {
+    public RideOffer(String uid, String author, String facebookId, String start, Double startLat, Double startLong,
+                     String destination, Double destinationLat, Double destinationLong, String vehicle,
+                     String vehicleModel, String vehicleColor, String vehiclePlateNo,
+                     String dateAndTime, String timeStamp) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.start = start;
+        this.startLat = startLat;
+        this.startLong = startLong;
         this.destination = destination;
+        this.destinationLat = destinationLat;
+        this.destinationLong = destinationLong;
         this.vehicle = vehicle;
         this.vehicleModel = vehicleModel;
         this.vehicleColor = vehicleColor;
         this.vehiclePlateNo = vehiclePlateNo;
         this.dateAndTime = dateAndTime;
+        this.timeStamp = timeStamp;
     }
 
     @Exclude
@@ -48,12 +60,17 @@ public class RideOffer {
         result.put("author", author);
         result.put("facebookId", facebookId);
         result.put("start", start);
+        result.put("startLat", startLat);
+        result.put("startLong", startLong);
         result.put("destination", destination);
+        result.put("destinationLat", destinationLat);
+        result.put("destinationLong", destinationLong);
         result.put("vehicle", vehicle);
         result.put("vehicleModel", vehicleModel);
         result.put("vehicleColor", vehicleColor);
         result.put("vehiclePlateNo", vehiclePlateNo);
         result.put("dateAndTime", dateAndTime);
+        result.put("timeStamp", timeStamp);
 
         return result;
     }
