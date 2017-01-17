@@ -30,16 +30,21 @@ public class CommentOffer {
     public String author;
     public String facebookId;
     public String pickUp;
+    public Double pickUpLat;
+    public Double pickUpLong;
 
     public CommentOffer() {
         // Default constructor required for calls to DataSnapshot.getValue(CommentOffer.class)
     }
 
-    public CommentOffer(String uid, String author, String facebookId, String pickUp) {
+    public CommentOffer(String uid, String author, String facebookId, String pickUp,
+                        Double pickUpLat, Double pickUpLong) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.pickUp = pickUp;
+        this.pickUpLat = pickUpLat;
+        this.pickUpLong = pickUpLong;
     }
 
     @Exclude
@@ -49,6 +54,8 @@ public class CommentOffer {
         result.put("author", author);
         result.put("facebookId", facebookId);
         result.put("pickUp", pickUp);
+        result.put("pickUpLat", pickUpLat);
+        result.put("pickUpLong", pickUpLong);
 
         return result;
     }

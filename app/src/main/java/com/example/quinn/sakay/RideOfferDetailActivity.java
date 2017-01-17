@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,6 +61,14 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private DatabaseReference mPostReference;
     private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
+    private DatabaseReference userSettingsRef;
+    private DatabaseReference homeAddressRef;
+    private DatabaseReference homeLatRef;
+    private DatabaseReference homeLongRef;
+    private DatabaseReference workAddressRef;
+    private DatabaseReference workLatRef;
+    private DatabaseReference workLongRef;
+
     private ValueEventListener mPostListener;
     private String mPostKey;
     private RideOfferDetailActivity.CommentAdapter mAdapter;
@@ -95,8 +105,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private String startLong;
 
     private String destination;
-    private String destinationLat;
-    private String destinationLong;
+    private Double destinationLat;
+    private Double destinationLong;
 
     private String dateAndTime;
     private String timeStamp;
@@ -106,7 +116,19 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private String vehicleColor;
     private String vehiclePlateNo;
 
+    private String currentHome;
+    private Double currentHomeLat;
+    private Double currentHomeLong;
+    private String currentWork;
+    private Double currentWorkLat;
+    private Double currentWorkLong;
 
+    public Boolean workSet = false;
+    public Boolean homeSet = false;
+
+    public MaterialDialog progressDialog;
+
+    //String arrRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +150,13 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mPostReference = mRootRef.child("rideOffers").child(mPostKey);
         mUserPostReference = mRootRef.child("user-rideOffers").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideOffers-comments").child(mPostKey);
+        userSettingsRef = mRootRef.child("users-settings").child(userId);
+        homeAddressRef = userSettingsRef.child("home");
+        homeLatRef = userSettingsRef.child("homeLat");
+        homeLongRef = userSettingsRef.child("homeLong");
+        workAddressRef = userSettingsRef.child("work");
+        workLatRef = userSettingsRef.child("workLat");
+        workLongRef = userSettingsRef.child("workLong");
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
@@ -175,6 +204,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
             }
         });
+        checkAddress();
     }
 
     @Override
@@ -195,6 +225,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
         // Add value event listener to the post
         // [START post_value_event_listener]
         noResponses();
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading map")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
 
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -235,8 +271,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     startLong = rideOffer.startLong.toString();
 
                     destination = rideOffer.destination;
-                    destinationLat = rideOffer.destinationLat.toString();
-                    destinationLong = rideOffer.destinationLong.toString();
+                    destinationLat = rideOffer.destinationLat;
+                    destinationLong = rideOffer.destinationLong;
 
                     dateAndTime = rideOffer.dateAndTime;
                     timeStamp = rideOffer.timeStamp;
@@ -248,11 +284,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                     rideExists = true;
                 }
-
-
-
-
-
             }
 
             @Override
@@ -266,20 +297,14 @@ public class RideOfferDetailActivity extends BaseActivity implements
         };
 
         mPostReference.addValueEventListener(postListener);
-        // [END post_value_event_listener]
-
-        // Keep copy of post listener so we can remove it when app stops
         mPostListener = postListener;
 
-        // Listen for comments
-//        if (rideExists){
-//            mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
-//        }
         mAdapter = new RideOfferDetailActivity.CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
 
 
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -316,6 +341,94 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     }
 
+    public void checkAddress(){
+        homeAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    homeSet = true;
+                    currentHome = dataSnapshot.getValue(String.class);
+                } else {
+                    homeSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        workAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    workSet = true;
+                    currentWork = dataSnapshot.getValue(String.class);
+                } else {
+                    workSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     public void viewProfile(){
         Intent intent = new Intent(this, ViewProfileActivity.class);
         intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userAuthorId);
@@ -323,13 +436,25 @@ public class RideOfferDetailActivity extends BaseActivity implements
     }
 
     public void alreadyExists(){
+
         mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            String[] arrRef;
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)){
                     launchAlreadySentDialog();
                 } else {
-                    launchPickupLocationPicker();
+                    if (homeSet && workSet){
+                        arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_all);
+                    } else if (homeSet) {
+                        arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_home);
+                    } else if (workSet) {
+                        arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_work);
+                    } else {
+                        arrRef = getResources().getStringArray(R.array.offer_select_pickup_location);
+                    }
+                    launchPickupLocationPicker(arrRef);
+
                     //launchSakayDialog();
                 }
             }
@@ -349,9 +474,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     responsesTextView.setVisibility(View.VISIBLE);
                     responsesView.setVisibility(View.VISIBLE);
                 } else {
-                    if (isAuthor){
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
-                    }
+                    responsesTextView.setVisibility(View.GONE);
+                    responsesView.setVisibility(View.GONE);
+                    if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE); }
                 }
             }
 
@@ -370,7 +495,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         //DeletePost.DeleteThis(mPostReference, mUserPostReference);
     }
 
-    private void postComment(final String location) {
+    private void postComment(final String location, final Double lat, final Double lng) {
         final String uid = getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -380,7 +505,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-                        CommentOffer comment = new CommentOffer(uid, authorName, userFacebookId, location);
+                        CommentOffer comment = new CommentOffer(uid, authorName, userFacebookId,
+                                location, lat, lng);
 
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
@@ -508,6 +634,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
             final CommentOffer comment = mComments.get(position);
             final String commentAuthor = comment.author;
             final String commentPickup = comment.pickUp;
+            final Double commentPickupLat = comment.pickUpLat;
+            final Double commentPickupLong = comment.pickUpLong;
             final String commentFacebookId = comment.facebookId;
             final String commentAuthorUid = comment.uid;
 
@@ -519,7 +647,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
             holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentPickup);
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId,
+                            commentPickup, commentPickupLat, commentPickupLong);
                 }
             });
 
@@ -545,7 +674,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
         }
 
         public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
-                                       final String commentFacebookId, final String commentPickup){
+                                       final String commentFacebookId, final String commentPickup,
+                                       final Double commentPickupLat, final Double commentPickupLong){
             new MaterialDialog.Builder(mContext)
                     .content("Confirm Sakay?")
                     .positiveText("OK")
@@ -554,26 +684,41 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             String sakayKey = mRootRef.child("user-sakays").push().getKey();
-                            newSakay(userId, userAuthorName, userFacebookId, "driver", commentPickup,
-                                    destination, dateAndTime, vehicle, commentAuthorId, commentAuthor,
-                                    commentFacebookId,
+                            newSakay(userId, userAuthorName, userFacebookId, "driver",
+                                    commentPickup, commentPickupLat, commentPickupLong,
+                                    destination, destinationLat, destinationLong,
+                                    dateAndTime, timeStamp,
+                                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
+                                    commentAuthorId, commentAuthor, commentFacebookId,
                                     sakayKey);
-                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "rider", commentPickup,
-                                    destination, dateAndTime, vehicle, userId, userAuthorName, userFacebookId,
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "rider",
+                                    commentPickup, commentPickupLat, commentPickupLong,
+                                    destination, destinationLat, destinationLong,
+                                    dateAndTime, timeStamp,
+                                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
+                                    userId, userAuthorName, userFacebookId,
                                     sakayKey);
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     })
                     .show();
         }
 
         private void newSakay(String userId, String userName, String userFacebookId, String userRole,
-                              String start, String destination, String dateAndTime, String vehicle,
+                              String start, Double startLat, Double startLong,
+                              String destination, Double destinationLat, Double destinationLong,
+                              String dateAndTime, String timeStamp,
+                              String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
                               String otherId, String otherName, String otherFacebookId,
                               String sakayKey){
             //String key = mRootRef.child("user-sakays").push().getKey();
-            Sakay sakay = new Sakay(userId, userName, userFacebookId, userRole, start, destination, dateAndTime,
-                    vehicle, otherId, otherName, otherFacebookId);
+            Sakay sakay = new Sakay(userId, userName, userFacebookId, userRole,
+                    start, startLat, startLong,
+                    destination, destinationLat, destinationLong,
+                    dateAndTime, timeStamp,
+                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
+                    otherId, otherName, otherFacebookId);
             Map<String, Object> sakayValues = sakay.toMap();
 
             Map<String, Object> childUpdates = new HashMap<>();
@@ -587,7 +732,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
     }
 
-    public void launchSakayDialog(final String location){
+    public void launchSakayDialog(final String location, final Double lat, final Double lng){
         new MaterialDialog.Builder(this)
                 .content("Pickup location has been set to " + location + ". Send sakay request?")
                 .positiveText("OK")
@@ -596,7 +741,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        postComment(location);
+                        postComment(location, lat, lng);
                         Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -611,15 +756,25 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .show();
     }
 
-    public void launchPickupLocationPicker(){
+    public void launchPickupLocationPicker(String[] arrRef){
         new MaterialDialog.Builder(this)
                 .title("Choose a pickup location")
-                .items(R.array.offer_select_pickup_location)
+                .items(arrRef)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         if(text.equals("Choose on Map")){
+                            progressDialog.show();
                             launchPlacePicker();
+                        } else if(text.equals("My Home Address")){
+                            postComment(currentHome, currentHomeLat, currentHomeLong);
+                            Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
+                                    Toast.LENGTH_SHORT).show();
+
+                        } else if(text.equals("My Work Address")){
+                            postComment(currentWork, currentWorkLat, currentWorkLong);
+                            Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -672,6 +827,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     Toast.LENGTH_LONG)
                     .show();
         }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        }, 450);
 
     }
 
@@ -692,6 +853,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 final CharSequence address = place.getAddress();
                 final CharSequence phone = place.getPhoneNumber();
                 final String placeId = place.getId();
+                final LatLng placeLatLng = place.getLatLng();
+
                 String attribution = PlacePicker.getAttributions(data);
                 if(attribution == null){
                     attribution = "";
@@ -702,7 +865,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     location = address.toString();
                     launchAlertDialog();
                 } else {
-                    launchSakayDialog(location);
+                    launchSakayDialog(location, placeLatLng.latitude, placeLatLng.longitude);
                     //Toast.makeText(this, "Chosen Location: " + location, Toast.LENGTH_SHORT).show();
                 }
 

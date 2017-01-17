@@ -15,25 +15,44 @@ public class Sakay {
     public String facebookId;
     public String role;
     public String start;
+    public Double startLat;
+    public Double startLong;
     public String destination;
+    public Double destinationLat;
+    public Double destinationLong;
     public String dateAndTime;
+    public String timeStamp;
     public String vehicle;
+    public String vehicleModel;
+    public String vehicleColor;
+    public String vehiclePlateNo;
     public String otherUid;
     public String otherAuthor;
     public String otherFacbookId;
 
     public Sakay(){}
 
-    public Sakay(String uid, String author, String facebookId, String role, String start, String destination,
-                 String dateAndTime, String vehicle, String otherUid, String otherAuthor,
-                 String otherFacbookId){
+    public Sakay(String uid, String author, String facebookId, String role,
+                 String start, Double startLat, Double startLong,
+                 String destination, Double destinationLat, Double destinationLong,
+                 String dateAndTime, String timeStamp,
+                 String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
+                 String otherUid, String otherAuthor, String otherFacbookId){
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.start = start;
+        this.startLat = startLat;
+        this.startLong = startLong;
         this.destination = destination;
+        this.destinationLat = destinationLat;
+        this.destinationLong = destinationLong;
         this.dateAndTime = dateAndTime;
+        this.timeStamp = timeStamp;
         this.vehicle = vehicle;
+        this.vehicleModel = vehicleModel;
+        this.vehicleColor = vehicleColor;
+        this.vehiclePlateNo = vehiclePlateNo;
         this.role = role;
         this.otherUid = otherUid;
         this.otherAuthor = otherAuthor;
@@ -48,9 +67,17 @@ public class Sakay {
         result.put("facebookId", facebookId);
         result.put("role", role);
         result.put("start", start);
+        result.put("startLat", startLat);
+        result.put("startLong", startLong);
         result.put("destination", destination);
+        result.put("destinationLat", destinationLat);
+        result.put("destinationLong", destinationLong);
         result.put("dateAndTime", dateAndTime);
+        result.put("timeStamp", timeStamp);
         result.put("vehicle", vehicle);
+        result.put("vehicleModel", vehicleModel);
+        result.put("vehicleColor", vehicleColor);
+        result.put("vehiclePlateNo", vehiclePlateNo);
         result.put("otherUid", otherUid);
         result.put("otherAuthor", otherAuthor);
         result.put("otherFacebookId", otherFacbookId);

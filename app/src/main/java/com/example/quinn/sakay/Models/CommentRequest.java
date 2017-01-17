@@ -14,16 +14,23 @@ public class CommentRequest {
     public String author;
     public String facebookId;
     public String vehicle;
+    public String vehicleModel;
+    public String vehicleColor;
+    public String vehiclePlateNo;
 
     public CommentRequest() {
         // Default constructor required for calls to DataSnapshot.getValue(CommentOffer.class)
     }
 
-    public CommentRequest(String uid, String author, String facebookId, String vehicle) {
+    public CommentRequest(String uid, String author, String facebookId, String vehicle,
+                          String vehicleModel, String vehicleColor, String vehiclePlateNo) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;
         this.vehicle = vehicle;
+        this.vehicleModel = vehicleModel;
+        this.vehicleColor = vehicleColor;
+        this.vehiclePlateNo = vehiclePlateNo;
     }
 
     @Exclude
@@ -33,6 +40,9 @@ public class CommentRequest {
         result.put("author", author);
         result.put("facebookId", facebookId);
         result.put("vehicle", vehicle);
+        result.put("vehicleModel", vehicleModel);
+        result.put("vehicleColor", vehicleColor);
+        result.put("vehiclePlateNo", vehiclePlateNo);
 
         return result;
     }

@@ -73,6 +73,19 @@
     <string-array name="offer_select_pickup_location">
         <item>Choose on Map</item>
     </string-array>
+    <string-array name="offer_select_pickup_location_home">
+        <item>Choose on Map</item>
+        <item>My Home Address</item>
+    </string-array>
+    <string-array name="offer_select_pickup_location_work">
+        <item>Choose on Map</item>
+        <item>My Work Address</item>
+    </string-array>
+    <string-array name="offer_select_pickup_location_all">
+        <item>Choose on Map</item>
+        <item>My Home Address</item>
+        <item>My Work Address</item>
+    </string-array>
     <string name="title_activity_notifications">Notifications</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_profile">ProfileActivity</string>
@@ -84,6 +97,8 @@
         <item>"2  Unsatisfied"</item>
         <item>"1  Poor"</item>
     </string-array>
+    <string name="driver_text">"You will be driving for "</string>
+    <string name="rider_text">"You will be riding with"</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

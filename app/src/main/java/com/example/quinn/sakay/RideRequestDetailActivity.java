@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.CommentRequest;
 import com.example.quinn.sakay.Models.RideRequest;
 import com.example.quinn.sakay.Models.Sakay;
+import com.example.quinn.sakay.Models.Vehicle;
 import com.facebook.Profile;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -52,6 +54,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private DatabaseReference mPostReference;
     private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
+    private DatabaseReference vehicleRef;
+
     private ValueEventListener mPostListener;
     private String mPostKey;
     private CommentAdapter mAdapter;
@@ -81,16 +85,28 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private String userAuthorName;
 
     private String start;
-    private String startLat;
-    private String startLong;
+    private Double startLat;
+    private Double startLong;
 
     private String destination;
-    private String destinationLat;
-    private String destinationLong;
+    private Double destinationLat;
+    private Double destinationLong;
 
     private String dateAndTime;
     private String timeStamp;
 
+    private View positiveAction;
+    private EditText EditVehicleType;
+    private EditText EditVehicleModel;
+    private EditText EditVehicleColor;
+    private EditText EditPlateNo;
+
+    public String currentVehicleType;
+    public String currentVehicleModel;
+    public String currentVehicleColor;
+    public String currentVehiclePlateNo;
+
+    public Boolean carSet = false;
 
     public String getUserAuthorName(){
         return userAuthorName;
@@ -116,6 +132,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         mPostReference = mRootRef.child("rideRequests").child(mPostKey);
         mUserPostReference = mRootRef.child("user-rideRequests").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideRequests-comments").child(mPostKey);
+        vehicleRef = mRootRef.child("users-settings").child(userId).child("vehicle");
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
@@ -133,6 +150,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
         seeRouteButton = (Button) findViewById(R.id.button_see_route_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
         userFacebookId = profile.getId();
+
+        checkForVehicle();
 
         sakayButton.setOnClickListener(this);
         seeRouteButton.setOnClickListener(this);
@@ -193,19 +212,13 @@ public class RideRequestDetailActivity extends BaseActivity implements
             }
         });
 
-        // Add value event listener to the post
-        // [START post_value_event_listener]
+
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
-                    if (!(rideRequest.uid.equals(userId))){
-                        isAuthor = false;
-                        sakayButton.setVisibility(View.VISIBLE);
-                    } else {
-                        buttonDelete.setVisibility(View.VISIBLE);
-                    }
+
                     // [START_EXCLUDE]
                     setPhoto(rideRequest.facebookId);
                     authorView.setText(rideRequest.author);
@@ -219,12 +232,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     userAuthorFacebookId = rideRequest.facebookId;
 
                     start = rideRequest.start;
-                    startLat = rideRequest.startLat.toString();
-                    startLong = rideRequest.startLong.toString();
+                    startLat = rideRequest.startLat;
+                    startLong = rideRequest.startLong;
 
                     destination = rideRequest.destination;
-                    destinationLat = rideRequest.destinationLat.toString();
-                    destinationLong = rideRequest.destinationLong.toString();
+                    destinationLat = rideRequest.destinationLat;
+                    destinationLong = rideRequest.destinationLong;
 
                     dateAndTime = rideRequest.dateAndTime;
                     timeStamp = rideRequest.timeStamp;
@@ -301,7 +314,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 if (dataSnapshot.hasChild(userId)){
                     launchAlreadySentDialog();
                 } else {
-                    launchSakayDialog();
+                    //launchSakayDialog();
+                    if (carSet){
+                        launchMyVehicleInput();
+                    } else {
+                        launchInputVehicle();
+                    }
                 }
             }
 
@@ -320,6 +338,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     responsesTextView.setVisibility(View.VISIBLE);
                     responsesView.setVisibility(View.VISIBLE);
                 } else {
+                    responsesTextView.setVisibility(View.GONE);
+                    responsesView.setVisibility(View.GONE);
                     if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE);}
                 }
             }
@@ -338,7 +358,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
         Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
     }
 
-    private void postComment(final String vehicle) {
+    private void postComment(final String vehicle, final String vehicleModel, final String vehicleColor,
+                             final String vehiclePlateNo) {
         final String uid = getUid();
         FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -348,7 +369,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         User user = dataSnapshot.getValue(User.class);
                         String authorName = user.getName();
 
-                        CommentRequest comment = new CommentRequest(uid, authorName, userFacebookId, vehicle);
+                        CommentRequest comment = new CommentRequest(uid, authorName, userFacebookId,
+                                vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
 
                         // Push the comment, it will appear in the list
                         Map<String, Object> postValues = comment.toMap();
@@ -503,6 +525,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
             final String commentFacebookId = comment.facebookId;
             final String commentAuthorUid = comment.uid;
             final String commentVehicle = comment.vehicle;
+            final String commentVehicleModel = comment.vehicleModel;
+            final String commentVehicleColor = comment.vehicleColor;
+            final String commentVehiclePlateNo = comment.vehiclePlateNo;
 
             holder.authorView.setText(commentAuthor);
             holder.vehicleView.setText(commentVehicle);
@@ -513,7 +538,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
             holder.buttonSakay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId, commentVehicle);
+                    launchConfirmSakay(commentAuthorUid, commentAuthor, commentFacebookId,
+                            commentVehicle, commentVehicleModel, commentVehicleColor, commentVehiclePlateNo);
                 }
             });
 
@@ -539,7 +565,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         }
 
         public void launchConfirmSakay(final String commentAuthorId, final String commentAuthor,
-                                       final String commentFacebookId, final String commentVehicle){
+                                       final String commentFacebookId, final String commentVehicle,
+                                       final String commentVehicleModel, final String commentVehicleColor,
+                                       final String commentVehiclePlateNo){
             new MaterialDialog.Builder(mContext)
                     .content("Confirm Sakay?")
                     .positiveText("OK")
@@ -548,25 +576,42 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             String sakayKey = mRootRef.child("user-sakays").push().getKey();
-                            newSakay(userId, userAuthorName, userFacebookId, "rider", start, destination,
-                                    dateAndTime, commentVehicle, commentAuthorId, commentAuthor, commentFacebookId,
+                            newSakay(userId, userAuthorName, userFacebookId, "rider",
+                                    start, startLat, startLong,
+                                    destination, destinationLat, destinationLong,
+                                    dateAndTime, timeStamp,
+                                    commentVehicle, commentVehicleModel, commentVehicleColor, commentVehiclePlateNo,
+                                    commentAuthorId, commentAuthor, commentFacebookId,
                                     sakayKey);
-                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "driver", start,
-                                    destination, dateAndTime, commentVehicle, userId, userAuthorName,
-                                    userFacebookId, sakayKey);
+                            newSakay(commentAuthorId, commentAuthor, commentFacebookId, "driver",
+                                    start, startLat, startLong,
+                                    destination, destinationLat, destinationLong,
+                                    dateAndTime, timeStamp,
+                                    commentVehicle, commentVehicleModel, commentVehicleColor, commentVehiclePlateNo,
+                                    userId, userAuthorName, userFacebookId,
+                                    sakayKey);
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     })
                     .show();
         }
 
         private void newSakay(String userId, String userName, String userFacebookId, String userRole,
-                              String start, String destination, String dateAndTime, String vehicle,
+                              String start, Double startLat, Double startLong,
+                              String destination, Double destinationLat, Double destinationLong,
+                              String dateAndTime, String timeStamp,
+                              String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
                               String otherId, String otherName, String otherFacebookId,
                               String sakayKey){
             //String key = mRootRef.child("user-sakays").push().getKey();
-            Sakay sakay = new Sakay(userId, userName, userFacebookId, userRole, start, destination, dateAndTime,
-                    vehicle, otherId, otherName, otherFacebookId);
+            Sakay sakay = new Sakay(userId, userName, userFacebookId, userRole,
+                    start, startLat, startLong,
+                    destination, destinationLat, destinationLong,
+                    dateAndTime, timeStamp,
+                    vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
+                    otherId, otherName, otherFacebookId);
+
             Map<String, Object> sakayValues = sakay.toMap();
 
             Map<String, Object> childUpdates = new HashMap<>();
@@ -590,7 +635,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        launchInputVehicle();
+                        if (carSet){
+                            launchMyVehicleInput();
+                        } else {
+                            launchInputVehicle();
+                        }
                     }
                 })
                 .show();
@@ -603,19 +652,96 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .show();
     }
 
+//    public void launchInputVehicle(){
+//        new MaterialDialog.Builder(this)
+//                .title("Input Vehicle")
+//                .positiveText("submit")
+//                .cancelable(false)
+//                .input(null, null, false, new MaterialDialog.InputCallback() {
+//                    @Override
+//                    public void onInput(MaterialDialog dialog, CharSequence input) {
+//                        postComment(input.toString());
+//                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
+//                                Toast.LENGTH_SHORT).show();
+//                    }
+//                }).show();
+//    }
+
     public void launchInputVehicle(){
-        new MaterialDialog.Builder(this)
-                .title("Input Vehicle")
-                .positiveText("submit")
-                .cancelable(false)
-                .input(null, null, false, new MaterialDialog.InputCallback() {
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Your vehicle details")
+                .customView(R.layout.item_vehicle, true)
+                .positiveText("Save")
+                .negativeText("cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        postComment(input.toString());
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postComment(EditVehicleType.getText().toString(),
+                                EditVehicleModel.getText().toString(),
+                                EditVehicleColor.getText().toString(),
+                                EditPlateNo.getText().toString());
                         Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
-                }).show();
+                })
+                .build();
+        positiveAction = dialog.getActionButton(DialogAction.POSITIVE);
+
+        EditVehicleType = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_type);
+        EditVehicleModel = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_model);
+        EditVehicleColor = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_color);
+        EditPlateNo = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_plate_no);
+
+
+        dialog.show();
+
+    }
+
+    public void launchMyVehicleInput(){
+        MaterialDialog dialog = new MaterialDialog.Builder(this)
+                .title("Your vehicle details")
+                .customView(R.layout.item_vehicle, true)
+                .positiveText("Save")
+                .negativeText("cancel")
+                .neutralText("use my vehicle")
+                .autoDismiss(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        postComment(EditVehicleType.getText().toString(),
+                                EditVehicleModel.getText().toString(),
+                                EditVehicleColor.getText().toString(),
+                                EditPlateNo.getText().toString());
+                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
+                                Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onNeutral(new MaterialDialog.SingleButtonCallback(){
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        EditVehicleType.setText(currentVehicleType);
+                        EditVehicleModel.setText(currentVehicleModel);
+                        EditVehicleColor.setText(currentVehicleColor);
+                        EditPlateNo.setText(currentVehiclePlateNo);
+                    }
+                })
+                .build();
+        positiveAction = dialog.getActionButton(DialogAction.POSITIVE);
+
+        EditVehicleType = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_type);
+        EditVehicleModel = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_model);
+        EditVehicleColor = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_color);
+        EditPlateNo = (EditText) dialog.getCustomView().findViewById(R.id.vehicle_plate_no);
+
+
+        dialog.show();
     }
 
     public void launchConfirmDelete(){
@@ -632,6 +758,27 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 .show();
     }
 
+    public void checkForVehicle(){
+        vehicleRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    carSet = true;
+                    Vehicle vehicle = dataSnapshot.getValue(Vehicle.class);
+                    currentVehicleType = vehicle.vehicleType;
+                    currentVehicleColor = vehicle.vehicleColor;
+                    currentVehicleModel = vehicle.vehicleModel;
+                    currentVehiclePlateNo = vehicle.plateNo;
+                } else {
+                    carSet = false;
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
 }

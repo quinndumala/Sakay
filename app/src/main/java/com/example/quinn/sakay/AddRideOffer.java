@@ -62,6 +62,14 @@ public class AddRideOffer extends BaseActivity
 
     private DatabaseReference mDatabase;
     private DatabaseReference vehicleRef;
+    private DatabaseReference userSettingsRef;
+    private DatabaseReference homeAddressRef;
+    private DatabaseReference homeLatRef;
+    private DatabaseReference homeLongRef;
+    private DatabaseReference workAddressRef;
+    private DatabaseReference workLatRef;
+    private DatabaseReference workLongRef;
+
     private EditText fStart;
     private EditText fDestination;
     private ReminderDatePicker datePicker;
@@ -88,6 +96,16 @@ public class AddRideOffer extends BaseActivity
     public Double destinationLong;
     public Timestamp time;
 
+    private String currentHome;
+    private Double currentHomeLat;
+    private Double currentHomeLong;
+    private String currentWork;
+    private Double currentWorkLat;
+    private Double currentWorkLong;
+
+    public Boolean workSet = false;
+    public Boolean homeSet = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +131,13 @@ public class AddRideOffer extends BaseActivity
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         vehicleRef = mDatabase.child("users-settings").child(userId).child("vehicle");
+        userSettingsRef = mDatabase.child("users-settings").child(userId);
+        homeAddressRef = userSettingsRef.child("home");
+        homeLatRef = userSettingsRef.child("homeLat");
+        homeLongRef = userSettingsRef.child("homeLong");
+        workAddressRef = userSettingsRef.child("work");
+        workLatRef = userSettingsRef.child("workLat");
+        workLongRef = userSettingsRef.child("workLong");
 
         fStart = (EditText) findViewById(R.id.field_offer_start);
         fDestination = (EditText) findViewById(R.id.field_offer_destination);
@@ -129,6 +154,8 @@ public class AddRideOffer extends BaseActivity
 
 
         checkForVehicle();
+        checkAddress();
+
 
     }
 
@@ -157,6 +184,7 @@ public class AddRideOffer extends BaseActivity
         findViewById(R.id.field_offer_start).setOnClickListener(this);
         findViewById(R.id.field_offer_destination).setOnClickListener(this);
         findViewById(R.id.offer_my_vehicle_button).setOnClickListener(this);
+
 
     }
 
@@ -280,16 +308,29 @@ public class AddRideOffer extends BaseActivity
     @Override
     public void onClick(View view) {
         int id = view.getId();
+        String[] arrRef;
+        if (homeSet && workSet){
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_all);
+        } else if (homeSet) {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_home);
+        } else if (workSet) {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_work);
+        } else {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location);
+        }
+
         switch (id){
             case R.id.field_offer_start:
                 startOrDestination = "start";
-                progressDialog.show();
-                launchPlacePicker();
+                pickPlace(arrRef);
+//                progressDialog.show();
+//                launchPlacePicker();
                 break;
             case R.id.field_offer_destination:
                 startOrDestination = "destination";
-                progressDialog.show();
-                launchPlacePicker();
+                pickPlace(arrRef);
+//                progressDialog.show();
+//                launchPlacePicker();
                 break;
             case R.id.offer_my_vehicle_button:
                 fillVehicleInfo();
@@ -310,13 +351,6 @@ public class AddRideOffer extends BaseActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_add_ride) {
-//            // Create a new child with a auto-generated ID.
-//            DatabaseReference childRef = myRef.push();
-//
-//            // Set the child's data to the value passed in from the text box.
-//            childRef.setValue(text.getText().toString());
-//            Toast.makeText(getApplicationContext(), "Ride Offer Added", Toast.LENGTH_SHORT).show();
-//            finish();
             submitPost();
         } else if (id == android.R.id.home){
             Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
@@ -363,6 +397,141 @@ public class AddRideOffer extends BaseActivity
             textView.setTextColor(color);
             snackbar.show();
         }
+    }
+
+    public void checkAddress(){
+        homeAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    homeSet = true;
+                    currentHome = dataSnapshot.getValue(String.class);
+                } else {
+                    homeSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        workAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    workSet = true;
+                    currentWork = dataSnapshot.getValue(String.class);
+                } else {
+                    workSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void pickPlace(String[] arrRef){
+        String dialogTitle;
+        if (startOrDestination.equals("start")){
+            dialogTitle = "Choose starting location";
+        } else {
+            dialogTitle = "Choose destination";
+        }
+
+        new MaterialDialog.Builder(this)
+                .title(dialogTitle)
+                .items(arrRef)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        if(text.equals("Choose on Map")){
+                            progressDialog.show();
+                            launchPlacePicker();
+                        } else if(text.equals("My Home Address")){
+                            if(startOrDestination.equals("start")){
+                                fStart.setText(currentHome);
+                                startLat = currentHomeLat;
+                                startLong = currentHomeLong;
+
+                            } else if(startOrDestination.equals("destination")){
+                                fDestination.setText(currentHome);
+                                destinationLat = currentHomeLat;
+                                destinationLong = currentHomeLong;
+                            }
+
+                        } else if(text.equals("My Work Address")){
+                            if(startOrDestination.equals("start")){
+                                fStart.setText(currentWork);
+                                startLat = currentWorkLat;
+                                startLong = currentWorkLong;
+
+                            } else if(startOrDestination.equals("destination")){
+                                fDestination.setText(currentWork);
+                                destinationLat = currentWorkLat;
+                                destinationLong = currentWorkLong;
+                            }
+                        }
+                    }
+                })
+                .positiveText("cancel")
+                .show();
     }
 
     public void launchPlacePicker(){

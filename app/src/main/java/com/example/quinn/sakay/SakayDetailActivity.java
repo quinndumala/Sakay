@@ -1,8 +1,13 @@
 package com.example.quinn.sakay;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,11 +41,21 @@ public class SakayDetailActivity extends BaseActivity implements
     private String userFacebookId = "";
     private Profile profile = getCurrentProfile();
     private final String userId = getUid();
+    private String otherUserId;
+
     private TextView otherAuthorNameView;
     private TextView startView;
     private TextView destinationView;
     private TextView dateAndTimeView;
-    private TextView vehicleView;
+
+    private TextView vehicleTypeView;
+    private TextView vehicleModelView;
+    private TextView vehicleColorView;
+    private TextView vehiclePlateNoView;
+
+//    public String driverText;
+//    public String riderText;
+
     private FloatingActionButton trackLocationButton;
 
     @Override
@@ -52,22 +67,24 @@ public class SakayDetailActivity extends BaseActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get post key from intent
         mPostKey = getIntent().getStringExtra(EXTRA_POST_KEY);
         if (mPostKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
 
-        // Initialize Database
+
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mPostReference = mRootRef.child("user-sakays").child(userId).child(mPostKey);
 
-        //Views
         otherAuthorNameView = (TextView) findViewById(R.id.sakay_detail_other_author);
         dateAndTimeView = (TextView) findViewById(R.id.sakay_detail_date_and_time);
         startView = (TextView) findViewById(R.id.sakay_detail_start);
         destinationView = (TextView) findViewById(R.id.sakay_detail_destination);
-        vehicleView = (TextView) findViewById(R.id.sakay_detail_vehicle);
+
+        vehicleTypeView = (TextView) findViewById(R.id.sakay_detail_vehicle_type);
+        vehicleModelView = (TextView) findViewById(R.id.sakay_detail_vehicle_model);
+        vehicleColorView = (TextView) findViewById(R.id.sakay_detail_vehicle_color) ;
+        vehiclePlateNoView = (TextView) findViewById(R.id.sakay_detail_vehicle_plate_no);
 
         trackLocationButton = (FloatingActionButton) findViewById(R.id.fabTrackLocation);
         trackLocationButton.hide(false);
@@ -82,7 +99,12 @@ public class SakayDetailActivity extends BaseActivity implements
 
 
         userFacebookId = profile.getId();
+
         trackLocationButton.setOnClickListener(this);
+        otherAuthorNameView.setOnClickListener(this);
+
+//        driverText = "You will be driving for ";
+//        riderText = "You will be riding with";
 
     }
 
@@ -92,6 +114,8 @@ public class SakayDetailActivity extends BaseActivity implements
 
         if (id == R.id.fabTrackLocation) {
             Toast.makeText(SakayDetailActivity.this, "Track Location", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.sakay_detail_other_author){
+            viewProfile();
         }
     }
 
@@ -113,26 +137,35 @@ public class SakayDetailActivity extends BaseActivity implements
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
                 Sakay sakay = dataSnapshot.getValue(Sakay.class);
-                // [START_EXCLUDE]
-                //Photo
-                // setPhoto(rideOffer.facebookId);
+
                 String sakayWith;
-                if(sakay.role == "driver")
-                    sakayWith = "You will be joined by " + sakay.otherAuthor;
-                else
-                    sakayWith = "You will be joining " + sakay.otherAuthor;
+                if(sakay.role.equals("driver")) {
+                    sakayWith = "You will be driving for " + sakay.otherAuthor;
+                } else {
+                    sakayWith = "You will be riding with " + sakay.otherAuthor;
+                }
+                otherUserId = sakay.otherUid;
                 String dateTime = sakay.dateAndTime;
                 String pickupLocation = "Pickup Location: " + sakay.start;
                 String destination = "Destination: " + sakay.destination;
-                String onVehicle = "Vehicle: " + sakay.vehicle;
+                String vehicleType = "Vehicle type: " + sakay.vehicle;
+                String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
+                String vehicleColor = "Color: " + sakay.vehicleColor;
+                String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
 
-                otherAuthorNameView.setText(sakayWith);
+                Spannable spannable = new SpannableString(sakayWith);
+                spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
+                        sakayWith.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                otherAuthorNameView.setText(spannable, TextView.BufferType.SPANNABLE);
                 dateAndTimeView.setText(dateTime);
                 startView.setText(pickupLocation);
                 destinationView.setText(destination);
-                vehicleView.setText(onVehicle);
+                vehicleTypeView.setText(vehicleType);
+                vehicleModelView.setText(vehicleModel);
+                vehicleColorView.setText(vehicleColor);
+                vehiclePlateNoView.setText(vehiclePlateNo);
                 // [END_EXCLUDE]
 
             }
@@ -161,5 +194,11 @@ public class SakayDetailActivity extends BaseActivity implements
         if (mPostListener != null) {
             mPostReference.removeEventListener(mPostListener);
         }
+    }
+
+    public void viewProfile(){
+        Intent intent = new Intent(this, ViewProfileActivity.class);
+        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, otherUserId);
+        startActivity(intent);
     }
 }

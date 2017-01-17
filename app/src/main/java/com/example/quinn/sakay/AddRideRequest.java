@@ -51,6 +51,15 @@ public class AddRideRequest extends BaseActivity
     private static final int REQUEST_PLACE_PICKER = 1;
 
     private DatabaseReference mDatabase;
+    private DatabaseReference userSettingsRef;
+    private DatabaseReference homeAddressRef;
+    private DatabaseReference homeLatRef;
+    private DatabaseReference homeLongRef;
+    private DatabaseReference workAddressRef;
+    private DatabaseReference workLatRef;
+    private DatabaseReference workLongRef;
+
+    final String userId = getUid();
     private EditText fStart;
     private EditText fDestination;
     private ReminderDatePicker datePicker;
@@ -66,6 +75,16 @@ public class AddRideRequest extends BaseActivity
     public Timestamp time;
 
     public MaterialDialog progressDialog;
+
+    private String currentHome;
+    private Double currentHomeLat;
+    private Double currentHomeLong;
+    private String currentWork;
+    private Double currentWorkLat;
+    private Double currentWorkLong;
+
+    public Boolean workSet = false;
+    public Boolean homeSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +107,15 @@ public class AddRideRequest extends BaseActivity
 
         checkConnection();
 
-        // [START initialize_database_ref]
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        // [END initialize_database_ref]
+        userSettingsRef = mDatabase.child("users-settings").child(userId);
+        homeAddressRef = userSettingsRef.child("home");
+        homeLatRef = userSettingsRef.child("homeLat");
+        homeLongRef = userSettingsRef.child("homeLong");
+        workAddressRef = userSettingsRef.child("work");
+        workLatRef = userSettingsRef.child("workLat");
+        workLongRef = userSettingsRef.child("workLong");
 
         fStart = (EditText) findViewById(R.id.field_request_start);
         fDestination = (EditText) findViewById(R.id.field_request_destination);
@@ -102,11 +127,8 @@ public class AddRideRequest extends BaseActivity
         findViewById(R.id.field_request_start).setOnClickListener(this);
         findViewById(R.id.field_request_destination).setOnClickListener(this);
 
-        progressDialog = new MaterialDialog.Builder(this)
-                .title("Loading map")
-                .content("Please wait")
-                .progress(true, 0)
-                .build();
+        checkAddress();
+
     }
 
     private java.text.DateFormat savedFormat;
@@ -115,6 +137,106 @@ public class AddRideRequest extends BaseActivity
             savedFormat = DateFormat.getDateTimeInstance();
         return savedFormat;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading map")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
+    }
+
+    public void checkAddress(){
+        homeAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    homeSet = true;
+                    currentHome = dataSnapshot.getValue(String.class);
+                } else {
+                    homeSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        homeLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentHomeLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        workAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    workSet = true;
+                    currentWork = dataSnapshot.getValue(String.class);
+                } else {
+                    workSet = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLat = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        workLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    currentWorkLong = dataSnapshot.getValue(Double.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     private void submitPost() {
         final String start = fStart.getText().toString();
@@ -126,8 +248,6 @@ public class AddRideRequest extends BaseActivity
         } else {
             confirmPost(start, destination);
         }
-
-
 
     }
 
@@ -151,7 +271,7 @@ public class AddRideRequest extends BaseActivity
         Toast.makeText(this, "Posting...", Toast.LENGTH_SHORT).show();
 
         // [START single_value_read]
-        final String userId = getUid();
+
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
                 new ValueEventListener() {
                     @Override
@@ -221,16 +341,25 @@ public class AddRideRequest extends BaseActivity
     @Override
     public void onClick(View view) {
         int id = view.getId();
+        String[] arrRef;
+        if (homeSet && workSet){
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_all);
+        } else if (homeSet) {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_home);
+        } else if (workSet) {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_work);
+        } else {
+            arrRef = getResources().getStringArray(R.array.offer_select_pickup_location);
+        }
+
         switch (id){
             case R.id.field_request_start:
-                progressDialog.show();
                 startOrDestination = "start";
-                launchPlacePicker();
+                pickPlace(arrRef);
                 break;
             case R.id.field_request_destination:
                 startOrDestination = "destination";
-                progressDialog.show();
-                launchPlacePicker();
+                pickPlace(arrRef);
                 break;
         }
     }
@@ -287,6 +416,53 @@ public class AddRideRequest extends BaseActivity
             textView.setTextColor(color);
             snackbar.show();
         }
+    }
+
+    public void pickPlace(String[] arrRef){
+        String dialogTitle;
+        if (startOrDestination.equals("start")){
+            dialogTitle = "Choose starting location";
+        } else {
+            dialogTitle = "Choose destination";
+        }
+
+        new MaterialDialog.Builder(this)
+                .title(dialogTitle)
+                .items(arrRef)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        if(text.equals("Choose on Map")){
+                            progressDialog.show();
+                            launchPlacePicker();
+                        } else if(text.equals("My Home Address")){
+                            if(startOrDestination.equals("start")){
+                                fStart.setText(currentHome);
+                                startLat = currentHomeLat;
+                                startLong = currentHomeLong;
+
+                            } else if(startOrDestination.equals("destination")){
+                                fDestination.setText(currentHome);
+                                destinationLat = currentHomeLat;
+                                destinationLong = currentHomeLong;
+                            }
+
+                        } else if(text.equals("My Work Address")){
+                            if(startOrDestination.equals("start")){
+                                fStart.setText(currentWork);
+                                startLat = currentWorkLat;
+                                startLong = currentWorkLong;
+
+                            } else if(startOrDestination.equals("destination")){
+                                fDestination.setText(currentWork);
+                                destinationLat = currentWorkLat;
+                                destinationLong = currentWorkLong;
+                            }
+                        }
+                    }
+                })
+                .positiveText("cancel")
+                .show();
     }
 
     public void launchPlacePicker(){
