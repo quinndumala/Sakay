@@ -74,6 +74,8 @@ public class AddRideOffer extends BaseActivity
     private EditText fDestination;
     private ReminderDatePicker datePicker;
     public String dateAndTime = "";
+    public Timestamp time;
+
     private EditText fVehicleType;
     private EditText fVehicleModel;
     private EditText fVehicleColor;
@@ -94,7 +96,6 @@ public class AddRideOffer extends BaseActivity
     public Double startLong;
     public Double destinationLat;
     public Double destinationLong;
-    public Timestamp time;
 
     private String currentHome;
     private Double currentHomeLat;

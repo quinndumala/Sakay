@@ -6,17 +6,23 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
@@ -24,6 +30,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.simplicityapks.reminderdatepicker.lib.DateSpinner;
+import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
+
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.util.Calendar;
 
 
 /**
@@ -41,9 +53,44 @@ public class RideOffersFragment extends Fragment
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private FloatingActionButton addRideOffer;
+    private View positiveAction;
+    private DateSpinner filterDate;
+    public String dateAndTime = "";
+    public Timestamp time;
 
     public RideOffersFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            return true;
+        } else if (id == R.id.action_notifications){
+            Intent intent = new Intent(getActivity(), NotificationsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if (id == R.id.action_filter_date) {
+            //Toast.makeText(getActivity(), "Filter date", Toast.LENGTH_SHORT).show();
+            launchFilterPosts();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private java.text.DateFormat savedFormat;
+    public java.text.DateFormat getDateFormat() {
+        if(savedFormat == null)
+            savedFormat = DateFormat.getDateTimeInstance();
+        return savedFormat;
     }
 
     @Nullable
@@ -219,5 +266,34 @@ public class RideOffersFragment extends Fragment
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    public void launchFilterPosts(){
+        MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title("Select date to filter ride offers")
+                .customView(R.layout.item_date_picker, true)
+                .positiveText("OK")
+                .negativeText("cancel")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                       Toast.makeText(getActivity(), "TODO: Filter posts", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .build();
+        positiveAction = dialog.getActionButton(DialogAction.POSITIVE);
+        filterDate = (DateSpinner) dialog.getCustomView().findViewById(R.id.filter_date_picker);
+        filterDate.setOnDateSelectedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(Calendar date) {
+                String selectedDate = getDateFormat().format(date.getTime());
+                dateAndTime = selectedDate;
+                time = new Timestamp(date.getTime().getTime());
+                Log.d(TAG, "Selected date: " + selectedDate);
+                Log.d(TAG, "Timestamp: " + time.toString());
+            }
+        });
+
+        dialog.show();
     }
 }
