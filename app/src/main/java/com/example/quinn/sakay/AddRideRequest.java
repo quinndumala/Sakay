@@ -105,8 +105,6 @@ public class AddRideRequest extends BaseActivity
             }
         });
 
-        checkConnection();
-
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         userSettingsRef = mDatabase.child("users-settings").child(userId);
@@ -141,6 +139,7 @@ public class AddRideRequest extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
+        checkConnection();
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading map")
@@ -485,7 +484,7 @@ public class AddRideRequest extends BaseActivity
             public void run() {
                 progressDialog.dismiss();
             }
-        }, 300);
+        }, 550);
 
     }
 

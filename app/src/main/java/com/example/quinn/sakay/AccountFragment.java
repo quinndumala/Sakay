@@ -57,9 +57,9 @@ public class AccountFragment extends Fragment
         GoogleApiClient.OnConnectionFailedListener,
         ConnectivityReceiver.ConnectivityReceiverListener{
 
+    private ViewGroup accountView;
     private View view;
     private Button signOutFacebook;
-   // private Firebase db;
     private FirebaseAuth mAuth;
     //private DatabaseReference mDatabase;
     private CircleImageView profilePhoto;
@@ -70,14 +70,12 @@ public class AccountFragment extends Fragment
     private GoogleApiClient mGoogleApiClient;
     private static final int RC_SIGN_IN = 103;
 
-    //test<...
-    String facebookUserId = "";
-    Profile profile = getCurrentProfile();
-    //..>
+    public String facebookUserId = "";
+    public Profile profile = getCurrentProfile();
 
-    public AccountFragment() {
-        // Required empty public constructor
-    }
+    public MaterialDialog progressDialog;
+
+    public AccountFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,19 +98,15 @@ public class AccountFragment extends Fragment
             ((ViewGroup) view.getParent()).removeView(view);
         }
 
-        //db = new Firebase("https://sakay-2af91.firebaseio.com/users/");
+        accountView = (ViewGroup) view.findViewById(R.id.profile);
         mAuth = FirebaseAuth.getInstance();
-
         return view;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
-        checkConnection();
         FacebookSdk.sdkInitialize(getApplicationContext());
-//        profileName = (TextView) view.findViewById(R.id.profile_user_name);
-//        mProfilePhoto = (CircleImageView) view.findViewById(R.id.profile_user_photo);
         signOutFacebook = (Button) view.findViewById(R.id.sign_out_button);
         signOutFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,25 +115,25 @@ public class AccountFragment extends Fragment
             }
         });
 
+        profileName = (TextView) getView().findViewById(R.id.profile_user_name);
+        profilePhoto = (CircleImageView) getView().findViewById(R.id.profile_user_photo);
+        userEmail = (TextView) getView().findViewById(R.id.profile_user_email) ;
+        facebookUserId = profile.getId();
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        profileName = (TextView) getView().findViewById(R.id.profile_user_name);
-        profilePhoto = (CircleImageView) getView().findViewById(R.id.profile_user_photo);
-        userEmail = (TextView) getView().findViewById(R.id.profile_user_email) ;
+        checkConnection();
+
+        progressDialog = new MaterialDialog.Builder(getActivity())
+                .title("Loading account information")
+                .content("Please wait")
+                .progress(true, 0)
+                .build();
 
         String uid = getActivity().getIntent().getExtras().getString("user_id");
-        String imageUrl = getActivity().getIntent().getExtras().getString("profile_picture");
-
-        //test..
-        facebookUserId = profile.getId();
-        //Toast.makeText(getApplicationContext(), facebookUserId, Toast.LENGTH_LONG).show();
         String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-
-        //..>
-
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
 
@@ -147,11 +141,11 @@ public class AccountFragment extends Fragment
         DatabaseReference email_ref = database.getReference(emailRef);
 
         //new ImageLoadTask(photoUrl, profilePhoto).execute();
-        GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
 
         name_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                progressDialog.show();
                 String data = dataSnapshot.getValue(String.class);
                 profileName.setText(data);
             }
@@ -162,11 +156,14 @@ public class AccountFragment extends Fragment
             }
         });
 
+        GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
+
         email_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
                 userEmail.setText(data);
+                progressDialog.dismiss();
             }
 
             @Override
@@ -175,31 +172,6 @@ public class AccountFragment extends Fragment
             }
         });
 
-//        db.child(uid).child("name").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String data = dataSnapshot.getValue(String.class);
-//                profileName.setText(data);
-//            }
-//
-//            @Override
-//            public void onCancelled(FirebaseError firebaseError) {
-//                Toast.makeText(getApplicationContext(), "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-//            }
-//        });
-//
-//        db.child(uid).child("email").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                String emailData = dataSnapshot.getValue(String.class);
-//                userEmail.setText(emailData);
-//            }
-//
-//            @Override
-//            public void onCancelled(FirebaseError firebaseError) {
-//                Toast.makeText(getApplicationContext(), "" + firebaseError.getMessage(), Toast.LENGTH_LONG).show();
-//            }
-//        });
     }
 
     @Override
@@ -239,6 +211,7 @@ public class AccountFragment extends Fragment
         String message;
         int color = Color.WHITE;
         if (!(isConnected)) {
+            accountView.setVisibility(View.GONE);
             message = "No connection";
             Snackbar snackbar = Snackbar
                     .make(getView().findViewById(R.id.fragment_account_layout), message, Snackbar.LENGTH_INDEFINITE);
@@ -284,6 +257,8 @@ public class AccountFragment extends Fragment
         }
 
     }
+
+
 
     public void launchSignOutDialog(){
         new MaterialDialog.Builder(getActivity())

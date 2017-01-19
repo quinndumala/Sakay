@@ -128,8 +128,6 @@ public class AddRideOffer extends BaseActivity
             }
         });
 
-        checkConnection();
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
         vehicleRef = mDatabase.child("users-settings").child(userId).child("vehicle");
         userSettingsRef = mDatabase.child("users-settings").child(userId);
@@ -175,6 +173,7 @@ public class AddRideOffer extends BaseActivity
     @Override
     public void onStart() {
         super.onStart();
+        checkConnection();
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading map")
@@ -555,7 +554,7 @@ public class AddRideOffer extends BaseActivity
             public void run() {
                 progressDialog.dismiss();
             }
-        }, 450);
+        }, 550);
     }
 
     @Override

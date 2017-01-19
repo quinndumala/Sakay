@@ -9,6 +9,8 @@ import android.animation.ObjectAnimator;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,13 +49,22 @@ import static com.example.quinn.sakay.R.id.map;
 public class TrafficFragment extends Fragment
         implements
         OnMapReadyCallback,
+        LocationListener,
         GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         ConnectivityReceiver.ConnectivityReceiverListener {
     private View rootView;
-    private static final String TAG = "Testing: ";
-    MapView mapView;
-    GoogleMap googleMap;
+    private static final String TAG = "TrafficFragment";
+
+    private MapView mapView;
+    private GoogleMap googleMap;
+
+    //private static LocationService instance = null;
+    private LocationManager locationManager;
+    public Location location;
+    public double longitude;
+    public double latitude;
+
     private FloatingActionMenu menuTraffic;
     private FloatingActionButton fab1;
     private FloatingActionButton fab2;
@@ -62,9 +73,12 @@ public class TrafficFragment extends Fragment
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
+
 //
 //    private static final double lat = 9.306840;
 //    private static final double lon = 123.305447;
+
+
 
 
     public TrafficFragment() {
@@ -324,6 +338,26 @@ public class TrafficFragment extends Fragment
         showSnack(isConnected);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -348,4 +382,30 @@ public class TrafficFragment extends Fragment
             snackbar.show();
         }
     }
+
+//    public void loadMap(){
+//        try {
+//            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+//            Criteria criteria = new Criteria();
+//
+//            Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+//            if (location != null)
+//            {
+//                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude());
+//
+//                CameraPosition cameraPosition = new CameraPosition.Builder()
+//                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+//                        .zoom(17)                   // Sets the zoom
+//                        .bearing(90)                // Sets the orientation of the camera to east
+//                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+//                        .build();                   // Creates a CameraPosition from the builder
+//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//            }
+//
+//        } catch (Exception e){
+//            Toast.makeText(getActivity(), "Problem with permissions", Toast.LENGTH_SHORT);
+//            Log.d(TAG, "Excelption: " + e);
+//        }
+//
+//    }
 }

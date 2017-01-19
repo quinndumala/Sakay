@@ -124,6 +124,12 @@ public class RideOffersFragment extends Fragment
             }
         });
 
+
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
         checkConnection();
     }
 
@@ -253,6 +259,7 @@ public class RideOffersFragment extends Fragment
         String message;
         int color = Color.WHITE;
         if (!(isConnected)) {
+            addRideOffer.setVisibility(View.GONE);
             message = "No connection";
             Snackbar snackbar = Snackbar
                     .make(getView().findViewById(R.id.fragment_ride_offers_layout), message, Snackbar.LENGTH_INDEFINITE);

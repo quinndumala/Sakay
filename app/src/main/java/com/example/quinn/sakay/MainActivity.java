@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        db = new Firebase("https://androidbashfirebaseupdat-bd094.firebaseio.com/users/");
         mAuth = FirebaseAuth.getInstance();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity
         String emailRef = String.format("users/%s/email", uid);
         DatabaseReference name_ref = database.getReference(nameRef);
         DatabaseReference email_ref = database.getReference(emailRef);
-        name_ref.addValueEventListener(new ValueEventListener() {
+        name_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
@@ -126,8 +125,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-
-        email_ref.addValueEventListener(new ValueEventListener() {
+        email_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);

@@ -2,9 +2,11 @@ package com.example.quinn.sakay;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -298,6 +300,26 @@ public class RideRequestDetailActivity extends BaseActivity implements
             viewProfile();
         } else if (id == R.id.post_author_large){
             viewProfile();
+        }
+    }
+
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(this.findViewById(R.id.content_ride_request_detail), message, Snackbar.LENGTH_INDEFINITE);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
         }
     }
 
@@ -671,7 +693,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Your vehicle details")
                 .customView(R.layout.item_vehicle, true)
-                .positiveText("Save")
+                .positiveText("ok")
                 .negativeText("cancel")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
@@ -701,7 +723,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         MaterialDialog dialog = new MaterialDialog.Builder(this)
                 .title("Your vehicle details")
                 .customView(R.layout.item_vehicle, true)
-                .positiveText("Save")
+                .positiveText("ok")
                 .negativeText("cancel")
                 .neutralText("use my vehicle")
                 .autoDismiss(false)

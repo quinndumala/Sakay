@@ -3,9 +3,10 @@ package com.example.quinn.sakay;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -164,23 +165,6 @@ public class ViewProfileActivity extends BaseActivity implements
             }
         });
 
-
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog.dismiss();
-            }
-        }, 550);
-        if (!(mUserKey.equals(MY_USER_ID))){
-            buttonRateUser.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
         userNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -218,6 +202,7 @@ public class ViewProfileActivity extends BaseActivity implements
                     USER_PHONE_NO = dataSnapshot.getValue(String.class);
                     phoneNumberView.setText(USER_PHONE_NO);
                     mobileNumberView.setVisibility(View.VISIBLE);
+                    progressDialog.dismiss();
                 }
             }
 
@@ -226,6 +211,17 @@ public class ViewProfileActivity extends BaseActivity implements
 
             }
         });
+
+
+        if (!(mUserKey.equals(MY_USER_ID))){
+            buttonRateUser.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
 
         //hasRated();
         //listenToRatings();
@@ -278,6 +274,26 @@ public class ViewProfileActivity extends BaseActivity implements
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(Uri.parse("tel:" + USER_PHONE_NO));
             startActivity(intent);
+        }
+    }
+
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color = Color.WHITE;
+        if (!(isConnected)) {
+            message = "No connection";
+            Snackbar snackbar = Snackbar
+                    .make(this.findViewById(R.id.content_view_profile), message, Snackbar.LENGTH_INDEFINITE);
+
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(color);
+            snackbar.show();
         }
     }
 

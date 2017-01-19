@@ -69,6 +69,8 @@ public class SettingsFragment extends Fragment
 
     private final String userId = getUid();
 
+    private View settingsView;
+
     private ViewGroup mobileNumberView;
     private ViewGroup homeAddressView;
     private ViewGroup workAddressView;
@@ -116,7 +118,7 @@ public class SettingsFragment extends Fragment
         item.setVisible(false);
     }
 
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -135,6 +137,8 @@ public class SettingsFragment extends Fragment
         workAddressLongRef = settingsRef.child("workLong");
 
         vehicleRef = settingsRef.child("vehicle");
+
+        settingsView = rootView.findViewById(R.id.fragment_settings_layout);
 
         mobileNumberView = (ViewGroup) rootView.findViewById(R.id.settings_phone_number);
         homeAddressView = (ViewGroup) rootView.findViewById(R.id.settings_home_address);
@@ -163,19 +167,12 @@ public class SettingsFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        checkConnection();
+
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
         ValueEventListener phoneListener = new ValueEventListener() {
             @Override
@@ -249,6 +246,14 @@ public class SettingsFragment extends Fragment
         workAddressRef.addValueEventListener(workListener);
         vehicleRef.addValueEventListener(vehicleListener);
 
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkConnection();
+
     }
 
     @Override
@@ -305,9 +310,13 @@ public class SettingsFragment extends Fragment
         String message;
         int color = Color.WHITE;
         if (!(isConnected)) {
+            mobileNumberView.setVisibility(View.GONE);
+            workAddressView.setVisibility(View.GONE);
+            homeAddressView.setVisibility(View.GONE);
+            vehicleView.setVisibility(View.GONE);
             message = "No connection";
             Snackbar snackbar = Snackbar
-                    .make(getView().findViewById(R.id.fragment_sakays_layout), message, Snackbar.LENGTH_INDEFINITE);
+                    .make(getView().findViewById(R.id.fragment_settings_layout), message, Snackbar.LENGTH_INDEFINITE);
 
             View sbView = snackbar.getView();
             TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
@@ -411,7 +420,7 @@ public class SettingsFragment extends Fragment
             public void run() {
                 progressDialog.dismiss();
             }
-        }, 450);
+        }, 550);
     }
 
     @Override
