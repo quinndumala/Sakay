@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     private CircleImageView navProfilePhoto;
     private TextView navProfileName;
     private TextView navUserEmail;
+    public MaterialDialog progressDialog;
 
     private Fragment[] fragments = new Fragment[] { new TrafficFragment(), new SakaysFragment(),
     new RideOffersFragment(), new RideRequestsFragment(), new AccountFragment(), new SettingsFragment(),
@@ -73,6 +75,12 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
+
+        progressDialog = new MaterialDialog.Builder(this)
+                .title("Loading account information")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -118,6 +126,7 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
                 navProfileName.setText(data);
+                progressDialog.dismiss();
             }
 
             @Override
@@ -137,6 +146,7 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
+
     }
 
     @Override

@@ -119,7 +119,7 @@ public class RideRequestsFragment extends Fragment
                 getActivity().startActivity(intent);
             }
         });
-        
+
     }
 
     @Override

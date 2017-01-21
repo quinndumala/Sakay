@@ -6,6 +6,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -40,8 +41,9 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-import static com.example.quinn.sakay.R.id.map;
+import static com.example.quinn.sakay.R.id.map_traffic;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +55,7 @@ public class TrafficFragment extends Fragment
         GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         ConnectivityReceiver.ConnectivityReceiverListener {
+
     private View rootView;
     private static final String TAG = "TrafficFragment";
 
@@ -94,6 +97,7 @@ public class TrafficFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Nullable
@@ -103,13 +107,14 @@ public class TrafficFragment extends Fragment
         try {
             rootView = inflater.inflate(R.layout.fragment_traffic, container, false);
             MapsInitializer.initialize(this.getActivity());
-            mapView = (MapView) rootView.findViewById(map);
+            mapView = (MapView) rootView.findViewById(map_traffic);
             mapView.onCreate(savedInstanceState);
             mapView.getMapAsync(this);
 
         } catch (InflateException e) {
             Log.e(TAG, "Inflate exception");
         }
+
 
         return rootView;
 //        View view = inflater.inflate(R.layout.fragment_traffic, container, false);
@@ -126,6 +131,8 @@ public class TrafficFragment extends Fragment
         fab3 = (FloatingActionButton) view.findViewById(R.id.fabHeavy);
 
         menuTraffic.setClosedOnTouchOutside(true);
+
+
         checkConnection();
     }
 
@@ -148,6 +155,8 @@ public class TrafficFragment extends Fragment
             }
         }, 350);
         createCustomAnimation();
+
+       // setRetainInstance(true);
 
     }
 
@@ -212,6 +221,16 @@ public class TrafficFragment extends Fragment
 //    private void setupMapIfNeeded{
 //        if(googleMap == null){
 //
+//        }
+//    }
+
+//    private boolean isGooglePlayServicesAvailable() {
+//        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+//        if (ConnectionResult.SUCCESS == status) {
+//            return true;
+//        } else {
+//            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+//            return false;
 //        }
 //    }
 
@@ -285,8 +304,15 @@ public class TrafficFragment extends Fragment
         } else if (googleMap != null) {
             // Access to the location has been granted to the app.
             googleMap.setMyLocationEnabled(true);
+            googleMap.setTrafficEnabled(true);
+            //To setup location manager
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            //To request location updates
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
         }
     }
+
 
     //   @Override
     private void handleNewLocation(Location location) {
@@ -340,6 +366,21 @@ public class TrafficFragment extends Fragment
 
     @Override
     public void onLocationChanged(Location location) {
+        //To clear map data
+        googleMap.clear();
+
+        //To hold location
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        //To create marker in map
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        markerOptions.title("My Location");
+        //adding marker to the map
+        //googleMap.addMarker(markerOptions);
+
+        //opening position with some zoom level in the map
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.0f));
 
     }
 
@@ -382,6 +423,24 @@ public class TrafficFragment extends Fragment
             snackbar.show();
         }
     }
+
+//    private Location getMyLocation() {
+//        // Get location from GPS if it's available
+//        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+//        Location myLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//
+//        // Location wasn't found, check the next most accurate place for the current location
+//        if (myLocation == null) {
+//            Criteria criteria = new Criteria();
+//            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+//            // Finds a provider that matches the criteria
+//            String provider = lm.getBestProvider(criteria, true);
+//            // Use the provider to get the last known location
+//            myLocation = lm.getLastKnownLocation(provider);
+//        }
+//
+//        return myLocation;
+//    }
 
 //    public void loadMap(){
 //        try {

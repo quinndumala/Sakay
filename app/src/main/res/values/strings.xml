@@ -99,6 +99,10 @@
     </string-array>
     <string name="driver_text">"You will be driving for "</string>
     <string name="rider_text">"You will be riding with"</string>
+    <string name="lbl_you_are_at">YOU ARE AT</string>
+    <string name="btn_get_location">GET MY LOCATION</string>
+    <string name="btn_start_location_updates">START LOCATION UPDATES</string>
+    <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
