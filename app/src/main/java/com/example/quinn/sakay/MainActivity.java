@@ -59,11 +59,6 @@ public class MainActivity extends AppCompatActivity
     private TextView navUserEmail;
     public MaterialDialog progressDialog;
 
-    private Fragment[] fragments = new Fragment[] { new TrafficFragment(), new SakaysFragment(),
-    new RideOffersFragment(), new RideRequestsFragment(), new AccountFragment(), new SettingsFragment(),
-            new BlankFragment()
-    };
-
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     @Override
@@ -108,14 +103,12 @@ public class MainActivity extends AppCompatActivity
 
         navProfilePhoto = (CircleImageView) header.findViewById(R.id.nav_user_photo);
         navProfileName = (TextView) header.findViewById(R.id.nav_user_name);
-        navUserEmail = (TextView) header.findViewById(R.id.nav_email);
+        //navUserEmail = (TextView) header.findViewById(R.id.nav_email);
 
         String uid = getIntent().getExtras().getString("user_id");
         String imageUrl = getIntent().getExtras().getString("profile_picture");
 
         GlideUtil.loadProfileIcon(imageUrl, navProfilePhoto);
-
-        //new ImageLoadTask(imageUrl, navProfilePhoto).execute();
 
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
@@ -134,18 +127,18 @@ public class MainActivity extends AppCompatActivity
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
-        email_ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                navUserEmail.setText(data);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
+//        email_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String data = dataSnapshot.getValue(String.class);
+//                navUserEmail.setText(data);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                System.out.println("The read failed: " + databaseError.getCode());
+//            }
+//        });
 
     }
 

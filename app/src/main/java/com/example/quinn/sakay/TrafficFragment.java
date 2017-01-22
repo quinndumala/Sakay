@@ -380,7 +380,7 @@ public class TrafficFragment extends Fragment
         //googleMap.addMarker(markerOptions);
 
         //opening position with some zoom level in the map
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.0f));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
 
     }
 
