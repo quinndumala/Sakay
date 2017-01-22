@@ -38,15 +38,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
-//import java.security.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Timestamp;
-
 
 import static com.facebook.Profile.getCurrentProfile;
+
+//import java.security.Timestamp;
 
 public class AddRideOffer extends BaseActivity
         implements CompoundButton.OnCheckedChangeListener,
@@ -74,7 +73,7 @@ public class AddRideOffer extends BaseActivity
     private EditText fDestination;
     private ReminderDatePicker datePicker;
     public String dateAndTime = "";
-    public Timestamp time;
+    public Long time;
 
     private EditText fVehicleType;
     private EditText fVehicleModel;
@@ -122,9 +121,9 @@ public class AddRideOffer extends BaseActivity
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
-                time = new Timestamp(date.getTime().getTime());
+                time = date.getTimeInMillis();
                 Log.d(TAG, "Selected date: " + selectedDate);
-                Log.d(TAG, "Timestamp: " + time.toString());
+                Log.d(TAG, "Timestamp: " + time);
             }
         });
 
@@ -253,7 +252,7 @@ public class AddRideOffer extends BaseActivity
                             writeNewPost(userId, user.getName(), userFacebookId, start, startLat, startLong,
                                     destination, destinationLat, destinationLong,
                                     vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
-                                    dateAndTime, time.toString());
+                                    dateAndTime, time);
                         }
 
                         // Finish this Activity, back to the stream
@@ -289,7 +288,7 @@ public class AddRideOffer extends BaseActivity
     private void writeNewPost(String userId, String username, String userFacebookId, String start, Double startLat,
                               Double startLong, String destination, Double destinationLat, Double destinationLong,
                               String vehicle, String vehicleModel, String vehicleColor,
-                              String vehiclePlateNo, String dateAndTime, String timeStamp) {
+                              String vehiclePlateNo, String dateAndTime, Long timeStamp) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideOffers").push().getKey();

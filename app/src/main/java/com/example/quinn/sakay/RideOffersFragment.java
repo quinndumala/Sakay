@@ -33,9 +33,9 @@ import com.google.firebase.database.Query;
 import com.simplicityapks.reminderdatepicker.lib.DateSpinner;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -50,13 +50,15 @@ public class RideOffersFragment extends Fragment
     // [END define_database_reference]
 
     private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> filterAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private FloatingActionButton addRideOffer;
     private View positiveAction;
+    private TextView noOffersView;
     private DateSpinner filterDate;
     public String dateAndTime = "";
-    public Timestamp time;
+    public Long filterTime;
 
     public RideOffersFragment() {
         // Required empty public constructor
@@ -99,9 +101,7 @@ public class RideOffersFragment extends Fragment
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_ride_offers, container, false);
 
-        // [START create_database_reference]
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        // [END create_database_reference]
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.rideOffers_list);
         mRecycler.setHasFixedSize(true);
@@ -114,6 +114,7 @@ public class RideOffersFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
 
         final String imageUrl = getActivity().getIntent().getExtras().getString("profile_picture");
+        noOffersView = (TextView) view.findViewById(R.id.no_offers_text);
         addRideOffer = (FloatingActionButton) view.findViewById(R.id.fabRideOffers);
         addRideOffer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,8 +124,6 @@ public class RideOffersFragment extends Fragment
                 getActivity().startActivity(intent);
             }
         });
-
-
     }
 
     @Override
@@ -162,8 +161,6 @@ public class RideOffersFragment extends Fragment
             }
         });
 
-
-        // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
@@ -173,6 +170,30 @@ public class RideOffersFragment extends Fragment
         Set up FirebaseRecyclerAdapter with the Query
         TODO: Check if database node has values first and set a condition
         */
+        getAllPosts();
+
+    }
+
+    public Query getQuery(DatabaseReference databaseReference) {
+        // [START recent_posts_query]
+        // Last 100 posts, these are automatically the 100 most recent
+        // due to sorting by push() keys
+        Query recentPostsQuery = databaseReference.child("rideOffers")
+                .limitToFirst(100);
+        // [END recent_posts_query]
+
+        return recentPostsQuery;
+    }
+
+    public Query filterQuery(DatabaseReference databaseReference){
+        long endTime = filterTime + TimeUnit.HOURS.toMillis(24);
+        Log.d(TAG, "End Time: " + endTime);
+        Query filterQuery = databaseReference.child("rideOffers").orderByChild("timeStamp").startAt(filterTime)
+                .endAt(endTime);
+        return filterQuery;
+    }
+
+    public void getAllPosts(){
         Query postsQuery = getQuery(mDatabase);
         mAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
                 R.layout.item_ride_offer, RideOfferViewHolder.class, postsQuery) {
@@ -192,43 +213,36 @@ public class RideOffersFragment extends Fragment
                     }
                 });
 
-                // Determine if the current user has liked this post and set UI accordingly
-//                if (model.stars.containsKey(getUid())) {
-//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_24);
-//                } else {
-//                    viewHolder.starView.setImageResource(R.drawable.ic_toggle_star_outline_24);
-//                }
-
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-//                viewHolder.bindToPost(model, new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View starView) {
-//                        // Need to write to both places the post is stored
-//                        DatabaseReference globalPostRef = mDatabase.child("rideOffers").child(postRef.getKey());
-//                        DatabaseReference userPostRef = mDatabase.child("user-rideOffers").child(model.uid).child(postRef.getKey());
-//
-//                        // Run two transactions
-////                        onStarClicked(globalPostRef);
-////                        onStarClicked(userPostRef);
-//                    }
-//                });
-
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
             }
         };
         mRecycler.setAdapter(mAdapter);
+
     }
 
-    public Query getQuery(DatabaseReference databaseReference) {
-        // [START recent_posts_query]
-        // Last 100 posts, these are automatically the 100 most recent
-        // due to sorting by push() keys
-        Query recentPostsQuery = databaseReference.child("rideOffers")
-                .limitToFirst(100);
-        // [END recent_posts_query]
+    public void updatePosts(){
+        Query filter = filterQuery(mDatabase);
+        filterAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
+                R.layout.item_ride_offer, RideOfferViewHolder.class, filter) {
+            @Override
+            protected void populateViewHolder(final RideOfferViewHolder viewHolder, final RideOffer model,
+                                              final int position) {
+                final DatabaseReference postRef = getRef(position);
+                final String postKey = postRef.getKey();
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), RideOfferDetailActivity.class);
+                        intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
+                    }
+                });
 
-        return recentPostsQuery;
+                viewHolder.bindToPost(model);
+            }
+        };
+        mRecycler.setAdapter(filterAdapter);
+
     }
 
     public void onResume(){
@@ -279,12 +293,29 @@ public class RideOffersFragment extends Fragment
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title("Select date to filter ride offers")
                 .customView(R.layout.item_date_picker, true)
+                .autoDismiss(false)
                 .positiveText("OK")
                 .negativeText("cancel")
+                .neutralText("show all")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                       Toast.makeText(getActivity(), "TODO: Filter posts", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Searching...", Toast.LENGTH_SHORT).show();
+                        updatePosts();
+                        dialog.dismiss();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onNeutral(new MaterialDialog.SingleButtonCallback(){
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        getAllPosts();
+                        dialog.dismiss();
                     }
                 })
                 .build();
@@ -295,9 +326,9 @@ public class RideOffersFragment extends Fragment
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
-                time = new Timestamp(date.getTime().getTime());
+                filterTime = date.getTimeInMillis();
                 Log.d(TAG, "Selected date: " + selectedDate);
-                Log.d(TAG, "Timestamp: " + time.toString());
+                Log.d(TAG, "Timestamp: " + filterTime);
             }
         });
 

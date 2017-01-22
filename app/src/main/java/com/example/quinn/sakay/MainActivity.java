@@ -11,8 +11,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -58,6 +56,26 @@ public class MainActivity extends AppCompatActivity
     private TextView navProfileName;
     private TextView navUserEmail;
     public MaterialDialog progressDialog;
+    android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+    String title = "Sakay";
+
+//    FragmentTransaction ft;
+//    FragmentManager fm;
+//    TrafficFragment trafficFragment = new TrafficFragment();
+//    SakaysFragment sakaysFragment = new SakaysFragment();
+//    RideOffersFragment offersFragment = new RideOffersFragment();
+//    RideRequestsFragment requestsFragment = new RideRequestsFragment();
+//    AccountFragment accountFragment = new AccountFragment();
+//    SettingsFragment settingsFragment = new SettingsFragment();
+//    BlankFragment helpFragment = new BlankFragment();
+//    BlankFragment aboutFragment = new BlankFragment();
+//
+//    private Fragment[] fragments = new Fragment[] {trafficFragment, sakaysFragment,
+//            offersFragment, requestsFragment, accountFragment, settingsFragment,
+//            helpFragment, aboutFragment};
+//
+//    String[] fragmentTAGS = new String[]{"traffic_tag","sakays_tag","offers_tag",
+//            "requests_tag","account_tag", "settings_tag", "help_tag", "about_tag"};
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -75,6 +93,7 @@ public class MainActivity extends AppCompatActivity
                 .title("Loading account information")
                 .content("Please wait")
                 .progress(true, 0)
+                .cancelable(false)
                 .show();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -87,18 +106,23 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
 
-        if (savedInstanceState == null) {
-            Fragment fragment = null;
-            Class fragmentClass = null;
-            fragmentClass = TrafficFragment.class;
-            try {
-                fragment = (Fragment) fragmentClass.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//        if (savedInstanceState == null) {
+//            Fragment fragment = null;
+//            Class fragmentClass = null;
+//            fragmentClass = TrafficFragment.class;
+//            try {
+//                fragment = (Fragment) fragmentClass.newInstance();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
+//        }
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
+        if (savedInstanceState == null){
+            fragmentManager.beginTransaction().add(R.id.content_main, new TrafficFragment(), "traffic").commit();
+            setTitle("Traffic");
         }
 
         navProfilePhoto = (CircleImageView) header.findViewById(R.id.nav_user_photo);
@@ -139,6 +163,12 @@ public class MainActivity extends AppCompatActivity
 //                System.out.println("The read failed: " + databaseError.getCode());
 //            }
 //        });
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
     }
 
@@ -208,39 +238,272 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_traffic) {
             fragmentClass = TrafficFragment.class;
+            title = "Traffic";
+
+            if(fragmentManager.findFragmentByTag("traffic") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("traffic")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new TrafficFragment(), "traffic").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_sakays) {
             fragmentClass = SakaysFragment.class;
+            title = "Sakays";
+
+            if(fragmentManager.findFragmentByTag("sakays") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("sakays")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new SakaysFragment(), "sakays").commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_rideRequests) {
             fragmentClass = RideRequestsFragment.class;
+            title = "Ride Requests";
+
+            if(fragmentManager.findFragmentByTag("requests") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("requests")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new RideRequestsFragment(), "requests").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_rideOffers) {
             fragmentClass = RideOffersFragment.class;
+            title = "Ride Offers";
+
+            if(fragmentManager.findFragmentByTag("offers") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("offers")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new RideOffersFragment(), "offers").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_account) {
             fragmentClass = AccountFragment.class;
+            title = "Account";
+
+            if(fragmentManager.findFragmentByTag("account") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("account")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new AccountFragment(), "account").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_settings) {
             fragmentClass = SettingsFragment.class;
+            title = "Settings";
+
+            if(fragmentManager.findFragmentByTag("settings") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("settings")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new SettingsFragment(), "settings").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_helpAndSupport) {
             fragmentClass = BlankFragment.class;
             Toast.makeText(this, "Help and Support", Toast.LENGTH_SHORT).show();
+            title = "Sakay";
+
+            if(fragmentManager.findFragmentByTag("help") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("help")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new BlankFragment(), "help").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("about") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("about")).commit();
+            }
+
         } else if (id == R.id.nav_aboutSakay) {
             fragmentClass = BlankFragment.class;
+            title = "Sakay";
+
+            if(fragmentManager.findFragmentByTag("about") != null) {
+                fragmentManager.beginTransaction().show(fragmentManager.findFragmentByTag("about")).commit();
+            } else {
+                fragmentManager.beginTransaction().add(R.id.content_main, new BlankFragment(), "about").commit();
+            }
+            if(fragmentManager.findFragmentByTag("sakays") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("sakays")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("offers") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("offers")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("requests") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("requests")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("account") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("account")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("settings") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("settings")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("help") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("help")).commit();
+            }
+            if(fragmentManager.findFragmentByTag("traffic") != null){
+                fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag("traffic")).commit();
+            }
         }
 
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            fragment = (Fragment) fragmentClass.newInstance();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        Fragment containerFragment = getSupportFragmentManager().findFragmentById(R.id.content_main);
+//
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        if (!(containerFragment.getClass().getName().equalsIgnoreCase(fragment.getClass().getName()))){
+//            transaction.replace(R.id.content_main, fragment);
+//   //         transaction.addToBackStack(null);
+//            transaction.commit();
+//        }
 
-        Fragment containerFragment = getSupportFragmentManager().findFragmentById(R.id.content_main);
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (!(containerFragment.getClass().getName().equalsIgnoreCase(fragment.getClass().getName()))){
-            transaction.replace(R.id.content_main, fragment);
-   //         transaction.addToBackStack(null);
-            transaction.commit();
-        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setActionBarTitle(title);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

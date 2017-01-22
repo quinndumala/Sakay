@@ -22,14 +22,14 @@ public class RideRequest {
     public Double destinationLat;
     public Double destinationLong;
     public String dateAndTime;
-    public String timeStamp;
+    public Long timeStamp;
     public Map<String, Boolean> responses = new HashMap<>();
 
     public RideRequest(){}
 
     public RideRequest(String uid, String author, String facebookId, String start, Double startLat, Double startLong,
                        String destination, Double destinationLat, Double destinationLong, String dateAndTime,
-                       String timeStamp) {
+                       Long timeStamp) {
         this.uid = uid;
         this.author = author;
         this.facebookId = facebookId;

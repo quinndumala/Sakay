@@ -111,6 +111,7 @@ public class TrafficFragment extends Fragment
             mapView.onCreate(savedInstanceState);
             mapView.getMapAsync(this);
 
+
         } catch (InflateException e) {
             Log.e(TAG, "Inflate exception");
         }
@@ -131,9 +132,6 @@ public class TrafficFragment extends Fragment
         fab3 = (FloatingActionButton) view.findViewById(R.id.fabHeavy);
 
         menuTraffic.setClosedOnTouchOutside(true);
-
-
-        checkConnection();
     }
 
     @Override
@@ -234,6 +232,13 @@ public class TrafficFragment extends Fragment
 //        }
 //    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkConnection();
+
+    }
+
 
     @Override
     public void onPause() {
@@ -245,6 +250,7 @@ public class TrafficFragment extends Fragment
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+
     }
 
     @Override

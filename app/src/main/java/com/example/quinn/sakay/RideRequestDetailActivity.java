@@ -95,7 +95,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private Double destinationLong;
 
     private String dateAndTime;
-    private String timeStamp;
+    private Long timeStamp;
 
     private View positiveAction;
     private EditText EditVehicleType;
@@ -622,7 +622,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         private void newSakay(String userId, String userName, String userFacebookId, String userRole,
                               String start, Double startLat, Double startLong,
                               String destination, Double destinationLat, Double destinationLong,
-                              String dateAndTime, String timeStamp,
+                              String dateAndTime, Long timeStamp,
                               String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
                               String otherId, String otherName, String otherFacebookId,
                               String sakayKey){

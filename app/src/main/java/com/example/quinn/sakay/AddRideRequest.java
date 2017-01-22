@@ -34,7 +34,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import com.simplicityapks.reminderdatepicker.lib.ReminderDatePicker;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -72,7 +71,7 @@ public class AddRideRequest extends BaseActivity
     public Double startLong;
     public Double destinationLat;
     public Double destinationLong;
-    public Timestamp time;
+    public Long time;
 
     public MaterialDialog progressDialog;
 
@@ -101,7 +100,7 @@ public class AddRideRequest extends BaseActivity
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
-                time = new Timestamp(date.getTime().getTime());
+                time = date.getTimeInMillis();
             }
         });
 
@@ -288,7 +287,7 @@ public class AddRideRequest extends BaseActivity
                         } else {
                             // Write new post
                             writeNewPost(userId, user.getName(), userFacebookId, start, startLat, startLong,
-                                    destination, destinationLat, destinationLong, dateAndTime, time.toString());
+                                    destination, destinationLat, destinationLong, dateAndTime, time);
                         }
 
                         // Finish this Activity, back to the stream
@@ -322,7 +321,7 @@ public class AddRideRequest extends BaseActivity
     // [START write_fan_out]
     private void writeNewPost(String userId, String username, String userFacebookId, String start, Double startLat,
                               Double startLong, String destination, Double destinationLat, Double destinationLong,
-                              String dateAndTime, String timeStamp) {
+                              String dateAndTime, Long timeStamp) {
         // Create new post at /user-posts/$userid/$postid and at
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideRequests").push().getKey();

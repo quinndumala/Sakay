@@ -21,7 +21,7 @@ public class Sakay {
     public Double destinationLat;
     public Double destinationLong;
     public String dateAndTime;
-    public String timeStamp;
+    public Long timeStamp;
     public String vehicle;
     public String vehicleModel;
     public String vehicleColor;
@@ -35,7 +35,7 @@ public class Sakay {
     public Sakay(String uid, String author, String facebookId, String role,
                  String start, Double startLat, Double startLong,
                  String destination, Double destinationLat, Double destinationLong,
-                 String dateAndTime, String timeStamp,
+                 String dateAndTime, Long timeStamp,
                  String vehicle, String vehicleModel, String vehicleColor, String vehiclePlateNo,
                  String otherUid, String otherAuthor, String otherFacbookId){
         this.uid = uid;

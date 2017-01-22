@@ -188,7 +188,6 @@ public class SettingsFragment extends Fragment
                 Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
             }
         };
-
         ValueEventListener vehicleListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -210,7 +209,6 @@ public class SettingsFragment extends Fragment
                 Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
             }
         };
-
         ValueEventListener homeListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -225,7 +223,6 @@ public class SettingsFragment extends Fragment
                 Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
             }
         };
-
         ValueEventListener workListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -245,7 +242,6 @@ public class SettingsFragment extends Fragment
         homeAddressRef.addValueEventListener(homeListener);
         workAddressRef.addValueEventListener(workListener);
         vehicleRef.addValueEventListener(vehicleListener);
-
 
     }
 
@@ -383,12 +379,6 @@ public class SettingsFragment extends Fragment
 
     }
 
-
-
-    public void showToast(String vehicleTYpe, String vehicleModel, String vehicleColor, String plateNo){
-        String string = vehicleTYpe + ", " + vehicleModel + ", " + vehicleColor + ", " + plateNo;
-        Toast.makeText(getActivity(), string , Toast.LENGTH_SHORT).show();
-    }
 
     public void updateUserPhoneNumber(String number){
         phoneRef.setValue(number);
