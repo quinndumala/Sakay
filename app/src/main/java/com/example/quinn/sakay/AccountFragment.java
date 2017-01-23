@@ -181,8 +181,8 @@ public class AccountFragment extends Fragment
 
     public void onResume(){
         super.onResume();
-        ((MainActivity) getActivity())
-                .setActionBarTitle(getString(R.string.account_title));
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle(getString(R.string.account_title));
         MyApplication.getInstance().setConnectivityListener(this);
     }
 

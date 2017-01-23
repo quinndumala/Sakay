@@ -45,9 +45,9 @@ public class BlankFragment extends Fragment {
     public void onResume(){
         super.onResume();
 
-        // Set title bar
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Sakay");
+//        // Set title bar
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Sakay");
 
     }
 

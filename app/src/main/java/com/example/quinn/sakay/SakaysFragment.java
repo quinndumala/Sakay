@@ -149,8 +149,8 @@ public class SakaysFragment extends Fragment
     @Override
     public void onResume(){
         super.onResume();
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Sakays");
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Sakays");
 
         MyApplication.getInstance().setConnectivityListener(this);
     }

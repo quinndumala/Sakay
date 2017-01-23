@@ -286,8 +286,8 @@ public class SettingsFragment extends Fragment
     @Override
     public void onResume(){
         super.onResume();
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Settings");
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Settings");
 
         MyApplication.getInstance().setConnectivityListener(this);
     }

@@ -270,8 +270,8 @@ public class TrafficFragment extends Fragment
         super.onResume();
 
         // Set title bar
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Traffic");
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Traffic");
 
 //        if (mPermissionDenied) {
 //            // Permission was not granted, display error dialog.

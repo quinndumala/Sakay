@@ -27,9 +27,12 @@ import com.example.quinn.sakay.Models.RideOffer;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.DateSpinner;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 
@@ -52,6 +55,7 @@ public class RideOffersFragment extends Fragment
     private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> mAdapter;
     private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> filterAdapter;
     private RecyclerView mRecycler;
+
     private LinearLayoutManager mManager;
     private FloatingActionButton addRideOffer;
     private View positiveAction;
@@ -195,6 +199,21 @@ public class RideOffersFragment extends Fragment
 
     public void getAllPosts(){
         Query postsQuery = getQuery(mDatabase);
+        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null){
+                    noOffersView.setVisibility(View.VISIBLE);
+                } else {
+                    noOffersView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         mAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
                 R.layout.item_ride_offer, RideOfferViewHolder.class, postsQuery) {
             @Override
@@ -202,7 +221,6 @@ public class RideOffersFragment extends Fragment
                                               final int position) {
                 final DatabaseReference postRef = getRef(position);
 
-                // Set click listener for the whole post view
                 final String postKey = postRef.getKey();
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -222,6 +240,21 @@ public class RideOffersFragment extends Fragment
 
     public void updatePosts(){
         Query filter = filterQuery(mDatabase);
+        filter.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null){
+                    noOffersView.setVisibility(View.VISIBLE);
+                } else {
+                    noOffersView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         filterAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
                 R.layout.item_ride_offer, RideOfferViewHolder.class, filter) {
             @Override
@@ -249,8 +282,8 @@ public class RideOffersFragment extends Fragment
         super.onResume();
 
         // Set title bar
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Ride Offers");
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Ride Offers");
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
@@ -314,7 +347,8 @@ public class RideOffersFragment extends Fragment
                 .onNeutral(new MaterialDialog.SingleButtonCallback(){
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        getAllPosts();
+                        //getAllPosts();
+                        mRecycler.setAdapter(mAdapter);
                         dialog.dismiss();
                     }
                 })

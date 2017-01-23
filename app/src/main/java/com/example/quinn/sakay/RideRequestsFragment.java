@@ -27,15 +27,18 @@ import com.example.quinn.sakay.Models.RideRequest;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.simplicityapks.reminderdatepicker.lib.DateSpinner;
 import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -50,13 +53,15 @@ public class RideRequestsFragment extends Fragment
     // [END define_database_reference]
 
     private FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder> filterAdapter;
     private RecyclerView mRecycler;
     private LinearLayoutManager mManager;
     private FloatingActionButton addRideRequest;
     private View positiveAction;
+    private TextView noRequestsView;
     private DateSpinner filterDate;
     public String dateAndTime = "";
-    public Timestamp time;
+    public Long filterTime;
 
     public RideRequestsFragment() {
         // Required empty public constructor
@@ -111,6 +116,7 @@ public class RideRequestsFragment extends Fragment
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        noRequestsView = (TextView) view.findViewById(R.id.no_requests_text);
         addRideRequest = (FloatingActionButton) view.findViewById(R.id.fabRideRequests);
         addRideRequest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,31 +174,7 @@ public class RideRequestsFragment extends Fragment
         Set up FirebaseRecyclerAdapter with the Query
         TODO: Check if database node has values first and set a condition
         */
-        Query postsQuery = getQuery(mDatabase);
-        mAdapter = new FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder>(RideRequest.class,
-                R.layout.item_ride_request, RideRequestViewHolder.class, postsQuery) {
-            @Override
-            protected void populateViewHolder(final RideRequestViewHolder viewHolder, final RideRequest model,
-                                              final int position) {
-                final DatabaseReference postRef = getRef(position);
-
-                // Set click listener for the whole post view
-                final String postKey = postRef.getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Launch RideRequestDetailActivity
-                        Intent intent = new Intent(getActivity(), RideRequestDetailActivity.class);
-                        intent.putExtra(RideRequestDetailActivity.EXTRA_POST_KEY, postKey);
-                        startActivity(intent);
-                    }
-                });
-
-
-                viewHolder.bindToPost(model);
-            }
-        };
-        mRecycler.setAdapter(mAdapter);
+        getAllPosts();
     }
 
 //    private Query getQuery(DatabaseReference mDatabase) {
@@ -200,24 +182,103 @@ public class RideRequestsFragment extends Fragment
 //    }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        // [START recent_posts_query]
-        // Last 100 posts, these are automatically the 100 most recent
-        // due to sorting by push() keys
         Query recentPostsQuery = databaseReference.child("rideRequests")
                 .limitToFirst(100);
-        // [END recent_posts_query]
 
         return recentPostsQuery;
     }
 
-    // [START post_stars_transaction]
+    public Query filterQuery(DatabaseReference databaseReference){
+        long endTime = filterTime + TimeUnit.HOURS.toMillis(24);
+        Log.d(TAG, "End Time: " + endTime);
+        Query filterQuery = databaseReference.child("rideRequests").orderByChild("timeStamp").startAt(filterTime)
+                .endAt(endTime);
+        return filterQuery;
+    }
+
+    public void getAllPosts(){
+        Query postsQuery = getQuery(mDatabase);
+        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null){
+                    noRequestsView.setVisibility(View.VISIBLE);
+                } else {
+                    noRequestsView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        mAdapter = new FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder>(RideRequest.class,
+                R.layout.item_ride_request, RideRequestViewHolder.class, postsQuery) {
+            @Override
+            protected void populateViewHolder(final RideRequestViewHolder viewHolder, final RideRequest model,
+                                              final int position) {
+                final DatabaseReference postRef = getRef(position);
+                final String postKey = postRef.getKey();
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), RideRequestDetailActivity.class);
+                        intent.putExtra(RideRequestDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
+                    }
+                });
+                viewHolder.bindToPost(model);
+            }
+        };
+        mRecycler.setAdapter(mAdapter);
+    }
+
+    public void updatePosts(){
+        Query filter = filterQuery(mDatabase);
+        filter.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null){
+                    noRequestsView.setVisibility(View.VISIBLE);
+                } else {
+                    noRequestsView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        filterAdapter = new FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder>(RideRequest.class,
+                R.layout.item_ride_request, RideRequestViewHolder.class, filter) {
+            @Override
+            protected void populateViewHolder(final RideRequestViewHolder viewHolder, final RideRequest model,
+                                              final int position) {
+                final DatabaseReference postRef = getRef(position);
+                final String postKey = postRef.getKey();
+                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), RideRequestDetailActivity.class);
+                        intent.putExtra(RideRequestDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
+                    }
+                });
+
+                viewHolder.bindToPost(model);
+            }
+        };
+        mRecycler.setAdapter(filterAdapter);
+    }
 
     public void onResume(){
         super.onResume();
 
         // Set title bar
-        ((MainActivity) getActivity())
-                .setActionBarTitle("Ride Requests");
+//        ((MainActivity) getActivity())
+//                .setActionBarTitle("Ride Requests");
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
@@ -268,12 +329,30 @@ public class RideRequestsFragment extends Fragment
         MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
                 .title("Select date to filter ride requests")
                 .customView(R.layout.item_date_picker, true)
+                .autoDismiss(false)
                 .positiveText("OK")
                 .negativeText("cancel")
+                .neutralText("show all")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        Toast.makeText(getActivity(), "TODO: Filter posts", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Searching", Toast.LENGTH_SHORT).show();
+                        updatePosts();
+                        dialog.dismiss();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                })
+                .onNeutral(new MaterialDialog.SingleButtonCallback(){
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        //getAllPosts();
+                        mRecycler.setAdapter(mAdapter);
+                        dialog.dismiss();
                     }
                 })
                 .build();
@@ -284,9 +363,9 @@ public class RideRequestsFragment extends Fragment
             public void onDateSelected(Calendar date) {
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
-                time = new Timestamp(date.getTime().getTime());
+                filterTime = date.getTimeInMillis();
                 Log.d(TAG, "Selected date: " + selectedDate);
-                Log.d(TAG, "Timestamp: " + time.toString());
+                Log.d(TAG, "Timestamp: " + filterTime);
             }
         });
 
