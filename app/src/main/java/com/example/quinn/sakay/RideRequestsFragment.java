@@ -62,6 +62,7 @@ public class RideRequestsFragment extends Fragment
     private DateSpinner filterDate;
     public String dateAndTime = "";
     public Long filterTime;
+    public Query allPostsQuery;
 
     public RideRequestsFragment() {
         // Required empty public constructor
@@ -196,9 +197,8 @@ public class RideRequestsFragment extends Fragment
         return filterQuery;
     }
 
-    public void getAllPosts(){
-        Query postsQuery = getQuery(mDatabase);
-        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void isQueryEmpty(Query query){
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue() == null){
@@ -213,8 +213,13 @@ public class RideRequestsFragment extends Fragment
 
             }
         });
+    }
+
+    public void getAllPosts(){
+        allPostsQuery = getQuery(mDatabase);
+        isQueryEmpty(allPostsQuery);
         mAdapter = new FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder>(RideRequest.class,
-                R.layout.item_ride_request, RideRequestViewHolder.class, postsQuery) {
+                R.layout.item_ride_request, RideRequestViewHolder.class, allPostsQuery) {
             @Override
             protected void populateViewHolder(final RideRequestViewHolder viewHolder, final RideRequest model,
                                               final int position) {
@@ -236,21 +241,7 @@ public class RideRequestsFragment extends Fragment
 
     public void updatePosts(){
         Query filter = filterQuery(mDatabase);
-        filter.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() == null){
-                    noRequestsView.setVisibility(View.VISIBLE);
-                } else {
-                    noRequestsView.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        isQueryEmpty(filter);
         filterAdapter = new FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder>(RideRequest.class,
                 R.layout.item_ride_request, RideRequestViewHolder.class, filter) {
             @Override
@@ -352,6 +343,7 @@ public class RideRequestsFragment extends Fragment
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //getAllPosts();
                         mRecycler.setAdapter(mAdapter);
+                        isQueryEmpty(allPostsQuery);
                         dialog.dismiss();
                     }
                 })

@@ -63,6 +63,7 @@ public class RideOffersFragment extends Fragment
     private DateSpinner filterDate;
     public String dateAndTime = "";
     public Long filterTime;
+    public Query allPostsQuery;
 
     public RideOffersFragment() {
         // Required empty public constructor
@@ -197,9 +198,8 @@ public class RideOffersFragment extends Fragment
         return filterQuery;
     }
 
-    public void getAllPosts(){
-        Query postsQuery = getQuery(mDatabase);
-        postsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void isQueryEmpty(Query query){
+       query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.getValue() == null){
@@ -214,8 +214,13 @@ public class RideOffersFragment extends Fragment
 
             }
         });
+    }
+
+    public void getAllPosts(){
+        allPostsQuery = getQuery(mDatabase);
+        isQueryEmpty(allPostsQuery);
         mAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
-                R.layout.item_ride_offer, RideOfferViewHolder.class, postsQuery) {
+                R.layout.item_ride_offer, RideOfferViewHolder.class, allPostsQuery) {
             @Override
             protected void populateViewHolder(final RideOfferViewHolder viewHolder, final RideOffer model,
                                               final int position) {
@@ -240,21 +245,7 @@ public class RideOffersFragment extends Fragment
 
     public void updatePosts(){
         Query filter = filterQuery(mDatabase);
-        filter.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue() == null){
-                    noOffersView.setVisibility(View.VISIBLE);
-                } else {
-                    noOffersView.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        isQueryEmpty(filter);
         filterAdapter = new FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder>(RideOffer.class,
                 R.layout.item_ride_offer, RideOfferViewHolder.class, filter) {
             @Override
@@ -349,6 +340,7 @@ public class RideOffersFragment extends Fragment
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         //getAllPosts();
                         mRecycler.setAdapter(mAdapter);
+                        isQueryEmpty(allPostsQuery);
                         dialog.dismiss();
                     }
                 })
