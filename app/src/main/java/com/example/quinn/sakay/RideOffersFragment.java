@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.RideOffer;
+import com.facebook.Profile;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +40,8 @@ import com.simplicityapks.reminderdatepicker.lib.OnDateSelectedListener;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
+import static com.facebook.Profile.getCurrentProfile;
 
 
 /**
@@ -64,6 +67,8 @@ public class RideOffersFragment extends Fragment
     public String dateAndTime = "";
     public Long filterTime;
     public Query allPostsQuery;
+
+    private Profile profile = getCurrentProfile();
 
     public RideOffersFragment() {
         // Required empty public constructor

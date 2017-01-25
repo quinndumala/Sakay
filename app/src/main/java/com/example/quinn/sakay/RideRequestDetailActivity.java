@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.CommentRequest;
+import com.example.quinn.sakay.Models.Notif;
 import com.example.quinn.sakay.Models.RideRequest;
 import com.example.quinn.sakay.Models.Sakay;
 import com.example.quinn.sakay.Models.Vehicle;
@@ -34,6 +35,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -109,10 +111,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public String currentVehiclePlateNo;
 
     public Boolean carSet = false;
-
-    public String getUserAuthorName(){
-        return userAuthorName;
-    }
+    public User currentUser;
+    public MaterialDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +153,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
         userFacebookId = profile.getId();
 
+        loadingDialog = new MaterialDialog.Builder(this)
+                .title("Loading details")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
+
         checkForVehicle();
 
         sakayButton.setOnClickListener(this);
@@ -173,6 +179,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
                         isAuthor = false;
                         sakayButton.setVisibility(View.VISIBLE);
                     }
+                    setPhoto(rideRequest.facebookId);
+                    authorView.setText(rideRequest.author);
+                    startView.setText(rideRequest.start);
+                    destinationView.setText(rideRequest.destination);
+                    dateAndTimeView.setText(rideRequest.dateAndTime);
+                    loadingDialog.dismiss();
                 }
             }
 
@@ -197,8 +209,22 @@ public class RideRequestDetailActivity extends BaseActivity implements
     @Override
     public void onStart() {
         super.onStart();
-
+        checkConnection();
         noResponses();
+
+        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentUser = dataSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -214,7 +240,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
             }
         });
 
-
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -222,11 +247,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
 
                     // [START_EXCLUDE]
-                    setPhoto(rideRequest.facebookId);
-                    authorView.setText(rideRequest.author);
-                    startView.setText(rideRequest.start);
-                    destinationView.setText(rideRequest.destination);
-                    dateAndTimeView.setText(rideRequest.dateAndTime);
+
                     // [END_EXCLUDE]
 
                     userAuthorId = rideRequest.uid;
@@ -259,6 +280,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 // [END_EXCLUDE]
             }
         };
+
         mPostReference.addValueEventListener(postListener);
         // [END post_value_event_listener]
 
@@ -734,6 +756,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                 EditVehicleModel.getText().toString(),
                                 EditVehicleColor.getText().toString(),
                                 EditPlateNo.getText().toString());
+                        createNotif();
                         Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
@@ -801,6 +824,17 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
             }
         });
+    }
+
+    public void createNotif(){
+        String notifKey = mRootRef.child("user-notifications").push().getKey();
+        Notif notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), "offer", mPostKey,
+                "sent you a ride offer", ServerValue.TIMESTAMP);
+        Map<String, Object> notifValues = notif.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/user-notifications/" + userAuthorId + "/" + notifKey, notifValues);
+        mRootRef.updateChildren(childUpdates);
     }
 
 }

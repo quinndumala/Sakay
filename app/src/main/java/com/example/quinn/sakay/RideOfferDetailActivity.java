@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.CommentOffer;
+import com.example.quinn.sakay.Models.Notif;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
@@ -40,6 +41,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -129,6 +131,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public Boolean homeSet = false;
 
     public MaterialDialog progressDialog;
+    public MaterialDialog loadingDialog;
+    public User currentUser;
 
     //String arrRef;
 
@@ -180,6 +184,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
         userFacebookId = profile.getId();
         //noResponses();
 
+        loadingDialog = new MaterialDialog.Builder(this)
+                .title("Loading details")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
+
         sakayButton.setOnClickListener(this);
         seeRouteButton.setOnClickListener(this);
         buttonDelete.setOnClickListener(this);
@@ -192,12 +202,19 @@ public class RideOfferDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+                    setPhoto(rideOffer.facebookId);
+                    authorView.setText(rideOffer.author);
+                    startView.setText(rideOffer.start);
+                    destinationView.setText(rideOffer.destination);
+                    vehicleView.setText(rideOffer.vehicle);
+                    dateAndTimeView.setText(rideOffer.dateAndTime);
                     if ((rideOffer.uid.equals(userId))){
                         buttonDelete.setVisibility(View.VISIBLE);
                     } else {
                         isAuthor = false;
                         sakayButton.setVisibility(View.VISIBLE);
                     }
+                    loadingDialog.dismiss();
                 }
             }
 
@@ -235,6 +252,20 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .progress(true, 0)
                 .build();
 
+        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentUser = dataSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -257,12 +288,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
 
                     // [START_EXCLUDE]
-                    setPhoto(rideOffer.facebookId);
-                    authorView.setText(rideOffer.author);
-                    startView.setText(rideOffer.start);
-                    destinationView.setText(rideOffer.destination);
-                    vehicleView.setText(rideOffer.vehicle);
-                    dateAndTimeView.setText(rideOffer.dateAndTime);
+//                    setPhoto(rideOffer.facebookId);
+//                    authorView.setText(rideOffer.author);
+//                    startView.setText(rideOffer.start);
+//                    destinationView.setText(rideOffer.destination);
+//                    vehicleView.setText(rideOffer.vehicle);
+//                    dateAndTimeView.setText(rideOffer.dateAndTime);
                     // [END_EXCLUDE]
 
                     userAuthorId = rideOffer.uid;
@@ -721,6 +752,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
                                     vehicle, vehicleModel, vehicleColor, vehiclePlateNo,
                                     userId, userAuthorName, userFacebookId,
                                     sakayKey);
+
+                            createNotif(sakayKey, "sakay", commentAuthorId);
+
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                             finish();
                         }
@@ -765,6 +799,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         postComment(location, lat, lng);
+                        createNotif(mPostKey, "request", null);
                         Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -791,11 +826,13 @@ public class RideOfferDetailActivity extends BaseActivity implements
                             launchPlacePicker();
                         } else if(text.equals("My Home Address")){
                             postComment(currentHome, currentHomeLat, currentHomeLong);
+                            createNotif(mPostKey, "request", null);
                             Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                     Toast.LENGTH_SHORT).show();
 
                         } else if(text.equals("My Work Address")){
                             postComment(currentWork, currentWorkLat, currentWorkLong);
+                            createNotif(mPostKey, "request", null);
                             Toast.makeText(RideOfferDetailActivity.this, "Sakay request sent",
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -908,5 +945,25 @@ public class RideOfferDetailActivity extends BaseActivity implements
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public void createNotif(String key, String type, String commentAuthorID){
+        String notifKey = mRootRef.child("user-notifications").push().getKey();;
+        Notif notif;
+        if (type.equals("request")){
+            notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), type, key,
+                    "sent you a ride request", ServerValue.TIMESTAMP);
+
+        } else {
+            notif = new Notif(commentAuthorID, currentUser.getName(), currentUser.getFacebookId(), type, key,
+                    "accepted your ride request", ServerValue.TIMESTAMP);
+        }
+
+        Map<String, Object> notifValues = notif.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/user-notifications/" + userAuthorId + "/" + notifKey, notifValues);
+        mRootRef.updateChildren(childUpdates);
+
     }
 }
