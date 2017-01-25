@@ -57,6 +57,7 @@ dependencies {
     compile 'com.firebase:firebase-client-android:2.5.2'
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
     compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
     testCompile 'junit:junit:4.12'
 }
 

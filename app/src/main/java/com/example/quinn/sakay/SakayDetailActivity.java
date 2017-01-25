@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
 import com.github.clans.fab.FloatingActionButton;
@@ -53,6 +54,8 @@ public class SakayDetailActivity extends BaseActivity implements
     private TextView vehicleColorView;
     private TextView vehiclePlateNoView;
 
+    public MaterialDialog loadingDialog;
+
 //    public String driverText;
 //    public String riderText;
 
@@ -85,6 +88,63 @@ public class SakayDetailActivity extends BaseActivity implements
         vehicleModelView = (TextView) findViewById(R.id.sakay_detail_vehicle_model);
         vehicleColorView = (TextView) findViewById(R.id.sakay_detail_vehicle_color) ;
         vehiclePlateNoView = (TextView) findViewById(R.id.sakay_detail_vehicle_plate_no);
+
+        loadingDialog = new MaterialDialog.Builder(this)
+                .title("Loading details")
+                .content("Please wait")
+                .progress(true, 0)
+                .show();
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Sakay sakay = dataSnapshot.getValue(Sakay.class);
+
+                String sakayWith;
+                if(sakay.role.equals("driver")) {
+                    sakayWith = "You will be driving for " + sakay.otherAuthor;
+                } else {
+                    sakayWith = "You will be riding with " + sakay.otherAuthor;
+                }
+                otherUserId = sakay.otherUid;
+                String dateTime = sakay.dateAndTime;
+                String pickupLocation = "Pickup Location: " + sakay.start;
+                String destination = "Destination: " + sakay.destination;
+                String vehicleType = "Vehicle type: " + sakay.vehicle;
+                String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
+                String vehicleColor = "Color: " + sakay.vehicleColor;
+                String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
+
+                Spannable spannable = new SpannableString(sakayWith);
+                spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
+                        sakayWith.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                otherAuthorNameView.setText(spannable, TextView.BufferType.SPANNABLE);
+                dateAndTimeView.setText(dateTime);
+                startView.setText(pickupLocation);
+                destinationView.setText(destination);
+                vehicleTypeView.setText(vehicleType);
+                vehicleModelView.setText(vehicleModel);
+                vehicleColorView.setText(vehicleColor);
+                vehiclePlateNoView.setText(vehiclePlateNo);
+                // [END_EXCLUDE]
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                // [START_EXCLUDE]
+                Toast.makeText(SakayDetailActivity.this, "Failed to load post.",
+                        Toast.LENGTH_SHORT).show();
+                // [END_EXCLUDE]
+            }
+        };
+        mPostReference.addListenerForSingleValueEvent(postListener);
+        // [END post_value_event_listener]
+
+        // Keep copy of post listener so we can remove it when app stops
+        mPostListener = postListener;
 
         trackLocationButton = (FloatingActionButton) findViewById(R.id.fabTrackLocation);
         trackLocationButton.hide(false);
@@ -134,56 +194,7 @@ public class SakayDetailActivity extends BaseActivity implements
     public void onStart() {
         super.onStart();
 
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Sakay sakay = dataSnapshot.getValue(Sakay.class);
 
-                String sakayWith;
-                if(sakay.role.equals("driver")) {
-                    sakayWith = "You will be driving for " + sakay.otherAuthor;
-                } else {
-                    sakayWith = "You will be riding with " + sakay.otherAuthor;
-                }
-                otherUserId = sakay.otherUid;
-                String dateTime = sakay.dateAndTime;
-                String pickupLocation = "Pickup Location: " + sakay.start;
-                String destination = "Destination: " + sakay.destination;
-                String vehicleType = "Vehicle type: " + sakay.vehicle;
-                String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
-                String vehicleColor = "Color: " + sakay.vehicleColor;
-                String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
-
-                Spannable spannable = new SpannableString(sakayWith);
-                spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
-                        sakayWith.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                otherAuthorNameView.setText(spannable, TextView.BufferType.SPANNABLE);
-                dateAndTimeView.setText(dateTime);
-                startView.setText(pickupLocation);
-                destinationView.setText(destination);
-                vehicleTypeView.setText(vehicleType);
-                vehicleModelView.setText(vehicleModel);
-                vehicleColorView.setText(vehicleColor);
-                vehiclePlateNoView.setText(vehiclePlateNo);
-                // [END_EXCLUDE]
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // [START_EXCLUDE]
-                Toast.makeText(SakayDetailActivity.this, "Failed to load post.",
-                        Toast.LENGTH_SHORT).show();
-                // [END_EXCLUDE]
-            }
-        };
-        mPostReference.addValueEventListener(postListener);
-        // [END post_value_event_listener]
-
-        // Keep copy of post listener so we can remove it when app stops
-        mPostListener = postListener;
     }
 
     @Override

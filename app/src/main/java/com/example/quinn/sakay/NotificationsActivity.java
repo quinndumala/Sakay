@@ -21,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-;
 
 public class NotificationsActivity extends BaseActivity
         implements ConnectivityReceiver.ConnectivityReceiverListener{
@@ -143,7 +142,10 @@ public class NotificationsActivity extends BaseActivity
 
                         } else if (notifType.equals("offer")){
                             viewRideRequest(postKey);
-                        } else {
+                        } else if(notifType.equals("sakay")){
+                            viewSakay(postKey);
+                        }
+                        else {
                             Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
                         }
                     }
@@ -164,6 +166,12 @@ public class NotificationsActivity extends BaseActivity
     public void viewRideRequest(String refKey){
         Intent intent = new Intent(this, RideRequestDetailActivity.class);
         intent.putExtra(RideRequestDetailActivity.EXTRA_POST_KEY, refKey);
+        startActivity(intent);
+    }
+
+    public void viewSakay(String sakayKey){
+        Intent intent = new Intent(this, SakayDetailActivity.class);
+        intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, sakayKey);
         startActivity(intent);
     }
 

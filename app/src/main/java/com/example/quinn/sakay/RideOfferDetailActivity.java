@@ -948,21 +948,24 @@ public class RideOfferDetailActivity extends BaseActivity implements
     }
 
     public void createNotif(String key, String type, String commentAuthorID){
-        String notifKey = mRootRef.child("user-notifications").push().getKey();;
+        String notifId;
+        String notifKey = mRootRef.child("user-notifications").push().getKey();
         Notif notif;
         if (type.equals("request")){
+            notifId = userAuthorId;
             notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), type, key,
                     "sent you a ride request", ServerValue.TIMESTAMP);
 
         } else {
-            notif = new Notif(commentAuthorID, currentUser.getName(), currentUser.getFacebookId(), type, key,
+            notifId = commentAuthorID;
+            notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), type, key,
                     "accepted your ride request", ServerValue.TIMESTAMP);
         }
 
         Map<String, Object> notifValues = notif.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/user-notifications/" + userAuthorId + "/" + notifKey, notifValues);
+        childUpdates.put("/user-notifications/" + notifId + "/" + notifKey, notifValues);
         mRootRef.updateChildren(childUpdates);
 
     }

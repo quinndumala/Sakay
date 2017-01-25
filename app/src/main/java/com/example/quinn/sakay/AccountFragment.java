@@ -119,12 +119,6 @@ public class AccountFragment extends Fragment
         profilePhoto = (CircleImageView) getView().findViewById(R.id.profile_user_photo);
         userEmail = (TextView) getView().findViewById(R.id.profile_user_email) ;
         facebookUserId = profile.getId();
-    }
-
-    @Override
-    public void onStart(){
-        super.onStart();
-        checkConnection();
 
         progressDialog = new MaterialDialog.Builder(getActivity())
                 .title("Loading account information")
@@ -140,12 +134,9 @@ public class AccountFragment extends Fragment
         DatabaseReference name_ref = database.getReference(nameRef);
         DatabaseReference email_ref = database.getReference(emailRef);
 
-        //new ImageLoadTask(photoUrl, profilePhoto).execute();
-
         name_ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                progressDialog.show();
                 String data = dataSnapshot.getValue(String.class);
                 profileName.setText(data);
             }
@@ -171,6 +162,16 @@ public class AccountFragment extends Fragment
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        checkConnection();
+
+
+
+
 
     }
 
