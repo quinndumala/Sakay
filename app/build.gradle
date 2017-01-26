@@ -58,6 +58,9 @@ dependencies {
     compile 'com.github.arimorty:floatingsearchview:2.0.3'
     compile 'com.afollestad.material-dialogs:core:0.9.1.0'
     compile 'com.joanzapata.iconify:android-iconify-fontawesome:2.2.2'
+    compile 'com.github.juanlabrador:badgecounter:1.0.2@aar'
+    compile 'com.mikepenz:actionitembadge:3.3.1@aar'
+    compile 'com.mikepenz:iconics-core:2.8.1@aar'
     testCompile 'junit:junit:4.12'
 }
 

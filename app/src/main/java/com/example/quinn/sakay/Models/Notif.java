@@ -16,19 +16,21 @@ public class Notif {
     public String type;
     public String postKey;
     public String action;
+    public Boolean read;
     public Object timestamp;
 
 
     public Notif() {}
 
     public Notif(String userId, String userName, String facebookId, String type, String postKey,
-                 String action, Object timestamp){
+                 String action, Boolean read, Object timestamp){
         this.userId = userId;
         this.userName = userName;
         this.facebookId = facebookId;
         this.type = type;
         this.postKey = postKey;
         this.action = action;
+        this.read = read;
         this.timestamp = timestamp;
     }
 
@@ -41,6 +43,7 @@ public class Notif {
         result.put("type", type);
         result.put("postKey", postKey);
         result.put("action", action);
+        result.put("read", read);
         result.put("timestamp", timestamp);
         return result;
     }

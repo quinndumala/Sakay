@@ -124,54 +124,61 @@ public class AccountFragment extends Fragment
                 .title("Loading account information")
                 .content("Please wait")
                 .progress(true, 0)
-                .build();
+                .show();
 
         String uid = getActivity().getIntent().getExtras().getString("user_id");
         String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-        String nameRef = String.format("users/%s/name", uid);
-        String emailRef = String.format("users/%s/email", uid);
+        String userRef = String.format("users/%s", uid);
 
-        DatabaseReference name_ref = database.getReference(nameRef);
-        DatabaseReference email_ref = database.getReference(emailRef);
-
-        name_ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                profileName.setText(data);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
-        });
-
+        DatabaseReference user_ref = database.getReference(userRef);
         GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
-
-        email_ref.addValueEventListener(new ValueEventListener() {
+        user_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String data = dataSnapshot.getValue(String.class);
-                userEmail.setText(data);
+                User user = dataSnapshot.getValue(User.class);
+                profileName.setText(user.getName());
+                userEmail.setText(user.getEmail());
                 progressDialog.dismiss();
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+
             }
         });
+
+//        name_ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String data = dataSnapshot.getValue(String.class);
+//                profileName.setText(data);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                System.out.println("The read failed: " + databaseError.getCode());
+//            }
+//        });
+//        email_ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String data = dataSnapshot.getValue(String.class);
+//                userEmail.setText(data);
+//                progressDialog.dismiss();
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                System.out.println("The read failed: " + databaseError.getCode());
+//            }
+//        });
     }
 
     @Override
     public void onStart(){
         super.onStart();
         checkConnection();
-
-
-
-
 
     }
 

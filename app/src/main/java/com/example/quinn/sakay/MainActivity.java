@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,9 +49,7 @@ public class MainActivity extends AppCompatActivity
         AccountFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
-        ConnectivityReceiver.ConnectivityReceiverListener
-{
-    //private Firebase db;
+        ConnectivityReceiver.ConnectivityReceiverListener {
     private FirebaseAuth mAuth;
     private CircleImageView navProfilePhoto;
     private TextView navProfileName;
@@ -78,6 +77,13 @@ public class MainActivity extends AppCompatActivity
 //            "requests_tag","account_tag", "settings_tag", "help_tag", "about_tag"};
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference rootRef;
+    private DatabaseReference notifCheckRef;
+    public final String userId = getUid();
+    public Boolean hasNotifs = false;
+    public MenuItem notifs;
+    public RelativeLayout badgeLayout;
+    public TextView notifsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +94,9 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         mAuth = FirebaseAuth.getInstance();
+        rootRef = FirebaseDatabase.getInstance().getReference();
+        notifCheckRef = rootRef.child("notif-check").child(userId);
+
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading account information")
@@ -137,7 +146,6 @@ public class MainActivity extends AppCompatActivity
         String nameRef = String.format("users/%s/name", uid);
         String emailRef = String.format("users/%s/email", uid);
         DatabaseReference name_ref = database.getReference(nameRef);
-        DatabaseReference email_ref = database.getReference(emailRef);
         name_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -176,6 +184,25 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
 
+        notifCheckRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Boolean data = dataSnapshot.getValue(Boolean.class);
+                    if(data){
+                        hasNotifs = true;
+                    } else {
+                        hasNotifs = false;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -206,6 +233,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        //notifs = menu.findItem(R.id.action_notifications);
+
+
+
+//        badgeLayout = (RelativeLayout) notifs.getActionView();
+//        notifsTextView = (TextView) badgeLayout.findViewById(R.id.badge_textView);
+//        notifsTextView.setVisibility(View.GONE);
+
+
+
         return true;
     }
 
@@ -217,6 +254,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_notifications){
+            notifCheckRef.setValue(false);
             Intent intent = new Intent(this, NotificationsActivity.class);
             startActivity(intent);
             return true;
@@ -587,6 +625,10 @@ public class MainActivity extends AppCompatActivity
             imageView.setImageBitmap(result);
         }
 
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
 

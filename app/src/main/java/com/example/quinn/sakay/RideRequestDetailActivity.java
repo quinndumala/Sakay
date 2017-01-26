@@ -634,6 +634,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                     commentVehicle, commentVehicleModel, commentVehicleColor, commentVehiclePlateNo,
                                     userId, userAuthorName, userFacebookId,
                                     sakayKey);
+                            createNotif(sakayKey, "sakay", commentAuthorId);
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                             finish();
                         }
@@ -724,6 +725,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                 EditVehicleModel.getText().toString(),
                                 EditVehicleColor.getText().toString(),
                                 EditPlateNo.getText().toString());
+                        createNotif(mPostKey, "offer", null);
                         Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -756,8 +758,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                 EditVehicleModel.getText().toString(),
                                 EditVehicleColor.getText().toString(),
                                 EditPlateNo.getText().toString());
-                        createNotif();
-                        Toast.makeText(RideRequestDetailActivity.this, "Sakay request sent",
+                        createNotif(mPostKey, "offer", null);
+                        Toast.makeText(RideRequestDetailActivity.this, "Sakay offer sent",
                                 Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
@@ -826,15 +828,29 @@ public class RideRequestDetailActivity extends BaseActivity implements
         });
     }
 
-    public void createNotif(){
+    public void createNotif(String key, String type, String commentAuthorID){
+        String notifId;
         String notifKey = mRootRef.child("user-notifications").push().getKey();
-        Notif notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), "offer", mPostKey,
-                "sent you a ride offer", ServerValue.TIMESTAMP);
+        Notif notif;
+        String action;
+
+        if(type.equals("offer")){
+            notifId = userAuthorId;
+            action = "sent you a ride offer";
+        } else {
+            notifId = commentAuthorID;
+            action = "accepted your ride offer";
+        }
+
+        notif = new Notif(userId, currentUser.getName(), currentUser.getFacebookId(), type, key,
+                action, false, ServerValue.TIMESTAMP);
         Map<String, Object> notifValues = notif.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/user-notifications/" + userAuthorId + "/" + notifKey, notifValues);
+        childUpdates.put("/user-notifications/" + notifId + "/" + notifKey, notifValues);
         mRootRef.updateChildren(childUpdates);
+
+        mRootRef.child("notif-check").child(notifId).setValue(true);
     }
 
 }
