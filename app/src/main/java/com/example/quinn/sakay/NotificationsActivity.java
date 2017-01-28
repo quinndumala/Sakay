@@ -117,22 +117,9 @@ public class NotificationsActivity extends BaseActivity
                 final DatabaseReference notifRef = getRef(position);
 
                 final String notifKey = notifRef.getKey();
-//                notifRef.child("type")
-//                        .addListenerForSingleValueEvent(new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(DataSnapshot dataSnapshot) {
-//                                if(dataSnapshot.exists()){
-//                                    notifType = dataSnapshot.getValue().toString();
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(DatabaseError databaseError) {
-//
-//                            }
-//                        });
                 final String notifType = model.getType();
                 final String postKey = model.getPostKey();
+                final Boolean hasRead = model.getRead();
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -150,6 +137,12 @@ public class NotificationsActivity extends BaseActivity
                         }
                     }
                 });
+
+                if(!hasRead){
+                    viewHolder.itemView.setBackgroundColor(getResources().getColor(R.color.lightGray));
+                } else {
+                    viewHolder.itemView.setBackgroundColor(getResources().getColor(R.color.white));
+                }
 
                 viewHolder.bindToPost(model);
             }

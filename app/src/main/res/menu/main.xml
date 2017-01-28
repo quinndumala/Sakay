@@ -5,11 +5,17 @@
         android:title="Filter Date"
         android:id="@+id/action_filter_date"
         android:icon="@drawable/ic_calendar"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_notifications"
         android:title="Notifications"
-        android:icon="@drawable/ic_notifications"
+        app:actionLayout="@layout/menu_action_item_badge"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_notifications_no_badge"
+        android:title="Notifications"
+        android:icon="@drawable/ic_notifications"
+        app:showAsAction="always"
+        android:visible="false"/>
 
 </menu>

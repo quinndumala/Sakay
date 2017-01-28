@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,9 +52,8 @@ public class RideOffersFragment extends Fragment
     implements ConnectivityReceiver.ConnectivityReceiverListener{
     private static final String TAG = "RideOffersFragment";
 
-    // [START define_database_reference]
     private DatabaseReference mDatabase;
-    // [END define_database_reference]
+    private DatabaseReference notifCheckRef;
 
     private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> mAdapter;
     private FirebaseRecyclerAdapter<RideOffer, RideOfferViewHolder> filterAdapter;
@@ -67,6 +67,8 @@ public class RideOffersFragment extends Fragment
     public String dateAndTime = "";
     public Long filterTime;
     public Query allPostsQuery;
+    public String userId = getUid();
+    public Boolean hasNotifs;
 
     private Profile profile = getCurrentProfile();
 
@@ -81,18 +83,28 @@ public class RideOffersFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_notifications){
+            notifCheckRef.setValue(false);
             Intent intent = new Intent(getActivity(), NotificationsActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_filter_date) {
-            //Toast.makeText(getActivity(), "Filter date", Toast.LENGTH_SHORT).show();
             launchFilterPosts();
+        } else if (id == R.id.action_notifications_no_badge){
+            notifCheckRef.setValue(false);
+            Intent intent = new Intent(getActivity(), NotificationsActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -112,6 +124,7 @@ public class RideOffersFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_ride_offers, container, false);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        notifCheckRef = mDatabase.child("notif-check").child(userId);
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.rideOffers_list);
         mRecycler.setHasFixedSize(true);
@@ -140,6 +153,27 @@ public class RideOffersFragment extends Fragment
     public void onStart(){
         super.onStart();
         checkConnection();
+
+        notifCheckRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Boolean data = dataSnapshot.getValue(Boolean.class);
+                    if(data){
+                        hasNotifs = true;
+
+                    } else {
+                        hasNotifs = false;
+                    }
+                    getActivity().invalidateOptionsMenu();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -185,12 +219,8 @@ public class RideOffersFragment extends Fragment
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        // [START recent_posts_query]
-        // Last 100 posts, these are automatically the 100 most recent
-        // due to sorting by push() keys
         Query recentPostsQuery = databaseReference.child("rideOffers")
                 .limitToFirst(100);
-        // [END recent_posts_query]
 
         return recentPostsQuery;
     }
@@ -365,4 +395,6 @@ public class RideOffersFragment extends Fragment
 
         dialog.show();
     }
+
+
 }

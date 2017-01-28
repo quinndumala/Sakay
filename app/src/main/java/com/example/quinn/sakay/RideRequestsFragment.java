@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,9 +49,8 @@ public class RideRequestsFragment extends Fragment
     implements ConnectivityReceiver.ConnectivityReceiverListener{
     private static final String TAG = "RideRequestsFragment";
 
-    // [START define_database_reference]
     private DatabaseReference mDatabase;
-    // [END define_database_reference]
+    private DatabaseReference notifCheckRef;
 
     private FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder> mAdapter;
     private FirebaseRecyclerAdapter<RideRequest, RideRequestViewHolder> filterAdapter;
@@ -64,6 +64,9 @@ public class RideRequestsFragment extends Fragment
     public Long filterTime;
     public Query allPostsQuery;
 
+    public String userId = getUid();
+    public Boolean hasNotifs;
+
     public RideRequestsFragment() {
         // Required empty public constructor
     }
@@ -75,18 +78,28 @@ public class RideRequestsFragment extends Fragment
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_notifications){
+            notifCheckRef.setValue(false);
             Intent intent = new Intent(getActivity(), NotificationsActivity.class);
             startActivity(intent);
             return true;
         } else if (id == R.id.action_filter_date) {
-            //Toast.makeText(getActivity(), "Filter date", Toast.LENGTH_SHORT).show();
             launchFilterPosts();
+        } else if (id == R.id.action_notifications_no_badge){
+            notifCheckRef.setValue(false);
+            Intent intent = new Intent(getActivity(), NotificationsActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -106,6 +119,7 @@ public class RideRequestsFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_ride_requests, container, false);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        notifCheckRef = mDatabase.child("notif-check").child(userId);
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.rideRequest_list);
         mRecycler.setHasFixedSize(true);
@@ -133,6 +147,27 @@ public class RideRequestsFragment extends Fragment
     public void onStart(){
         super.onStart();
         checkConnection();
+
+        notifCheckRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Boolean data = dataSnapshot.getValue(Boolean.class);
+                    if(data){
+                        hasNotifs = true;
+
+                    } else {
+                        hasNotifs = false;
+                    }
+                    getActivity().invalidateOptionsMenu();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -171,10 +206,6 @@ public class RideRequestsFragment extends Fragment
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
 
-        /*
-        Set up FirebaseRecyclerAdapter with the Query
-        TODO: Check if database node has values first and set a condition
-        */
         getAllPosts();
     }
 

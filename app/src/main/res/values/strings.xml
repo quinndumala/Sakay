@@ -103,6 +103,7 @@
     <string name="btn_get_location">GET MY LOCATION</string>
     <string name="btn_start_location_updates">START LOCATION UPDATES</string>
     <string name="btn_stop_location_updates">STOP LOCATION UPDATES</string>
+    <string name="notifications_text">Notifications</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

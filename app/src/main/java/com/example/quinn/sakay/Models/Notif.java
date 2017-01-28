@@ -50,4 +50,5 @@ public class Notif {
 
     public String getType(){return type;}
     public String getPostKey(){return postKey;}
+    public Boolean getRead(){return read;}
 }

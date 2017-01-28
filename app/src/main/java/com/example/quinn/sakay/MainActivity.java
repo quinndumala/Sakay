@@ -30,6 +30,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mikepenz.actionitembadge.library.ActionItemBadge;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     public MenuItem notifs;
     public RelativeLayout badgeLayout;
     public TextView notifsTextView;
+    public int badgeCount = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,6 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         rootRef = FirebaseDatabase.getInstance().getReference();
         notifCheckRef = rootRef.child("notif-check").child(userId);
-
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading account information")
@@ -191,9 +192,11 @@ public class MainActivity extends AppCompatActivity
                     Boolean data = dataSnapshot.getValue(Boolean.class);
                     if(data){
                         hasNotifs = true;
+
                     } else {
                         hasNotifs = false;
                     }
+                    invalidateOptionsMenu();
                 }
             }
 
@@ -233,7 +236,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        //notifs = menu.findItem(R.id.action_notifications);
+        notifs = menu.findItem(R.id.action_notifications_no_badge);
+
+        if (hasNotifs) {
+            ActionItemBadge.update(this, menu.findItem(R.id.action_notifications),
+                    getResources().getDrawable(R.drawable.ic_notifications), ActionItemBadge.BadgeStyles.RED,
+                    "!");
+        } else {
+            ActionItemBadge.hide(menu.findItem(R.id.action_notifications));
+            notifs.setVisible(true);
+        }
 
 
 
@@ -260,6 +272,11 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if (id == R.id.action_filter_date) {
 
+        } else if (id == R.id.action_notifications_no_badge){
+            notifCheckRef.setValue(false);
+            Intent intent = new Intent(this, NotificationsActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
