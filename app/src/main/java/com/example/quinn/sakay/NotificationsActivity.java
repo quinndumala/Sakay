@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -18,7 +19,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -27,6 +30,7 @@ public class NotificationsActivity extends BaseActivity
     private static final String TAG = "NotifsActivity";
 
     private DatabaseReference mDatabase;
+    public DatabaseReference userNotifsRef;
 
     private FirebaseRecyclerAdapter<Notif, NotifsViewHolder> mAdapter;
     private RecyclerView mRecycler;
@@ -35,6 +39,7 @@ public class NotificationsActivity extends BaseActivity
     private TextView noNotifsView;
     public Query notifsQuery;
     public String userId = getUid();
+    public Boolean hasRead = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class NotificationsActivity extends BaseActivity
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        userNotifsRef = mDatabase.child("user-notifications").child(userId);
 
         mRecycler = (RecyclerView) findViewById(R.id.notifications_list);
         mRecycler.setHasFixedSize(true);
@@ -119,14 +125,16 @@ public class NotificationsActivity extends BaseActivity
                 final String notifKey = notifRef.getKey();
                 final String notifType = model.getType();
                 final String postKey = model.getPostKey();
-                final Boolean hasRead = model.getRead();
+                final Boolean hasNotifRead = model.getRead();
+                Log.d(TAG, "notifKey: " + notifKey);
+                Log.d(TAG, "hasread: " + hasNotifRead + " " + model.read);
+                Log.d(TAG, "action: " + model.action);
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if(notifType.equals("request")){
                             viewRideOffer(postKey);
-
                         } else if (notifType.equals("offer")){
                             viewRideRequest(postKey);
                         } else if(notifType.equals("sakay")){
@@ -135,13 +143,15 @@ public class NotificationsActivity extends BaseActivity
                         else {
                             Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
                         }
+
+                        DatabaseReference notifRef = userNotifsRef.child(notifKey);
+                        notifClicked(notifRef);
+
                     }
                 });
 
-                if(!hasRead){
-                    viewHolder.itemView.setBackgroundColor(getResources().getColor(R.color.lightGray));
-                } else {
-                    viewHolder.itemView.setBackgroundColor(getResources().getColor(R.color.white));
+                if(!hasNotifRead){
+                    viewHolder.itemView.setBackgroundColor(getResources().getColor(R.color.divider));
                 }
 
                 viewHolder.bindToPost(model);
@@ -149,6 +159,29 @@ public class NotificationsActivity extends BaseActivity
         };
         mRecycler.setAdapter(mAdapter);
     }
+
+   public void notifClicked(DatabaseReference notifRef){
+        notifRef.runTransaction(new Transaction.Handler(){
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Notif notif = mutableData.getValue(Notif.class);
+                if (notif == null){
+                    return Transaction.success(mutableData);
+                }
+                notif.read = true;
+                mutableData.setValue(notif);
+                return Transaction.success(mutableData);
+
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
+   }
 
     public void viewRideOffer(String refKey){
         Intent intent = new Intent(this, RideOfferDetailActivity.class);
