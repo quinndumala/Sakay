@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.mikepenz.actionitembadge.library.ActionItemBadge;
 
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     public MaterialDialog progressDialog;
     android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
     String title = "Sakay";
+    public String TAG = "MainActivity";
 
 //    FragmentTransaction ft;
 //    FragmentManager fm;
@@ -137,7 +141,6 @@ public class MainActivity extends AppCompatActivity
 
         navProfilePhoto = (CircleImageView) header.findViewById(R.id.nav_user_photo);
         navProfileName = (TextView) header.findViewById(R.id.nav_user_name);
-        //navUserEmail = (TextView) header.findViewById(R.id.nav_email);
 
         String uid = getIntent().getExtras().getString("user_id");
         String imageUrl = getIntent().getExtras().getString("profile_picture");
@@ -145,7 +148,6 @@ public class MainActivity extends AppCompatActivity
         GlideUtil.loadProfileIcon(imageUrl, navProfilePhoto);
 
         String nameRef = String.format("users/%s/name", uid);
-        String emailRef = String.format("users/%s/email", uid);
         DatabaseReference name_ref = database.getReference(nameRef);
         name_ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -196,8 +198,10 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         hasNotifs = false;
                     }
-                    invalidateOptionsMenu();
+                } else {
+                    hasNotifs = false;
                 }
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -234,14 +238,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         notifs = menu.findItem(R.id.action_notifications_no_badge);
 
         if (hasNotifs) {
             ActionItemBadge.update(this, menu.findItem(R.id.action_notifications),
-                    getResources().getDrawable(R.drawable.ic_notifications), ActionItemBadge.BadgeStyles.RED,
-                    "!");
+                    getResources().getDrawable(R.drawable.ic_notifications),
+                    ActionItemBadge.BadgeStyles.RED, "!");
         } else {
             ActionItemBadge.hide(menu.findItem(R.id.action_notifications));
             notifs.setVisible(true);
@@ -266,16 +269,12 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_notifications){
-            notifCheckRef.setValue(false);
-            Intent intent = new Intent(this, NotificationsActivity.class);
-            startActivity(intent);
+            notifClicked();
             return true;
         } else if (id == R.id.action_filter_date) {
 
         } else if (id == R.id.action_notifications_no_badge){
-            notifCheckRef.setValue(false);
-            Intent intent = new Intent(this, NotificationsActivity.class);
-            startActivity(intent);
+            notifClicked();
             return true;
         }
 
@@ -556,7 +555,6 @@ public class MainActivity extends AppCompatActivity
 //            transaction.commit();
 //        }
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         setActionBarTitle(title);
         drawer.closeDrawer(GravityCompat.START);
@@ -646,6 +644,32 @@ public class MainActivity extends AppCompatActivity
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    public void notifClicked(){
+        notifCheckRef.setValue(false);
+        Intent intent = new Intent(this, NotificationsActivity.class);
+        startActivity(intent);
+    }
+
+    public void changeNotifValue(DatabaseReference notifCheckRef){
+        notifCheckRef.runTransaction(new Transaction.Handler(){
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                Boolean hasNotifs = mutableData.getValue(Boolean.class);
+                if (hasNotifs == null){
+                    return Transaction.success(mutableData);
+                }
+                mutableData.setValue(false);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
     }
 
 

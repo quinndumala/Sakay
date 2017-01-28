@@ -126,9 +126,6 @@ public class NotificationsActivity extends BaseActivity
                 final String notifType = model.getType();
                 final String postKey = model.getPostKey();
                 final Boolean hasNotifRead = model.getRead();
-                Log.d(TAG, "notifKey: " + notifKey);
-                Log.d(TAG, "hasread: " + hasNotifRead + " " + model.read);
-                Log.d(TAG, "action: " + model.action);
 
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -177,7 +174,6 @@ public class NotificationsActivity extends BaseActivity
             @Override
             public void onComplete(DatabaseError databaseError, boolean b,
                                    DataSnapshot dataSnapshot) {
-                // Transaction completed
                 Log.d(TAG, "postTransaction:onComplete:" + databaseError);
             }
         });

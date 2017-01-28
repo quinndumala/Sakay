@@ -123,20 +123,17 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get post key from intent
         mPostKey = getIntent().getStringExtra(EXTRA_POST_KEY);
         if (mPostKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
 
-        // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mPostReference = mRootRef.child("rideRequests").child(mPostKey);
         mUserPostReference = mRootRef.child("user-rideRequests").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideRequests-comments").child(mPostKey);
         vehicleRef = mRootRef.child("users-settings").child(userId).child("vehicle");
 
-        // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
         authorPhotoView = (CircleImageView) findViewById(R.id.post_author_photo_large);
         buttonDelete = (ImageView) findViewById(R.id.button_request_detail_delete);
@@ -246,10 +243,6 @@ public class RideRequestDetailActivity extends BaseActivity implements
                 if (dataSnapshot.exists()) {
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
 
-                    // [START_EXCLUDE]
-
-                    // [END_EXCLUDE]
-
                     userAuthorId = rideRequest.uid;
                     userAuthorName = rideRequest.author;
                     userAuthorFacebookId = rideRequest.facebookId;
@@ -282,12 +275,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         };
 
         mPostReference.addValueEventListener(postListener);
-        // [END post_value_event_listener]
 
-        // Keep copy of post listener so we can remove it when app stops
         mPostListener = postListener;
 
-        // Listen for comments
         mAdapter = new CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
     }
