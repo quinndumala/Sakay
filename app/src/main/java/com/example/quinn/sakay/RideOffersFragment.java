@@ -210,12 +210,7 @@ public class RideOffersFragment extends Fragment
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
 
-        /*
-        Set up FirebaseRecyclerAdapter with the Query
-        TODO: Check if database node has values first and set a condition
-        */
         getAllPosts();
-
     }
 
     public Query getQuery(DatabaseReference databaseReference) {

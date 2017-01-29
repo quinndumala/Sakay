@@ -33,15 +33,28 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quinn.sakay.Models.TrafficReport;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.example.quinn.sakay.R.id.map_traffic;
 
@@ -67,15 +80,20 @@ public class TrafficFragment extends Fragment
     public Location location;
     public double longitude;
     public double latitude;
+    private Location myLastLocation;
 
     private FloatingActionMenu menuTraffic;
     private FloatingActionButton fab1;
     private FloatingActionButton fab2;
     private FloatingActionButton fab3;
     private Handler mUiHandler = new Handler();
+    private Handler mapHandler = new Handler();
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
+
+    public DatabaseReference mRootRef;
+    public DatabaseReference trafficReportsRef;
 
 //
 //    private static final double lat = 9.306840;
@@ -116,7 +134,8 @@ public class TrafficFragment extends Fragment
             Log.e(TAG, "Inflate exception");
         }
 
-
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        trafficReportsRef = mRootRef.child("traffic-reports");
         return rootView;
 //        View view = inflater.inflate(R.layout.fragment_traffic, container, false);
 //        return view;
@@ -155,7 +174,7 @@ public class TrafficFragment extends Fragment
         createCustomAnimation();
 
        // setRetainInstance(true);
-
+        mapHandler.postDelayed(refreshTask, 10 * 60 * 1000);
     }
 
     @Override
@@ -199,20 +218,34 @@ public class TrafficFragment extends Fragment
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.fabLight:
+                    addTrafficReport("light");
                     Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
                     menuTraffic.toggle(true);
                     break;
                 case R.id.fabModerate:
+                    addTrafficReport("moderate");
                     Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
                     menuTraffic.toggle(true);
                     break;
                 case R.id.fabHeavy:
+                    addTrafficReport("heavy");
                     Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
                     menuTraffic.toggle(true);
                     break;
             }
         }
     };
+
+    public void addTrafficReport(String intensity){
+        String key = mRootRef.child("traffic-reports").push().getKey();
+        TrafficReport trafficReport = new TrafficReport(myLastLocation.getLatitude(), myLastLocation.getLongitude(),
+                intensity, ServerValue.TIMESTAMP);
+        Map<String, Object> postValues = trafficReport.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/traffic-reports/" + key, postValues);
+        mRootRef.updateChildren(childUpdates);
+    }
 
 
 
@@ -222,22 +255,100 @@ public class TrafficFragment extends Fragment
 //        }
 //    }
 
-//    private boolean isGooglePlayServicesAvailable() {
-//        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//        if (ConnectionResult.SUCCESS == status) {
-//            return true;
-//        } else {
-//            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
-//            return false;
-//        }
-//    }
+    private boolean isGooglePlayServicesAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+        if (ConnectionResult.SUCCESS == status) {
+            return true;
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(status, getActivity(), 0).show();
+            return false;
+        }
+    }
 
     @Override
     public void onStart() {
         super.onStart();
         checkConnection();
 
+        trafficReportsRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.exists()){
+                    TrafficReport trafficReport = dataSnapshot.getValue(TrafficReport.class);
+                    Boolean isRecent = checkTime(trafficReport.timestamp);
+
+                    if (isRecent){
+                        LatLng latLng = new LatLng(trafficReport.latitude, trafficReport.longitude);
+                        MarkerOptions position = new MarkerOptions().position(latLng);
+                        chooseColor(position, trafficReport.intensity);
+                        googleMap.addMarker(position);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
+
+    public void chooseColor(MarkerOptions position, String intensity){
+        if(intensity.equals("heavy")){
+            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        } else if (intensity.equals("moderate")){
+            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        } else {
+            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+        }
+    }
+
+    public Boolean checkTime(Object timestamp){
+        long currentTime = System.currentTimeMillis();
+        long reportTime = (long) timestamp;
+        long diff = currentTime - reportTime;
+
+        Log.d(TAG, "Current Time: " + currentTime);
+        Log.d(TAG, "Report Time: " + reportTime);
+        Log.d(TAG, "Difference: " + diff);
+
+        if (diff > 10 * 60 * 1000){
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    private Runnable refreshTask = new Runnable()
+    {
+        public void run()
+        {
+            mapHandler.removeCallbacks(this);
+
+            mapView.postInvalidate();
+
+            mapHandler.postDelayed(this, 10 * 60 * 1000);
+
+        }
+    };
 
 
     @Override
@@ -374,6 +485,7 @@ public class TrafficFragment extends Fragment
     public void onLocationChanged(Location location) {
         //To clear map data
         googleMap.clear();
+        myLastLocation = location;
 
         //To hold location
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -432,7 +544,7 @@ public class TrafficFragment extends Fragment
 
 //    private Location getMyLocation() {
 //        // Get location from GPS if it's available
-//        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+//        LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
 //        Location myLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 //
 //        // Location wasn't found, check the next most accurate place for the current location
