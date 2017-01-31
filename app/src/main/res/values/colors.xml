@@ -27,4 +27,5 @@
 
     <color name="black_alpha_40">#66000000</color>
     <color name="actionbar_opacity">#33000000</color>
+    <color name="status_bar_opacity">#40000000</color>
 </resources>

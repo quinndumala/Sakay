@@ -38,6 +38,7 @@ public class SakayDetailActivity extends BaseActivity implements
     private DatabaseReference mPostReference;
     private ValueEventListener mPostListener;
     private String mPostKey;
+    private String otherUser;
 
     private String userFacebookId = "";
     private Profile profile = getCurrentProfile();
@@ -106,6 +107,7 @@ public class SakayDetailActivity extends BaseActivity implements
                 } else {
                     sakayWith = "You will be riding with " + sakay.otherAuthor;
                 }
+                otherUser = sakay.otherAuthor;
                 otherUserId = sakay.otherUid;
                 String dateTime = sakay.dateAndTime;
                 String pickupLocation = "Pickup Location: " + sakay.start;
@@ -173,9 +175,11 @@ public class SakayDetailActivity extends BaseActivity implements
         int id = view.getId();
 
         if (id == R.id.fabTrackLocation) {
-            Toast.makeText(SakayDetailActivity.this, "Track Location", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SakayDetailActivity.this, "Retrieving " + otherUser + "'s last known location",
+                    Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, TrackLocationActivity.class);
             //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+            intent.putExtra(TrackLocationActivity.EXTRA_SAKAY_KEY, mPostKey);
             startActivity(intent);
         } else if (id == R.id.sakay_detail_other_author){
             viewProfile();

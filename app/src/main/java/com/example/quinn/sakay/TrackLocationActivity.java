@@ -1,6 +1,7 @@
 package com.example.quinn.sakay;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -8,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -19,6 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Coordinates;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,8 +42,10 @@ public class TrackLocationActivity extends BaseActivity implements
         View.OnClickListener{
 
     public static final String TAG = "TrackLocation";
+    public static final String EXTRA_SAKAY_KEY = "sakay_key";
     private MapView mapView;
     private GoogleMap googleMap;
+    private String sakayKey;
 
     public Location location;
     private Location myLastLocation;
@@ -48,10 +54,12 @@ public class TrackLocationActivity extends BaseActivity implements
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
+    private boolean isInFront;
 
     public DatabaseReference mRootRef;
     public DatabaseReference userCoordsRef;
     public String userId = getUid();
+    public MaterialDialog locationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +81,11 @@ public class TrackLocationActivity extends BaseActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        sakayKey = getIntent().getStringExtra(EXTRA_SAKAY_KEY);
+        if (sakayKey == null) {
+            throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
+        }
+
         try {
             MapsInitializer.initialize(this);
             mapView = (MapView) findViewById(R.id.map_track_location);
@@ -86,8 +99,23 @@ public class TrackLocationActivity extends BaseActivity implements
 
         fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
         fabUserLocation = (FloatingActionButton) findViewById(R.id.fab_user_location);
+
+        locationDialog = new MaterialDialog.Builder(TrackLocationActivity.this)
+                .title("Location not found")
+                .content("Please turn on location services to continue using Sakay")
+                .positiveText("OK")
+                .cancelable(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .build();
+
         fabMyLocation.setOnClickListener(this);
         fabUserLocation.setOnClickListener(this);
+
     }
 
     public int getStatusBarHeight() {
@@ -123,11 +151,13 @@ public class TrackLocationActivity extends BaseActivity implements
     protected void onStart() {
         super.onStart();
         checkConnection();
+        checkLocationServices();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        isInFront = false;
         mapView.onPause();
     }
 
@@ -153,6 +183,7 @@ public class TrackLocationActivity extends BaseActivity implements
     @Override
     public void onResume() {
         super.onResume();
+        isInFront = true;
 
         mapView.onResume();
         MyApplication.getInstance().setConnectivityListener(this);
@@ -176,8 +207,11 @@ public class TrackLocationActivity extends BaseActivity implements
     }
 
     private void ZoomToMyLocation() {
-        LatLng latLng = new LatLng(myLastLocation.getLatitude(), myLastLocation.getLongitude());
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        if (myLastLocation != null){
+            LatLng latLng = new LatLng(myLastLocation.getLatitude(), myLastLocation.getLongitude());
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        }
+
     }
 
 
@@ -188,11 +222,14 @@ public class TrackLocationActivity extends BaseActivity implements
 
     @Override
     public void onProviderEnabled(String s) {
-
+        locationDialog.dismiss();
     }
 
     @Override
     public void onProviderDisabled(String s) {
+        if (isInFront){
+            turnOnLocationDialog();
+        }
 
     }
 
@@ -269,4 +306,17 @@ public class TrackLocationActivity extends BaseActivity implements
             snackbar.show();
         }
     }
+
+    private void checkLocationServices(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            turnOnLocationDialog();
+        }
+    }
+
+    private void turnOnLocationDialog(){
+        locationDialog.show();
+    }
+
 }
