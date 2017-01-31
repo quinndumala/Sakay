@@ -14,7 +14,7 @@
     <item
         android:id="@+id/action_notifications_no_badge"
         android:title="Notifications"
-        android:icon="@drawable/ic_notifications"
+        android:icon="@drawable/ic_empty_bell"
         app:showAsAction="always"
         android:visible="false"/>
 

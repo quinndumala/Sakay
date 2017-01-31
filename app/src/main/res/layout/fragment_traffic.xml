@@ -42,7 +42,7 @@
             android:src="@drawable/ic_alert3"
             fab:fab_size="mini"
             fab:fab_label="Heavy"
-            fab:fab_colorNormal="@color/white"
+            fab:fab_colorNormal="@color/traffic_red"
             fab:fab_colorPressed="@color/lightGray"
             />
 
@@ -53,7 +53,7 @@
             android:src="@drawable/ic_alert2"
             fab:fab_size="mini"
             fab:fab_label="Moderate"
-            fab:fab_colorNormal="@color/white"
+            fab:fab_colorNormal="@color/traffic_orange"
             fab:fab_colorPressed="@color/lightGray"
             />
 
@@ -64,7 +64,7 @@
             android:src="@drawable/ic_alert1"
             fab:fab_size="mini"
             fab:fab_label="Light"
-            fab:fab_colorNormal="@color/white"
+            fab:fab_colorNormal="@color/traffic_yellow"
             fab:fab_colorPressed="@color/lightGray"
             />
     </com.github.clans.fab.FloatingActionMenu>

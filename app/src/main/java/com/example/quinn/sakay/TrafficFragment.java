@@ -33,6 +33,7 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quinn.sakay.Models.Coordinates;
 import com.example.quinn.sakay.Models.TrafficReport;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -94,6 +96,8 @@ public class TrafficFragment extends Fragment
 
     public DatabaseReference mRootRef;
     public DatabaseReference trafficReportsRef;
+    public DatabaseReference userCoordsRef;
+    public String userId = getUid();
 
 //
 //    private static final double lat = 9.306840;
@@ -136,6 +140,7 @@ public class TrafficFragment extends Fragment
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         trafficReportsRef = mRootRef.child("traffic-reports");
+        userCoordsRef = mRootRef.child("user-coordinates").child(userId);
         return rootView;
 //        View view = inflater.inflate(R.layout.fragment_traffic, container, false);
 //        return view;
@@ -311,13 +316,25 @@ public class TrafficFragment extends Fragment
     }
 
     public void chooseColor(MarkerOptions position, String intensity){
+        int height = 80;
+        int width = 57;
+        //BitmapDrawable bitmapdraw;
+
         if(intensity.equals("heavy")){
             position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
         } else if (intensity.equals("moderate")){
             position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+
         } else {
             position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+
         }
+
+//        Bitmap b=bitmapdraw.getBitmap();
+//        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+//
+//        position.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
     }
 
     public Boolean checkTime(Object timestamp){
@@ -487,6 +504,8 @@ public class TrafficFragment extends Fragment
         googleMap.clear();
         myLastLocation = location;
 
+        saveUserCoordinates(location.getLatitude(), location.getLongitude());
+
         //To hold location
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -500,6 +519,11 @@ public class TrafficFragment extends Fragment
         //opening position with some zoom level in the map
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
 
+    }
+
+    public void saveUserCoordinates(Double lat, Double lng){
+        Coordinates coordinates = new Coordinates(lat, lng);
+        userCoordsRef.setValue(coordinates);
     }
 
     @Override
@@ -540,6 +564,10 @@ public class TrafficFragment extends Fragment
             textView.setTextColor(color);
             snackbar.show();
         }
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
 //    private Location getMyLocation() {

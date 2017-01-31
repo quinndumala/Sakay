@@ -12,6 +12,7 @@
         android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <permission
         android:name="com.example.quinn.sakay.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
@@ -54,7 +55,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/googleMaps_key" />
@@ -169,6 +169,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.MainActivity" />
+        </activity>
+        <activity
+            android:name=".TrackLocationActivity"
+            android:label="@string/title_activity_track_location"
+            android:parentActivityName=".SakayDetailActivity"
+            android:theme="@style/AppTheme.Transparent">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.SakayDetailActivity" />
         </activity>
     </application>
 

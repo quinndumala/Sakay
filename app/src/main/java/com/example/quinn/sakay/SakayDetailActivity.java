@@ -174,6 +174,9 @@ public class SakayDetailActivity extends BaseActivity implements
 
         if (id == R.id.fabTrackLocation) {
             Toast.makeText(SakayDetailActivity.this, "Track Location", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, TrackLocationActivity.class);
+            //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+            startActivity(intent);
         } else if (id == R.id.sakay_detail_other_author){
             viewProfile();
         }
