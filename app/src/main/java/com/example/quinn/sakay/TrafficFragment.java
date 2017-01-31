@@ -7,6 +7,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -15,6 +16,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -33,6 +35,8 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Coordinates;
 import com.example.quinn.sakay.Models.TrafficReport;
 import com.github.clans.fab.FloatingActionButton;
@@ -69,7 +73,8 @@ public class TrafficFragment extends Fragment
         LocationListener,
         GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
-        ConnectivityReceiver.ConnectivityReceiverListener {
+        ConnectivityReceiver.ConnectivityReceiverListener
+        {
 
     private View rootView;
     private static final String TAG = "TrafficFragment";
@@ -88,6 +93,7 @@ public class TrafficFragment extends Fragment
     private FloatingActionButton fab1;
     private FloatingActionButton fab2;
     private FloatingActionButton fab3;
+    private FloatingActionButton fabMyLocation;
     private Handler mUiHandler = new Handler();
     private Handler mapHandler = new Handler();
 
@@ -98,12 +104,7 @@ public class TrafficFragment extends Fragment
     public DatabaseReference trafficReportsRef;
     public DatabaseReference userCoordsRef;
     public String userId = getUid();
-
-//
-//    private static final double lat = 9.306840;
-//    private static final double lon = 123.305447;
-
-
+    public MaterialDialog locationDialog;
 
 
     public TrafficFragment() {
@@ -154,8 +155,11 @@ public class TrafficFragment extends Fragment
         fab1 = (FloatingActionButton) view.findViewById(R.id.fabLight);
         fab2 = (FloatingActionButton) view.findViewById(R.id.fabModerate);
         fab3 = (FloatingActionButton) view.findViewById(R.id.fabHeavy);
+        fabMyLocation = (FloatingActionButton) view.findViewById(R.id.fab_my_location_traffic);
 
         menuTraffic.setClosedOnTouchOutside(true);
+
+
     }
 
     @Override
@@ -165,6 +169,7 @@ public class TrafficFragment extends Fragment
         fab1.setOnClickListener(clickListener);
         fab2.setOnClickListener(clickListener);
         fab3.setOnClickListener(clickListener);
+        fabMyLocation.setOnClickListener(clickListener);
         menuTraffic.hideMenuButton(false);
         mUiHandler.postDelayed(new Runnable() {
             @Override
@@ -177,6 +182,19 @@ public class TrafficFragment extends Fragment
             }
         }, 350);
         createCustomAnimation();
+
+        locationDialog = new MaterialDialog.Builder(getActivity())
+                .title("Location not found")
+                .content("Please turn on location services to continue using Sakay")
+                .positiveText("OK")
+                .cancelable(false)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .build();
 
        // setRetainInstance(true);
         mapHandler.postDelayed(refreshTask, 10 * 60 * 1000);
@@ -237,6 +255,9 @@ public class TrafficFragment extends Fragment
                     Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
                     menuTraffic.toggle(true);
                     break;
+                case R.id.fab_my_location_traffic:
+                    zoomToMyLocation();
+                    break;
             }
         }
     };
@@ -274,6 +295,8 @@ public class TrafficFragment extends Fragment
     public void onStart() {
         super.onStart();
         checkConnection();
+        checkLocationServices();
+
 
         trafficReportsRef.addChildEventListener(new ChildEventListener() {
             @Override
@@ -367,6 +390,12 @@ public class TrafficFragment extends Fragment
         }
     };
 
+    private void zoomToMyLocation() {
+        if (myLastLocation != null){
+            LatLng latLng = new LatLng(myLastLocation.getLatitude(), myLastLocation.getLongitude());
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        }
+    }
 
     @Override
     public void onPause() {
@@ -422,7 +451,7 @@ public class TrafficFragment extends Fragment
         googleMap = map;
 
         //googleMap.setOnMyLocationButtonClickListener(this);
-        googleMap.setOnMyLocationButtonClickListener(this);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         enableMyLocation();
 
     }
@@ -501,7 +530,7 @@ public class TrafficFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
         //To clear map data
-        googleMap.clear();
+        //googleMap.clear();
         myLastLocation = location;
 
         saveUserCoordinates(location.getLatitude(), location.getLongitude());
@@ -533,12 +562,16 @@ public class TrafficFragment extends Fragment
 
     @Override
     public void onProviderEnabled(String s) {
-
+        if(TrafficFragment.this.isVisible()){
+            locationDialog.dismiss();
+        }
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
+        if(TrafficFragment.this.isVisible()){
+            turnOnLocationDialog();
+        }
     }
 
     public interface OnFragmentInteractionListener {
@@ -565,6 +598,19 @@ public class TrafficFragment extends Fragment
             snackbar.show();
         }
     }
+
+    private void checkLocationServices(){
+        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            turnOnLocationDialog();
+        }
+    }
+
+    private void turnOnLocationDialog(){
+        locationDialog.show();
+    }
+
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();

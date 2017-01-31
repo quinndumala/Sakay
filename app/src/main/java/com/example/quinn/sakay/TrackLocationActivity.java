@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.quinn.sakay.Models.Coordinates;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -42,6 +43,8 @@ public class TrackLocationActivity extends BaseActivity implements
 
     public Location location;
     private Location myLastLocation;
+    private FloatingActionButton fabMyLocation;
+    private FloatingActionButton fabUserLocation;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private boolean mPermissionDenied = false;
@@ -80,6 +83,11 @@ public class TrackLocationActivity extends BaseActivity implements
         } catch (InflateException e) {
             Log.e(TAG, "Inflate exception");
         }
+
+        fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
+        fabUserLocation = (FloatingActionButton) findViewById(R.id.fab_user_location);
+        fabMyLocation.setOnClickListener(this);
+        fabUserLocation.setOnClickListener(this);
     }
 
     public int getStatusBarHeight() {
@@ -104,7 +112,11 @@ public class TrackLocationActivity extends BaseActivity implements
 
     @Override
     public void onClick(View view) {
+        int id = view.getId();
 
+        if (id == R.id.fab_my_location) {
+            ZoomToMyLocation();
+        }
     }
 
     @Override
@@ -155,13 +167,19 @@ public class TrackLocationActivity extends BaseActivity implements
         //saveUserCoordinates(location.getLatitude(), location.getLongitude());
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+        //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
     }
 
     public void saveUserCoordinates(Double lat, Double lng){
         Coordinates coordinates = new Coordinates(lat, lng);
         userCoordsRef.setValue(coordinates);
     }
+
+    private void ZoomToMyLocation() {
+        LatLng latLng = new LatLng(myLastLocation.getLatitude(), myLastLocation.getLongitude());
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
+    }
+
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
@@ -189,11 +207,11 @@ public class TrackLocationActivity extends BaseActivity implements
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        googleMap = googleMap;
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
 
-        //googleMap.setOnMyLocationButtonClickListener(this);
-        googleMap.setOnMyLocationButtonClickListener(this);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
         enableMyLocation();
     }
 

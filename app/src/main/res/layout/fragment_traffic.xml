@@ -19,55 +19,80 @@
         map:cameraTargetLng="123.305447"
         map:cameraTilt="30"
         map:cameraZoom="17"
+    />
 
-        />
-
-    <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/fabTraffic"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|right"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="12dp"
         android:layout_marginRight="16dp"
-        fab:menu_labels_ellipsize="end"
-        fab:menu_labels_singleLine="true"
-        fab:menu_fab_label="Report Traffic"
-        fab:menu_icon="@drawable/ic_broadcast"
-        fab:menu_colorNormal="@color/colorPrimary"
-        fab:menu_colorPressed="@color/colorPrimaryDark" >
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabHeavy"
+        android:orientation="vertical"
+        >
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/fabTraffic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert3"
-            fab:fab_size="mini"
-            fab:fab_label="Heavy"
-            fab:fab_colorNormal="@color/traffic_red"
-            fab:fab_colorPressed="@color/lightGray"
-            />
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            fab:menu_labels_ellipsize="end"
+            fab:menu_labels_singleLine="true"
+            fab:menu_fab_label="Report Traffic"
+            fab:menu_icon="@drawable/ic_broadcast"
+            fab:menu_colorNormal="@color/colorPrimary"
+            fab:menu_colorPressed="@color/colorPrimaryDark" >
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fabHeavy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_alert3"
+                fab:fab_size="mini"
+                fab:fab_label="Heavy"
+                fab:fab_colorNormal="@color/traffic_red"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fabModerate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_alert2"
+                fab:fab_size="mini"
+                fab:fab_label="Moderate"
+                fab:fab_colorNormal="@color/traffic_orange"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fabLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_alert1"
+                fab:fab_size="mini"
+                fab:fab_label="Light"
+                fab:fab_colorNormal="@color/traffic_yellow"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+        </com.github.clans.fab.FloatingActionMenu>
 
         <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabModerate"
+            android:id="@+id/fab_my_location_traffic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert2"
-            fab:fab_size="mini"
-            fab:fab_label="Moderate"
-            fab:fab_colorNormal="@color/traffic_orange"
+            app:fab_elevationCompat="4dp"
+            fab:fab_hideAnimation="@anim/hide_to_bottom"
+            android:src="@drawable/ic_my_location"
+            fab:fab_colorNormal="@color/white"
             fab:fab_colorPressed="@color/lightGray"
+            android:layout_gravity="end"
+            android:layout_marginEnd="6dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/fabTraffic"
             />
+    </RelativeLayout>
 
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fabLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_alert1"
-            fab:fab_size="mini"
-            fab:fab_label="Light"
-            fab:fab_colorNormal="@color/traffic_yellow"
-            fab:fab_colorPressed="@color/lightGray"
-            />
-    </com.github.clans.fab.FloatingActionMenu>
+
 
 
 </android.support.design.widget.CoordinatorLayout>
