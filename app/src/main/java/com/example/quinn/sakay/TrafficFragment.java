@@ -9,7 +9,9 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -339,25 +341,28 @@ public class TrafficFragment extends Fragment
     }
 
     public void chooseColor(MarkerOptions position, String intensity){
-        int height = 80;
-        int width = 57;
-        //BitmapDrawable bitmapdraw;
+//        int height = 80;
+//        int width = 80;
+        BitmapDrawable bitmapdraw;
 
         if(intensity.equals("heavy")){
-            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_red));
+            bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_red);
 
         } else if (intensity.equals("moderate")){
-            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+            //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_orange));
+            bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_orange);
 
         } else {
-            position.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+            //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_yellow));
+            bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_yellow);
 
         }
 
-//        Bitmap b=bitmapdraw.getBitmap();
-//        Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
+        Bitmap b = bitmapdraw.getBitmap();
+        Bitmap marker = Bitmap.createScaledBitmap(b, 80, 80, false);
 //
-//        position.icon(BitmapDescriptorFactory.fromBitmap(smallMarker));
+        position.icon(BitmapDescriptorFactory.fromBitmap(marker));
     }
 
     public Boolean checkTime(Object timestamp){
@@ -452,6 +457,7 @@ public class TrafficFragment extends Fragment
 
         //googleMap.setOnMyLocationButtonClickListener(this);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.setPadding(0, 0, 150, 0);
         enableMyLocation();
 
     }

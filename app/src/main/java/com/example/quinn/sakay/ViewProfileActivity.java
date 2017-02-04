@@ -203,8 +203,9 @@ public class ViewProfileActivity extends BaseActivity implements
                     USER_PHONE_NO = dataSnapshot.getValue(String.class);
                     phoneNumberView.setText(USER_PHONE_NO);
                     mobileNumberView.setVisibility(View.VISIBLE);
-                    progressDialog.dismiss();
+
                 }
+                progressDialog.dismiss();
             }
 
             @Override

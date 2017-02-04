@@ -34,7 +34,7 @@
             android:id="@+id/fabTraffic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_gravity="end"
             fab:menu_labels_ellipsize="end"
             fab:menu_labels_singleLine="true"

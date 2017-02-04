@@ -67,6 +67,7 @@ public class TrackLocationActivity extends BaseActivity implements
     public static final String TAG = "TrackLocation";
     public static final String EXTRA_SAKAY_KEY = "sakay_key";
     public static final String EXTRA_OTHER_USER_ID = "other_user_id";
+    public static final String EXTRA_OTHER_USER_NAME = "other_user_name";
     private MapView mapView;
     private GoogleMap googleMap;
     private String sakayKey;
@@ -85,6 +86,7 @@ public class TrackLocationActivity extends BaseActivity implements
     public DatabaseReference sakayRef;
     public DatabaseReference otherUserLocationRef;
     public String otherUserId;
+    public String otherUserName;
     public LatLng otherUserLocation;
     public String userId = getUid();
     public MaterialDialog locationDialog;
@@ -95,8 +97,8 @@ public class TrackLocationActivity extends BaseActivity implements
     public LatLng endLocation;
     public Boolean isRecent = true;
     private List<Polyline> polylines;
-    private static final int[] COLORS = new int[]{R.color.colorPrimaryDark, R.color.light_gray,
-            R.color.light_gray,R.color.light_gray,R.color.light_gray};
+    private static final int[] COLORS = new int[]{R.color.colorPrimaryDark, R.color.midGray_light,
+            R.color.midGray_light,R.color.midGray_light,R.color.midGray_light};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,10 +128,13 @@ public class TrackLocationActivity extends BaseActivity implements
         if (sakayKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
-
         otherUserId = getIntent().getStringExtra(EXTRA_OTHER_USER_ID);
         if (otherUserId == null){
             throw new IllegalArgumentException("Must pass EXTRA_OTHER_USER_ID");
+        }
+        otherUserName = getIntent().getStringExtra(EXTRA_OTHER_USER_NAME);
+        if (otherUserName == null){
+            throw new IllegalArgumentException("Must pass EXTRA_OTHER_USER_NAME");
         }
 
         //Toast.makeText(TrackLocationActivity.this, "Sakay key: " + sakayKey, Toast.LENGTH_SHORT).show();
@@ -321,7 +326,8 @@ public class TrackLocationActivity extends BaseActivity implements
             }
             //MarkerOptions position = new MarkerOptions().position(otherUserLocation);
             otherUserMarker = googleMap.addMarker(new MarkerOptions().position(otherUserLocation)
-                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+                    .title(otherUserName));
             //otherUserMarker.setPosition(otherUserLocation);
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(otherUserLocation, 15.0f));
         }
@@ -439,7 +445,7 @@ public class TrackLocationActivity extends BaseActivity implements
         googleMap = map;
 
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.setPadding(0, 160, 0, 0);
+        googleMap.setPadding(0, 160, 150, 0);
 
         enableMyLocation();
     }
@@ -547,8 +553,31 @@ public class TrackLocationActivity extends BaseActivity implements
             Polyline polyline = googleMap.addPolyline(polyOptions);
             polylines.add(polyline);
 
-            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
         }
+
+        BitmapDrawable bitmapdrawA =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_a);
+        BitmapDrawable bitmapdrawB =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_b);
+        Bitmap a = bitmapdrawA.getBitmap();
+        Bitmap b = bitmapdrawB.getBitmap();
+        Bitmap markerA = Bitmap.createScaledBitmap(a, 75, 75, false);
+        Bitmap markerB = Bitmap.createScaledBitmap(b, 75, 75, false);
+
+
+        // Start marker
+        MarkerOptions options = new MarkerOptions();
+        options.position(startLocation);
+        options.icon(BitmapDescriptorFactory.fromBitmap(markerA));
+        options.title("Pickup Location");
+        googleMap.addMarker(options);
+
+        // End marker
+        options = new MarkerOptions();
+        options.position(endLocation);
+        options.icon(BitmapDescriptorFactory.fromBitmap(markerB));
+        options.title("Destination");
+        googleMap.addMarker(options);
+
         routeDialog.dismiss();
         if (isRecent){
             showNotRecentDialog();
