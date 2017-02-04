@@ -12,12 +12,14 @@ import java.util.Map;
 public class Coordinates {
     public Double latitude;
     public Double longitude;
+    public Object timestamp;
 
     public Coordinates(){}
 
-    public Coordinates(Double latitude, Double longitude){
+    public Coordinates(Double latitude, Double longitude, Object timestamp){
         this.latitude = latitude;
         this.longitude = longitude;
+        this.timestamp = timestamp;
     }
 
     @Exclude
@@ -25,6 +27,7 @@ public class Coordinates {
         HashMap<String, Object> result = new HashMap<>();
         result.put("latitude", latitude);
         result.put("longitude", longitude);
+        result.put("timestamp", timestamp);
         return result;
     }
 }

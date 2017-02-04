@@ -180,6 +180,7 @@ public class SakayDetailActivity extends BaseActivity implements
             Intent intent = new Intent(this, TrackLocationActivity.class);
             //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
             intent.putExtra(TrackLocationActivity.EXTRA_SAKAY_KEY, mPostKey);
+            intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_ID, otherUserId);
             startActivity(intent);
         } else if (id == R.id.sakay_detail_other_author){
             viewProfile();

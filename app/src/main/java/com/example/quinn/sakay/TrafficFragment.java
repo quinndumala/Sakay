@@ -385,7 +385,7 @@ public class TrafficFragment extends Fragment
 
             mapView.postInvalidate();
 
-            mapHandler.postDelayed(this, 10 * 60 * 1000);
+            mapHandler.postDelayed(this, 5 * 60 * 1000);
 
         }
     };
@@ -551,7 +551,7 @@ public class TrafficFragment extends Fragment
     }
 
     public void saveUserCoordinates(Double lat, Double lng){
-        Coordinates coordinates = new Coordinates(lat, lng);
+        Coordinates coordinates = new Coordinates(lat, lng, ServerValue.TIMESTAMP);
         userCoordsRef.setValue(coordinates);
     }
 

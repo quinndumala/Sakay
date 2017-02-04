@@ -128,6 +128,7 @@ public class ViewProfileActivity extends BaseActivity implements
                 .title("Loading profile")
                 .content("Please wait")
                 .progress(true, 0)
+                .cancelable(false)
                 .show();
 
         userFacebookIdRef.addListenerForSingleValueEvent(new ValueEventListener() {

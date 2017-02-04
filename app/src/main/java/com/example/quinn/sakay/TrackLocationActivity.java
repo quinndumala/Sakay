@@ -3,7 +3,9 @@ package com.example.quinn.sakay;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,18 +22,38 @@ import android.view.InflateException;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.directions.route.AbstractRouting;
+import com.directions.route.Route;
+import com.directions.route.RouteException;
+import com.directions.route.Routing;
+import com.directions.route.RoutingListener;
 import com.example.quinn.sakay.Models.Coordinates;
+import com.example.quinn.sakay.Models.Sakay;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrackLocationActivity extends BaseActivity implements
         OnMapReadyCallback,
@@ -39,10 +61,12 @@ public class TrackLocationActivity extends BaseActivity implements
         GoogleMap.OnMyLocationButtonClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         ConnectivityReceiver.ConnectivityReceiverListener,
-        View.OnClickListener{
+        View.OnClickListener,
+        RoutingListener{
 
     public static final String TAG = "TrackLocation";
     public static final String EXTRA_SAKAY_KEY = "sakay_key";
+    public static final String EXTRA_OTHER_USER_ID = "other_user_id";
     private MapView mapView;
     private GoogleMap googleMap;
     private String sakayKey;
@@ -58,8 +82,21 @@ public class TrackLocationActivity extends BaseActivity implements
 
     public DatabaseReference mRootRef;
     public DatabaseReference userCoordsRef;
+    public DatabaseReference sakayRef;
+    public DatabaseReference otherUserLocationRef;
+    public String otherUserId;
+    public LatLng otherUserLocation;
     public String userId = getUid();
     public MaterialDialog locationDialog;
+    public MaterialDialog routeDialog;
+    public Marker otherUserMarker;
+
+    public LatLng startLocation;
+    public LatLng endLocation;
+    public Boolean isRecent = true;
+    private List<Polyline> polylines;
+    private static final int[] COLORS = new int[]{R.color.colorPrimaryDark, R.color.light_gray,
+            R.color.light_gray,R.color.light_gray,R.color.light_gray};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,19 +109,30 @@ public class TrackLocationActivity extends BaseActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //toolbar.setPadding(0, getStatusBarHeight(), 0, 0);
-
         if (Build.VERSION.SDK_INT >= 21) {
             CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) toolbar.getLayoutParams();
-            lp.setMargins(0, getStatusBarHeight(), 0, 0);
+            //lp.height = lp.height + getStatusBarHeight();
+            //lp.setMargins(0, getStatusBarHeight(), 0, 0);
+            toolbar.setPadding(0, getStatusBarHeight(), 0, 0);
+
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        polylines = new ArrayList<>();
 
         sakayKey = getIntent().getStringExtra(EXTRA_SAKAY_KEY);
         if (sakayKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
+
+        otherUserId = getIntent().getStringExtra(EXTRA_OTHER_USER_ID);
+        if (otherUserId == null){
+            throw new IllegalArgumentException("Must pass EXTRA_OTHER_USER_ID");
+        }
+
+        //Toast.makeText(TrackLocationActivity.this, "Sakay key: " + sakayKey, Toast.LENGTH_SHORT).show();
 
         try {
             MapsInitializer.initialize(this);
@@ -96,6 +144,59 @@ public class TrackLocationActivity extends BaseActivity implements
         } catch (InflateException e) {
             Log.e(TAG, "Inflate exception");
         }
+
+        routeDialog = new MaterialDialog.Builder(TrackLocationActivity.this)
+                .title("Fetching route information")
+                .content("Please Wait")
+                .progress(true, 0)
+                .cancelable(false)
+                .build();
+
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        userCoordsRef = mRootRef.child("user-coordinates").child(userId);
+        sakayRef = mRootRef.child("user-sakays").child(userId).child(sakayKey);
+        otherUserLocationRef = mRootRef.child("user-coordinates").child(otherUserId);
+        //Toast.makeText(this, "Sakay exists" + sakayKey, Toast.LENGTH_SHORT);
+
+        otherUserLocationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Coordinates coordinates = dataSnapshot.getValue(Coordinates.class);
+                otherUserLocation = new LatLng(coordinates.latitude, coordinates.longitude);
+                showOtherUserLocation();
+                if (checkTime(coordinates.timestamp)){
+                    isRecent = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+        sakayRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    Sakay sakay = dataSnapshot.getValue(Sakay.class);
+                    startLocation = new LatLng(sakay.startLat, sakay.startLong);
+                    endLocation = new LatLng(sakay.destinationLat, sakay.destinationLong);
+                    routeDialog.show();
+                    buildRoute();
+                } else {
+                    Toast.makeText(TrackLocationActivity.this, "Something went wrong. Try again",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+//        if(startLocation != null && endLocation != null){
+//
+//        }
 
         fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_my_location);
         fabUserLocation = (FloatingActionButton) findViewById(R.id.fab_user_location);
@@ -116,6 +217,18 @@ public class TrackLocationActivity extends BaseActivity implements
         fabMyLocation.setOnClickListener(this);
         fabUserLocation.setOnClickListener(this);
 
+
+
+    }
+
+    public void buildRoute(){
+        Routing routing = new Routing.Builder()
+                .travelMode(AbstractRouting.TravelMode.DRIVING)
+                .withListener(this)
+                .alternativeRoutes(true)
+                .waypoints(startLocation, endLocation)
+                .build();
+        routing.execute();
     }
 
     public int getStatusBarHeight() {
@@ -144,6 +257,8 @@ public class TrackLocationActivity extends BaseActivity implements
 
         if (id == R.id.fab_my_location) {
             ZoomToMyLocation();
+        } else if (id == R.id.fab_user_location){
+            showOtherUserLocation();
         }
     }
 
@@ -152,6 +267,82 @@ public class TrackLocationActivity extends BaseActivity implements
         super.onStart();
         checkConnection();
         checkLocationServices();
+
+//        otherUserLocationRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {}
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                Coordinates newCoords = dataSnapshot.getValue(Coordinates.class);
+//                Toast.makeText(TrackLocationActivity.this, "Lat: " + newCoords.latitude + "Long: "
+//                        + newCoords.longitude, Toast.LENGTH_SHORT).show();
+//                //otherUserLocation = new LatLng(coordinates.latitude, coordinates.longitude);
+//                //showOtherUserLocation();
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {}
+//
+//        });
+
+        otherUserLocationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Coordinates newCoords = dataSnapshot.getValue(Coordinates.class);
+//                Toast.makeText(TrackLocationActivity.this, "Lat: " + newCoords.latitude + "Long: "
+//                        + newCoords.longitude, Toast.LENGTH_SHORT).show();
+                otherUserLocation = new LatLng(newCoords.latitude, newCoords.longitude);
+                showOtherUserLocation();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void showOtherUserLocation(){
+        if (otherUserLocation != null){
+            BitmapDrawable bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.user_location_marker);
+            Bitmap b = bitmapdraw.getBitmap();
+            Bitmap smallMarker = Bitmap.createScaledBitmap(b, 110, 110, false);
+
+            if (otherUserMarker != null){
+                otherUserMarker.remove();
+            }
+            //MarkerOptions position = new MarkerOptions().position(otherUserLocation);
+            otherUserMarker = googleMap.addMarker(new MarkerOptions().position(otherUserLocation)
+                    .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+            //otherUserMarker.setPosition(otherUserLocation);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(otherUserLocation, 15.0f));
+        }
+
+    }
+
+    public Boolean checkTime(Object timestamp){
+        long currentTime = System.currentTimeMillis();
+        long reportTime = (long) timestamp;
+        long diff = currentTime - reportTime;
+
+        Log.d(TAG, "Current Time: " + currentTime);
+        Log.d(TAG, "Report Time: " + reportTime);
+        Log.d(TAG, "Difference: " + diff);
+
+        if (diff > 10 * 60 * 1000){
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     @Override
@@ -192,17 +383,17 @@ public class TrackLocationActivity extends BaseActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        googleMap.clear();
+        //googleMap.clear();
         myLastLocation = location;
 
-        //saveUserCoordinates(location.getLatitude(), location.getLongitude());
+        saveUserCoordinates(location.getLatitude(), location.getLongitude());
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15.0f));
     }
 
     public void saveUserCoordinates(Double lat, Double lng){
-        Coordinates coordinates = new Coordinates(lat, lng);
+        Coordinates coordinates = new Coordinates(lat, lng, ServerValue.TIMESTAMP);
         userCoordsRef.setValue(coordinates);
     }
 
@@ -235,7 +426,7 @@ public class TrackLocationActivity extends BaseActivity implements
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
-
+        showSnack(isConnected);
     }
 
     @Override
@@ -248,6 +439,7 @@ public class TrackLocationActivity extends BaseActivity implements
         googleMap = map;
 
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.setPadding(0, 160, 0, 0);
 
         enableMyLocation();
     }
@@ -319,4 +511,62 @@ public class TrackLocationActivity extends BaseActivity implements
         locationDialog.show();
     }
 
+    @Override
+    public void onRoutingFailure(RouteException e) {
+        if(e != null) {
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(this, "Something went wrong, Try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRoutingStart() {
+
+    }
+
+    @Override
+    public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+        if(polylines.size()>0) {
+            for (Polyline poly : polylines) {
+                poly.remove();
+            }
+        }
+
+        polylines = new ArrayList<>();
+        //add route(s) to the map.
+        for (int i = 0; i <route.size(); i++) {
+
+            //In case of more than 5 alternative routes
+            int colorIndex = i % COLORS.length;
+
+            PolylineOptions polyOptions = new PolylineOptions();
+            polyOptions.color(getResources().getColor(COLORS[colorIndex]));
+            polyOptions.width(10 + i * 3);
+            polyOptions.addAll(route.get(i).getPoints());
+            Polyline polyline = googleMap.addPolyline(polyOptions);
+            polylines.add(polyline);
+
+            Toast.makeText(getApplicationContext(),"Route "+ (i+1) +": distance - "+ route.get(i).getDistanceValue()+": duration - "+ route.get(i).getDurationValue(),Toast.LENGTH_SHORT).show();
+        }
+        routeDialog.dismiss();
+        if (isRecent){
+            showNotRecentDialog();
+        }
+
+    }
+
+    @Override
+    public void onRoutingCancelled() {
+        Log.i(TAG, "Routing was cancelled.");
+    }
+
+    public void showNotRecentDialog(){
+        new MaterialDialog.Builder(TrackLocationActivity.this)
+                .title("Notice")
+                .content("The user you are tracking has not used Sakay for the past 10 minutes. The " +
+                        "latest recorded information will be used but might not be accurate as a result.")
+                .positiveText("OK")
+                .show();
+    }
 }
