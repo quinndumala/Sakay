@@ -214,8 +214,7 @@ public class RideOffersFragment extends Fragment
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        Query recentPostsQuery = databaseReference.child("rideOffers")
-                .limitToFirst(100);
+        Query recentPostsQuery = databaseReference.child("rideOffers").limitToFirst(100);
 
         return recentPostsQuery;
     }
@@ -225,7 +224,7 @@ public class RideOffersFragment extends Fragment
         Log.d(TAG, "End Time: " + endTime);
         Query filterQuery = databaseReference.child("rideOffers").orderByChild("timeStamp").startAt(filterTime)
                 .endAt(endTime);
-        return filterQuery;
+        return filterQuery.orderByKey();
     }
 
     public void isQueryEmpty(Query query){

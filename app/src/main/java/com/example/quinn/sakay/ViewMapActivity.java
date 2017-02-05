@@ -33,6 +33,7 @@ import com.directions.route.RoutingListener;
 import com.example.quinn.sakay.Models.Coordinates;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.example.quinn.sakay.Models.RideRequest;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -70,6 +71,8 @@ public class ViewMapActivity extends BaseActivity implements
     private GoogleMap googleMap;
     public Location location;
     private Location myLastLocation;
+
+    private FloatingActionButton fabMyLocation;
 
     public String postKey;
     public String postType;
@@ -154,9 +157,6 @@ public class ViewMapActivity extends BaseActivity implements
             Log.e(TAG, "Inflate exception");
         }
 
-
-
-
         locationDialog = new MaterialDialog.Builder(ViewMapActivity.this)
                 .title("Location not found")
                 .content("Please turn on location services to continue using Sakay")
@@ -169,6 +169,9 @@ public class ViewMapActivity extends BaseActivity implements
                     }
                 })
                 .build();
+
+        fabMyLocation = (FloatingActionButton) findViewById(R.id.fab_map_my_location);
+        fabMyLocation.setOnClickListener(this);
     }
 
     public void checkOffers(){
@@ -249,6 +252,9 @@ public class ViewMapActivity extends BaseActivity implements
     public void onClick(View view) {
         int id = view.getId();
 
+        if (id == R.id.fab_map_my_location) {
+            ZoomToMyLocation();
+        }
 
     }
 

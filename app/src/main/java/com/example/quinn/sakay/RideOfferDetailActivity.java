@@ -28,6 +28,7 @@ import com.example.quinn.sakay.Models.CommentOffer;
 import com.example.quinn.sakay.Models.Notif;
 import com.example.quinn.sakay.Models.RideOffer;
 import com.example.quinn.sakay.Models.Sakay;
+import com.example.quinn.sakay.Models.Settings;
 import com.facebook.Profile;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -65,12 +66,6 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private DatabaseReference mUserPostReference;
     private DatabaseReference mCommentsReference;
     private DatabaseReference userSettingsRef;
-    private DatabaseReference homeAddressRef;
-    private DatabaseReference homeLatRef;
-    private DatabaseReference homeLongRef;
-    private DatabaseReference workAddressRef;
-    private DatabaseReference workLatRef;
-    private DatabaseReference workLongRef;
 
     private ValueEventListener mPostListener;
     private String mPostKey;
@@ -97,6 +92,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public Boolean isAuthor = true;
     public Boolean rideExists = false;
     private Profile profile = getCurrentProfile();
+    public Long postTimeStamp;
 
     private final String userId = getUid();
     private String userAuthorId;
@@ -128,6 +124,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     public Boolean workSet = false;
     public Boolean homeSet = false;
+    public Boolean timeNotPassed = true;
 
     public MaterialDialog progressDialog;
     public MaterialDialog loadingDialog;
@@ -159,12 +156,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mUserPostReference = mRootRef.child("user-rideOffers").child(userId).child(mPostKey);
         mCommentsReference = mRootRef.child("rideOffers-comments").child(mPostKey);
         userSettingsRef = mRootRef.child("users-settings").child(userId);
-        homeAddressRef = userSettingsRef.child("home");
-        homeLatRef = userSettingsRef.child("homeLat");
-        homeLongRef = userSettingsRef.child("homeLong");
-        workAddressRef = userSettingsRef.child("work");
-        workLatRef = userSettingsRef.child("workLat");
-        workLongRef = userSettingsRef.child("workLong");
+//        homeAddressRef = userSettingsRef.child("home");
+//        homeLatRef = userSettingsRef.child("homeLat");
+//        homeLongRef = userSettingsRef.child("homeLong");
+//        workAddressRef = userSettingsRef.child("work");
+//        workLatRef = userSettingsRef.child("workLat");
+//        workLongRef = userSettingsRef.child("workLong");
 
         // Initialize Views
         authorView = (TextView) findViewById(R.id.post_author_large);
@@ -199,11 +196,29 @@ public class RideOfferDetailActivity extends BaseActivity implements
         authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
 
+        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentUser = dataSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+                    if (rideOffer.timeStamp < System.currentTimeMillis()){
+                        sakayButton.setEnabled(false);
+                        timeNotPassed = false;
+                    }
                     setPhoto(rideOffer.facebookId);
                     authorView.setText(rideOffer.author);
                     startView.setText(rideOffer.start);
@@ -216,7 +231,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         isAuthor = false;
                         sakayButton.setVisibility(View.VISIBLE);
                     }
-                    loadingDialog.dismiss();
+
                 }
             }
 
@@ -225,6 +240,23 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
             }
         });
+
+        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userId) && timeNotPassed){
+                    sakayButton.setText("\u2713" + " Sakay request sent");
+                }
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                finish();
+            }
+        });
+
+
         checkAddress();
     }
 
@@ -254,24 +286,10 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .progress(true, 0)
                 .build();
 
-        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    currentUser = dataSnapshot.getValue(User.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(userId)){
+                if (dataSnapshot.hasChild(userId) && timeNotPassed){
                     sakayButton.setText("\u2713" + " Sakay request sent");
                 }
             }
@@ -401,83 +419,128 @@ public class RideOfferDetailActivity extends BaseActivity implements
     }
 
     public void checkAddress(){
-        homeAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//        homeAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    homeSet = true;
+//                    currentHome = dataSnapshot.getValue(String.class);
+//                } else {
+//                    homeSet = false;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//        homeLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    currentHomeLat = dataSnapshot.getValue(Double.class);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//        homeLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    currentHomeLong = dataSnapshot.getValue(Double.class);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//        workAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    workSet = true;
+//                    currentWork = dataSnapshot.getValue(String.class);
+//                } else {
+//                    workSet = false;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//        workLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    currentWorkLat = dataSnapshot.getValue(Double.class);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+//        workLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    currentWorkLong = dataSnapshot.getValue(Double.class);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+        userSettingsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    homeSet = true;
-                    currentHome = dataSnapshot.getValue(String.class);
+                if (dataSnapshot.exists()) {
+                    Settings settings = dataSnapshot.getValue(Settings.class);
+                    if (settings.home != null){
+                        homeSet = true;
+                        currentHome = settings.home;
+                    } else {
+                        homeSet = false;
+                    }
+
+                    if (settings.homeLat != null){
+                        currentHomeLat = settings.homeLat;
+                    }
+
+                    if (settings.homeLong != null){
+                        currentHomeLong = settings.homeLong;
+                    }
+
+                    if (settings.work != null){
+                        workSet = true;
+                        currentWork = settings.work;
+                    } else {
+                        workSet = false;
+                    }
+
+                    if (settings.workLat != null){
+                        currentWorkLat = settings.workLat;
+                    }
+
+                    if (settings.workLong != null){
+                        currentWorkLong = settings.workLong;
+                    }
                 } else {
                     homeSet = false;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        homeLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    currentHomeLat = dataSnapshot.getValue(Double.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        homeLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    currentHomeLong = dataSnapshot.getValue(Double.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        workAddressRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    workSet = true;
-                    currentWork = dataSnapshot.getValue(String.class);
-                } else {
                     workSet = false;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        workLatRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    currentWorkLat = dataSnapshot.getValue(Double.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        workLongRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    currentWorkLong = dataSnapshot.getValue(Double.class);
                 }
             }
 
@@ -529,13 +592,20 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren() && isAuthor){
+                if (dataSnapshot.hasChildren() && isAuthor && timeNotPassed){
                     responsesTextView.setVisibility(View.VISIBLE);
                     responsesView.setVisibility(View.VISIBLE);
                 } else {
                     responsesTextView.setVisibility(View.GONE);
                     responsesView.setVisibility(View.GONE);
-                    if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE); }
+                    if (isAuthor){
+                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                    }
+                    if (!timeNotPassed){
+                        noResponsesYetTextView.setText("Schedule date and time for" +
+                                "\nthis ride offer has paased.");
+                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

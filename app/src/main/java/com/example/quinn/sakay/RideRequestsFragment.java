@@ -214,8 +214,7 @@ public class RideRequestsFragment extends Fragment
 //    }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        Query recentPostsQuery = databaseReference.child("rideRequests")
-                .limitToFirst(100);
+        Query recentPostsQuery = databaseReference.child("rideRequests").limitToFirst(100);
 
         return recentPostsQuery;
     }

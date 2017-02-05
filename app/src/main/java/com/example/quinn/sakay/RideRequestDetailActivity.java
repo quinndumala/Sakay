@@ -110,6 +110,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public String currentVehiclePlateNo;
 
     public Boolean carSet = false;
+    public Boolean timeNotPassed = true;
     public User currentUser;
     public MaterialDialog loadingDialog;
 
@@ -164,11 +165,29 @@ public class RideRequestDetailActivity extends BaseActivity implements
         authorView.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
 
+        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    currentUser = dataSnapshot.getValue(User.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+                    if (rideRequest.timeStamp < System.currentTimeMillis()){
+                        sakayButton.setEnabled(false);
+                        timeNotPassed = false;
+                    }
                     if ((rideRequest.uid.equals(userId))){
                         buttonDelete.setVisibility(View.VISIBLE);
                     } else {
@@ -180,7 +199,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     startView.setText(rideRequest.start);
                     destinationView.setText(rideRequest.destination);
                     dateAndTimeView.setText(rideRequest.dateAndTime);
-                    loadingDialog.dismiss();
+
                 }
             }
 
@@ -189,6 +208,22 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
             }
         });
+
+        mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(userId) && timeNotPassed){
+                    sakayButton.setText("\u2713" + " Sakay offer sent");
+                }
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -208,24 +243,10 @@ public class RideRequestDetailActivity extends BaseActivity implements
         checkConnection();
         noResponses();
 
-        mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    currentUser = dataSnapshot.getValue(User.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(userId)){
+                if (dataSnapshot.hasChild(userId) && timeNotPassed){
                     sakayButton.setText("\u2713" + " Sakay offer sent");
                 }
             }
@@ -241,6 +262,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+                    if (rideRequest.timeStamp < System.currentTimeMillis()){
+                        sakayButton.setEnabled(false);
+                    }
 
                     userAuthorId = rideRequest.uid;
                     userAuthorName = rideRequest.author;
@@ -370,13 +394,21 @@ public class RideRequestDetailActivity extends BaseActivity implements
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren() && isAuthor){
+                if (dataSnapshot.hasChildren() && isAuthor && timeNotPassed){
                     responsesTextView.setVisibility(View.VISIBLE);
                     responsesView.setVisibility(View.VISIBLE);
                 } else {
                     responsesTextView.setVisibility(View.GONE);
                     responsesView.setVisibility(View.GONE);
-                    if (isAuthor){ noResponsesYetTextView.setVisibility(View.VISIBLE);}
+                    if (isAuthor){
+                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                    }
+
+                    if (!timeNotPassed){
+                        noResponsesYetTextView.setText("Schedule date and time for" +
+                                "\nhis ride request has passed.");
+                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 
