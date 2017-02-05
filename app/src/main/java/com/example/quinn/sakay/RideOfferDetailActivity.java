@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -133,6 +132,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public MaterialDialog progressDialog;
     public MaterialDialog loadingDialog;
     public User currentUser;
+
+    public LatLng startLocation;
+    public LatLng endLocation;
 
     //String arrRef;
 
@@ -360,9 +362,12 @@ public class RideOfferDetailActivity extends BaseActivity implements
         if (id == R.id.button_sakay_offer) {
             alreadyExists();
         } else if(id == R.id.button_see_route_offer) {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
-                                "&daddr=" + destinationLat + "," + destinationLong));
+//            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+//                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
+//                                "&daddr=" + destinationLat + "," + destinationLong));
+            Intent intent = new Intent(this, ViewMapActivity.class);
+            intent.putExtra(ViewMapActivity.EXTRA_POST_KEY, mPostKey);
+            intent.putExtra(ViewMapActivity.EXTRA_POST_TYPE, "offer");
             startActivity(intent);
         } else if (id == R.id.button_offer_detail_delete) {
             Log.d(TAG, "delete clicked");

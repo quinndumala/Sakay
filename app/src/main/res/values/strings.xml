@@ -194,6 +194,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_track_location">Track User</string>
+    <string name="title_activity_view_map">View Route</string>
 
 
 </resources>

@@ -105,8 +105,8 @@ public class TrackLocationActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track_location);
 
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+//        getWindow().getDecorView().setSystemUiVisibility(
+//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -533,6 +533,8 @@ public class TrackLocationActivity extends BaseActivity implements
 
     @Override
     public void onRoutingSuccess(ArrayList<Route> route, int shortestRouteIndex) {
+        routeDialog.dismiss();
+
         if(polylines.size()>0) {
             for (Polyline poly : polylines) {
                 poly.remove();
@@ -578,7 +580,7 @@ public class TrackLocationActivity extends BaseActivity implements
         options.title("Destination");
         googleMap.addMarker(options);
 
-        routeDialog.dismiss();
+
         if (isRecent){
             showNotRecentDialog();
         }

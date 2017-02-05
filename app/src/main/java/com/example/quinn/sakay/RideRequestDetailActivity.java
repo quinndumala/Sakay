@@ -3,7 +3,6 @@ package com.example.quinn.sakay;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -302,9 +301,12 @@ public class RideRequestDetailActivity extends BaseActivity implements
         if (id == R.id.button_sakay_request) {
             alreadyExists();
         } else if(id == R.id.button_see_route_request) {
-            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
-                            "&daddr=" + destinationLat + "," + destinationLong));
+//            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+//                    Uri.parse("http://maps.google.com/maps?saddr=" + startLat + "," + startLong +
+//                            "&daddr=" + destinationLat + "," + destinationLong));
+            Intent intent = new Intent(this, ViewMapActivity.class);
+            intent.putExtra(ViewMapActivity.EXTRA_POST_KEY, mPostKey);
+            intent.putExtra(ViewMapActivity.EXTRA_POST_TYPE, "request");
             startActivity(intent);
         } else if (id == R.id.button_request_detail_delete){
             launchConfirmDelete();

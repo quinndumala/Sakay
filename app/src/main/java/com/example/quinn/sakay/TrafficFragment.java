@@ -199,7 +199,7 @@ public class TrafficFragment extends Fragment
                 .build();
 
        // setRetainInstance(true);
-        mapHandler.postDelayed(refreshTask, 10 * 60 * 1000);
+        mapHandler.postDelayed(refreshTask, 5 * 60 * 1000);
     }
 
     @Override
@@ -387,7 +387,7 @@ public class TrafficFragment extends Fragment
         public void run()
         {
             mapHandler.removeCallbacks(this);
-
+            googleMap.clear();
             mapView.postInvalidate();
 
             mapHandler.postDelayed(this, 5 * 60 * 1000);
