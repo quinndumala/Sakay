@@ -602,7 +602,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                         noResponsesYetTextView.setVisibility(View.VISIBLE);
                     }
                     if (!timeNotPassed){
-                        noResponsesYetTextView.setText("Schedule date and time for" +
+                        noResponsesYetTextView.setText("Scheduled date and time for" +
                                 "\nthis ride offer has paased.");
                         noResponsesYetTextView.setVisibility(View.VISIBLE);
                     }

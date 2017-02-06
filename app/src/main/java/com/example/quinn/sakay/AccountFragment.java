@@ -58,10 +58,13 @@ public class AccountFragment extends Fragment
         ConnectivityReceiver.ConnectivityReceiverListener{
 
     private ViewGroup accountView;
-    private View view;
+    //private View view;
     private Button signOutFacebook;
     private FirebaseAuth mAuth;
-    //private DatabaseReference mDatabase;
+
+    private DatabaseReference mDatabase;
+    private DatabaseReference userRef;
+
     private CircleImageView profilePhoto;
     private TextView profileName;
     private TextView userEmail;
@@ -70,7 +73,10 @@ public class AccountFragment extends Fragment
     private GoogleApiClient mGoogleApiClient;
     private static final int RC_SIGN_IN = 103;
 
+    public String uid;
+    public String userId = getUid();
     public String facebookUserId = "";
+
     public Profile profile = getCurrentProfile();
 
     public MaterialDialog progressDialog;
@@ -92,14 +98,18 @@ public class AccountFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (view == null){
-            view = inflater.inflate(R.layout.fragment_account, container, false);
-        } else {
-            ((ViewGroup) view.getParent()).removeView(view);
-        }
-
+//        if (view == null){
+//            view = inflater.inflate(R.layout.fragment_account, container, false);
+//        } else {
+//            ((ViewGroup) view.getParent()).removeView(view);
+//        }
+        View view = inflater.inflate(R.layout.fragment_account, container, false);
+        uid = getActivity().getIntent().getExtras().getString("user_id");
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        userRef = mDatabase.child("users").child(userId);
         accountView = (ViewGroup) view.findViewById(R.id.profile);
         mAuth = FirebaseAuth.getInstance();
+
         return view;
     }
 
@@ -126,13 +136,15 @@ public class AccountFragment extends Fragment
                 .progress(true, 0)
                 .show();
 
-        String uid = getActivity().getIntent().getExtras().getString("user_id");
-        String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-        String userRef = String.format("users/%s", uid);
 
-        DatabaseReference user_ref = database.getReference(userRef);
+        String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
         GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
-        user_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        //String userRef = String.format("users/%s", uid);
+
+        //DatabaseReference user_ref = database.getReference(userRef);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
@@ -287,5 +299,9 @@ public class AccountFragment extends Fragment
                     }
                 })
                 .show();
+    }
+
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 }

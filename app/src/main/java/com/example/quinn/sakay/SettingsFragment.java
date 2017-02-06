@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.quinn.sakay.Models.Settings;
 import com.example.quinn.sakay.Models.Vehicle;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -174,74 +175,114 @@ public class SettingsFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ValueEventListener phoneListener = new ValueEventListener() {
+//        ValueEventListener phoneListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    currentPhoneNumber = dataSnapshot.getValue(String.class);
+//                    mobileNumberText.setText(currentPhoneNumber);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
+//            }
+//        };
+//        ValueEventListener vehicleListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if(dataSnapshot.exists()){
+//                    vehicleExists = true;
+//                    Vehicle vehicle = dataSnapshot.getValue(Vehicle.class);
+//                    currentVehicleType = vehicle.vehicleType;
+//                    currentVehicleColor = vehicle.vehicleColor;
+//                    currentVehicleModel = vehicle.vehicleModel;
+//                    currentVehiclePlateNo = vehicle.plateNo;
+//                    String text = currentVehicleColor + " " + currentVehicleModel + ", " + currentVehiclePlateNo;
+//                    vehicleText.setText(text);
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
+//            }
+//        };
+//        ValueEventListener homeListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    String homeAddress = dataSnapshot.getValue(String.class);
+//                    homeAddressText.setText(homeAddress);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
+//            }
+//        };
+//        ValueEventListener workListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    String workAddress = dataSnapshot.getValue(String.class);
+//                    workAddressText.setText(workAddress);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        };
+//
+//        phoneRef.addValueEventListener(phoneListener);
+//        homeAddressRef.addValueEventListener(homeListener);
+//        workAddressRef.addValueEventListener(workListener);
+//        vehicleRef.addValueEventListener(vehicleListener);
+        ValueEventListener settingsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    currentPhoneNumber = dataSnapshot.getValue(String.class);
-                    mobileNumberText.setText(currentPhoneNumber);
+                if (dataSnapshot.exists()) {
+                    Settings userSettings = dataSnapshot.getValue(Settings.class);
+
+                    if(userSettings.phone != null){
+                        currentPhoneNumber = userSettings.phone;
+                        mobileNumberText.setText(currentPhoneNumber);
+                    }
+
+                    if(userSettings.home != null){
+                        homeAddressText.setText(userSettings.home);
+                    }
+
+                    if(userSettings.work != null){
+                        workAddressText.setText(userSettings.work);
+                    }
+
+                    if(userSettings.vehicle != null){
+                        vehicleExists = true;
+                        Vehicle userVehicle = userSettings.vehicle;
+                        currentVehicleType = userVehicle.vehicleType;
+                        currentVehicleColor = userVehicle.vehicleColor;
+                        currentVehicleModel = userVehicle.vehicleModel;
+                        currentVehiclePlateNo = userVehicle.plateNo;
+                        String text = currentVehicleColor + " " + currentVehicleModel + ", " + currentVehiclePlateNo;
+                        vehicleText.setText(text);
+
+                    }
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
-            }
-        };
-        ValueEventListener vehicleListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    vehicleExists = true;
-                    Vehicle vehicle = dataSnapshot.getValue(Vehicle.class);
-                    currentVehicleType = vehicle.vehicleType;
-                    currentVehicleColor = vehicle.vehicleColor;
-                    currentVehicleModel = vehicle.vehicleModel;
-                    currentVehiclePlateNo = vehicle.plateNo;
-                    String text = currentVehicleColor + " " + currentVehicleModel + ", " + currentVehiclePlateNo;
-                    vehicleText.setText(text);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
-            }
-        };
-        ValueEventListener homeListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    String homeAddress = dataSnapshot.getValue(String.class);
-                    homeAddressText.setText(homeAddress);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadPhoneNumber:onCancelled", databaseError.toException());
-            }
-        };
-        ValueEventListener workListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    String workAddress = dataSnapshot.getValue(String.class);
-                    workAddressText.setText(workAddress);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
             }
         };
 
-        phoneRef.addValueEventListener(phoneListener);
-        homeAddressRef.addValueEventListener(homeListener);
-        workAddressRef.addValueEventListener(workListener);
-        vehicleRef.addValueEventListener(vehicleListener);
+        settingsRef.addValueEventListener(settingsListener);
 
     }
 
@@ -306,10 +347,10 @@ public class SettingsFragment extends Fragment
         String message;
         int color = Color.WHITE;
         if (!(isConnected)) {
-            mobileNumberView.setVisibility(View.GONE);
-            workAddressView.setVisibility(View.GONE);
-            homeAddressView.setVisibility(View.GONE);
-            vehicleView.setVisibility(View.GONE);
+//            mobileNumberView.setVisibility(View.GONE);
+//            workAddressView.setVisibility(View.GONE);
+//            homeAddressView.setVisibility(View.GONE);
+//            vehicleView.setVisibility(View.GONE);
             message = "No connection";
             Snackbar snackbar = Snackbar
                     .make(getView().findViewById(R.id.fragment_settings_layout), message, Snackbar.LENGTH_INDEFINITE);

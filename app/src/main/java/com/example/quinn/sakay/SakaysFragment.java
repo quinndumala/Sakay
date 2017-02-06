@@ -139,8 +139,8 @@ public class SakaysFragment extends Fragment
         // [START recent_posts_query]
         // Last 100 posts, these are automatically the 100 most recent
         // due to sorting by push() keys
-        Query recentSakaysQuery = databaseReference.child("user-sakays").child(userId)
-                .limitToFirst(10);
+        Query recentSakaysQuery = databaseReference.child("user-sakays").child(userId).orderByChild("timeStamp")
+                .limitToFirst(20);
         // [END recent_posts_query]
 
         return recentSakaysQuery;

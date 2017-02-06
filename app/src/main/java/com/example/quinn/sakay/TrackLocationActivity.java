@@ -595,7 +595,7 @@ public class TrackLocationActivity extends BaseActivity implements
     public void showNotRecentDialog(){
         new MaterialDialog.Builder(TrackLocationActivity.this)
                 .title("Notice")
-                .content("The user you are tracking has not used Sakay for the past 10 minutes. The " +
+                .content(otherUserName + " has not used Sakay for the past 10 minutes. The " +
                         "latest recorded information will be used but might not be accurate as a result.")
                 .positiveText("OK")
                 .show();

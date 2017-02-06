@@ -405,8 +405,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     }
 
                     if (!timeNotPassed){
-                        noResponsesYetTextView.setText("Schedule date and time for" +
-                                "\nhis ride request has passed.");
+                        noResponsesYetTextView.setText("Scheduled date and time for" +
+                                "\nthis ride request has passed.");
                         noResponsesYetTextView.setVisibility(View.VISIBLE);
                     }
                 }

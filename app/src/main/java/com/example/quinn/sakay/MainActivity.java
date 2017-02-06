@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity
         AccountFragment.OnFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
-        ConnectivityReceiver.ConnectivityReceiverListener {
+        ConnectivityReceiver.ConnectivityReceiverListener,
+        View.OnClickListener{
     private FirebaseAuth mAuth;
     private CircleImageView navProfilePhoto;
     private TextView navProfileName;
@@ -83,6 +84,9 @@ public class MainActivity extends AppCompatActivity
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference rootRef;
+    private DatabaseReference userRef;
+    private DatabaseReference userNameRef;
+    private DatabaseReference settingsRef;
     private DatabaseReference notifCheckRef;
     public final String userId = getUid();
     public Boolean hasNotifs = false;
@@ -99,9 +103,19 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        String uid = getIntent().getExtras().getString("user_id");
+        String imageUrl = getIntent().getExtras().getString("profile_picture");
+
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAuth = FirebaseAuth.getInstance();
         rootRef = FirebaseDatabase.getInstance().getReference();
+        userRef = rootRef.child("users").child(userId);
+        userNameRef = rootRef.child("users").child(uid).child("name");
+        settingsRef = rootRef.child("users-settings").child(userId);
         notifCheckRef = rootRef.child("notif-check").child(userId);
+        userRef.keepSynced(true);
+        userNameRef.keepSynced(true);
+        settingsRef.keepSynced(true);
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading account information")
@@ -133,7 +147,6 @@ public class MainActivity extends AppCompatActivity
 //            FragmentManager fragmentManager = getSupportFragmentManager();
 //            fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit();
 //        }
-
         if (savedInstanceState == null){
             fragmentManager.beginTransaction().add(R.id.content_main, new TrafficFragment(), "traffic").commit();
             setTitle("Traffic");
@@ -142,14 +155,14 @@ public class MainActivity extends AppCompatActivity
         navProfilePhoto = (CircleImageView) header.findViewById(R.id.nav_user_photo);
         navProfileName = (TextView) header.findViewById(R.id.nav_user_name);
 
-        String uid = getIntent().getExtras().getString("user_id");
-        String imageUrl = getIntent().getExtras().getString("profile_picture");
+
 
         GlideUtil.loadProfileIcon(imageUrl, navProfilePhoto);
 
-        String nameRef = String.format("users/%s/name", uid);
-        DatabaseReference name_ref = database.getReference(nameRef);
-        name_ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//        String nameRef = String.format("users/%s/name", uid);
+//        DatabaseReference name_ref = database.getReference(nameRef);
+
+        userNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String data = dataSnapshot.getValue(String.class);
@@ -279,6 +292,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -606,6 +624,8 @@ public class MainActivity extends AppCompatActivity
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack(isConnected);
     }
+
+
 
     public class ImageLoadTask extends AsyncTask<Void, Void, Bitmap> {
 
