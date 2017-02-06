@@ -224,7 +224,7 @@ public class RideOffersFragment extends Fragment
         Log.d(TAG, "End Time: " + endTime);
         Query filterQuery = databaseReference.child("rideOffers").orderByChild("timeStamp").startAt(filterTime)
                 .endAt(endTime);
-        return filterQuery.orderByKey();
+        return filterQuery;
     }
 
     public void isQueryEmpty(Query query){

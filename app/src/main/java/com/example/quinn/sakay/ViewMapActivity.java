@@ -428,7 +428,7 @@ public class ViewMapActivity extends BaseActivity implements
         googleMap = map;
 
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.setPadding(0, 160, 0, 0);
+        googleMap.setPadding(0, 160, 150, 0);
 
         enableMyLocation();
     }

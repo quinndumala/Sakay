@@ -374,7 +374,7 @@ public class TrafficFragment extends Fragment
         Log.d(TAG, "Report Time: " + reportTime);
         Log.d(TAG, "Difference: " + diff);
 
-        if (diff > 10 * 60 * 1000){
+        if (diff > 5 * 60 * 1000){
             return false;
         } else {
             return true;
