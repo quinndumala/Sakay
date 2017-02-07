@@ -23,6 +23,7 @@ public class RideRequest {
     public Double destinationLong;
     public String dateAndTime;
     public Long timeStamp;
+    public Boolean available;
     public Map<String, Boolean> responses = new HashMap<>();
 
     public RideRequest(){}
@@ -41,6 +42,7 @@ public class RideRequest {
         this.destinationLong = destinationLong;
         this.dateAndTime = dateAndTime;
         this.timeStamp = timeStamp;
+        this.available = true;
     }
 
     @Exclude
@@ -57,6 +59,7 @@ public class RideRequest {
         result.put("destinationLong", destinationLong);
         result.put("dateAndTime", dateAndTime);
         result.put("timeStamp", timeStamp);
+        result.put("available", available);
         //result.put("responses", responses);
 
         return result;

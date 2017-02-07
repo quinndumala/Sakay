@@ -41,7 +41,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -830,6 +832,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                             createNotif(sakayKey, "sakay", commentAuthorId);
 
+                            setAvailableFalse(mPostReference);
+                            setAvailableFalse(mUserPostReference);
+
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                             finish();
                         }
@@ -1046,5 +1051,27 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         mRootRef.child("notif-check").child(notifId).setValue(true);
 
+    }
+
+    public void setAvailableFalse(DatabaseReference postRef){
+        postRef.runTransaction(new Transaction.Handler(){
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                RideOffer offer = mutableData.getValue(RideOffer.class);
+                if (offer == null) {
+                    return Transaction.success(mutableData);
+                }
+                offer.available = false;
+                mutableData.setValue(offer);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
     }
 }

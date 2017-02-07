@@ -243,19 +243,31 @@ public class TrafficFragment extends Fragment
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.fabLight:
-                    addTrafficReport("light");
-                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
-                    menuTraffic.toggle(true);
+                    if (isAdded()){
+                        addTrafficReport("light");
+                        menuTraffic.toggle(true);
+                    } else {
+                        Toast.makeText(getActivity(), "Something went wrong. Try again", Toast.LENGTH_SHORT).show();
+                    }
+
                     break;
                 case R.id.fabModerate:
-                    addTrafficReport("moderate");
-                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
-                    menuTraffic.toggle(true);
+                    if (isAdded()){
+                        addTrafficReport("moderate");
+                        menuTraffic.toggle(true);
+                    } else {
+                        Toast.makeText(getActivity(), "Something went wrong. Try again", Toast.LENGTH_SHORT).show();
+                    }
+
                     break;
                 case R.id.fabHeavy:
-                    addTrafficReport("heavy");
-                    Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
-                    menuTraffic.toggle(true);
+                    if (isAdded()){
+                        addTrafficReport("heavy");
+                        menuTraffic.toggle(true);
+                    } else {
+                        Toast.makeText(getActivity(), "Something went wrong. Try again", Toast.LENGTH_SHORT).show();
+                    }
+
                     break;
                 case R.id.fab_my_location_traffic:
                     zoomToMyLocation();
@@ -265,14 +277,19 @@ public class TrafficFragment extends Fragment
     };
 
     public void addTrafficReport(String intensity){
-        String key = mRootRef.child("traffic-reports").push().getKey();
-        TrafficReport trafficReport = new TrafficReport(myLastLocation.getLatitude(), myLastLocation.getLongitude(),
-                intensity, ServerValue.TIMESTAMP);
-        Map<String, Object> postValues = trafficReport.toMap();
+        if (myLastLocation != null){
+            String key = mRootRef.child("traffic-reports").push().getKey();
+            TrafficReport trafficReport = new TrafficReport(myLastLocation.getLatitude(), myLastLocation.getLongitude(),
+                    intensity, ServerValue.TIMESTAMP);
+            Map<String, Object> postValues = trafficReport.toMap();
 
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/traffic-reports/" + key, postValues);
-        mRootRef.updateChildren(childUpdates);
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/traffic-reports/" + key, postValues);
+            mRootRef.updateChildren(childUpdates);
+            Toast.makeText(getActivity(), "Traffic Successfully Reported", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "Something went wrong. Try again", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -309,9 +326,12 @@ public class TrafficFragment extends Fragment
 
                     if (isRecent){
                         LatLng latLng = new LatLng(trafficReport.latitude, trafficReport.longitude);
-                        MarkerOptions position = new MarkerOptions().position(latLng);
-                        chooseColor(position, trafficReport.intensity);
-                        googleMap.addMarker(position);
+                        if(isAdded()){
+                            MarkerOptions position = new MarkerOptions().position(latLng);
+                            chooseColor(position, trafficReport.intensity);
+                            googleMap.addMarker(position);
+                        }
+
                     }
                 }
 

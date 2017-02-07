@@ -25,6 +25,7 @@ public class RideOffer {
     public String vehicleModel;
     public String vehicleColor;
     public String vehiclePlateNo;
+    public Boolean available;
     public Map<String, Boolean> stars = new HashMap<>();
 
     //public int starCount = 0;
@@ -51,6 +52,7 @@ public class RideOffer {
         this.vehiclePlateNo = vehiclePlateNo;
         this.dateAndTime = dateAndTime;
         this.timeStamp = timeStamp;
+        this.available = true;
     }
 
     @Exclude
@@ -71,6 +73,7 @@ public class RideOffer {
         result.put("vehiclePlateNo", vehiclePlateNo);
         result.put("dateAndTime", dateAndTime);
         result.put("timeStamp", timeStamp);
+        result.put("available", available);
 
         return result;
     }
