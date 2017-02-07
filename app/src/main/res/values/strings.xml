@@ -195,6 +195,7 @@
     </string>
     <string name="title_activity_track_location">Track User</string>
     <string name="title_activity_view_map">Directions</string>
+    <string name="not_yet_text">"You can track a user an hour before your scheduled sakay."</string>
 
 
 </resources>

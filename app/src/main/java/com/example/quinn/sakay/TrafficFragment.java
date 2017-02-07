@@ -344,25 +344,29 @@ public class TrafficFragment extends Fragment
 //        int height = 80;
 //        int width = 80;
         BitmapDrawable bitmapdraw;
+        String markerTitle;
 
         if(intensity.equals("heavy")){
             //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_red));
             bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_red);
+            markerTitle = "Heavy traffic";
 
         } else if (intensity.equals("moderate")){
             //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_orange));
             bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_orange);
+            markerTitle = "Moderate traffic";
 
         } else {
             //position.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_traffic_yellow));
             bitmapdraw =(BitmapDrawable)getResources().getDrawable(R.drawable.marker_yellow);
+            markerTitle = "Light traffic";
 
         }
 
         Bitmap b = bitmapdraw.getBitmap();
         Bitmap marker = Bitmap.createScaledBitmap(b, 80, 80, false);
 //
-        position.icon(BitmapDescriptorFactory.fromBitmap(marker));
+        position.icon(BitmapDescriptorFactory.fromBitmap(marker)).title(markerTitle);
     }
 
     public Boolean checkTime(Object timestamp){
@@ -457,6 +461,7 @@ public class TrafficFragment extends Fragment
 
         //googleMap.setOnMyLocationButtonClickListener(this);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setPadding(0, 0, 150, 0);
         enableMyLocation();
 

@@ -25,6 +25,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.facebook.Profile.getCurrentProfile;
 
 public class SakayDetailActivity extends BaseActivity implements
@@ -44,6 +46,7 @@ public class SakayDetailActivity extends BaseActivity implements
     private Profile profile = getCurrentProfile();
     private final String userId = getUid();
     private String otherUserId;
+    private Long sakayTimestamp;
 
     private TextView otherAuthorNameView;
     private TextView startView;
@@ -116,6 +119,8 @@ public class SakayDetailActivity extends BaseActivity implements
                 String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
                 String vehicleColor = "Color: " + sakay.vehicleColor;
                 String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
+                sakayTimestamp = sakay.timeStamp;
+                Log.d(TAG, "sakayTimestamp: " + sakayTimestamp);
 
                 Spannable spannable = new SpannableString(sakayWith);
                 spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
@@ -131,6 +136,7 @@ public class SakayDetailActivity extends BaseActivity implements
                 vehiclePlateNoView.setText(vehiclePlateNo);
                 // [END_EXCLUDE]
                 loadingDialog.dismiss();
+                showFab();
             }
 
             @Override
@@ -150,14 +156,8 @@ public class SakayDetailActivity extends BaseActivity implements
 
         trackLocationButton = (FloatingActionButton) findViewById(R.id.fabTrackLocation);
         trackLocationButton.hide(false);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                trackLocationButton.show(true);
-                trackLocationButton.setShowAnimation (AnimationUtils.loadAnimation(SakayDetailActivity.this, R.anim.show_from_bottom));
-                trackLocationButton.setHideAnimation(AnimationUtils.loadAnimation(SakayDetailActivity.this, R.anim.hide_to_bottom));
-            }
-        }, 300);
+
+
 
 
         userFacebookId = profile.getId();
@@ -175,14 +175,17 @@ public class SakayDetailActivity extends BaseActivity implements
         int id = view.getId();
 
         if (id == R.id.fabTrackLocation) {
-            Toast.makeText(SakayDetailActivity.this, "Retrieving " + otherUser + "'s last known location",
-                    Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, TrackLocationActivity.class);
-            //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
-            intent.putExtra(TrackLocationActivity.EXTRA_SAKAY_KEY, mPostKey);
-            intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_ID, otherUserId);
-            intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_NAME, otherUser);
-            startActivity(intent);
+            if (canTrackUser(sakayTimestamp)){
+                showNotYetDialog();
+            } else {
+                Intent intent = new Intent(this, TrackLocationActivity.class);
+                //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                intent.putExtra(TrackLocationActivity.EXTRA_SAKAY_KEY, mPostKey);
+                intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_ID, otherUserId);
+                intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_NAME, otherUser);
+                startActivity(intent);
+            }
+
         } else if (id == R.id.sakay_detail_other_author){
             viewProfile();
         }
@@ -197,6 +200,54 @@ public class SakayDetailActivity extends BaseActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showFab(){
+        if (sakayTimestamp != null && checkTime(sakayTimestamp)){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    trackLocationButton.show(true);
+                    trackLocationButton.setShowAnimation (AnimationUtils.loadAnimation(SakayDetailActivity.this, R.anim.show_from_bottom));
+                    trackLocationButton.setHideAnimation(AnimationUtils.loadAnimation(SakayDetailActivity.this, R.anim.hide_to_bottom));
+                }
+            }, 300);
+        }
+    }
+
+    public Boolean checkTime(Object timestamp){
+        long currentTime = System.currentTimeMillis();
+        long sakayTime = (long) timestamp;
+        long hourLater = sakayTime + TimeUnit.HOURS.toMillis(1);
+
+        Log.d(TAG, "Current Time: " + currentTime);
+        Log.d(TAG, "Report Time: " + sakayTime);
+
+        if (currentTime > hourLater){
+            Log.d(TAG, "false");
+            return false;
+
+        } else {
+            Log.d(TAG, "true");
+            return true;
+        }
+
+    }
+
+    public Boolean canTrackUser(Object timestamp){
+        long currentTime = System.currentTimeMillis();
+        long sakayTime = (long) timestamp;
+        long diff = currentTime - sakayTime;
+
+        Log.d(TAG, "Current Time: " + currentTime);
+        Log.d(TAG, "Report Time: " + sakayTime);
+
+        if (diff > 60 * 60 * 1000){
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     @Override
@@ -220,5 +271,13 @@ public class SakayDetailActivity extends BaseActivity implements
         Intent intent = new Intent(this, ViewProfileActivity.class);
         intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, otherUserId);
         startActivity(intent);
+    }
+
+    public void showNotYetDialog(){
+        new MaterialDialog.Builder(this)
+                .title("Not yet")
+                .content(R.string.not_yet_text)
+                .positiveText("OK")
+                .show();
     }
 }

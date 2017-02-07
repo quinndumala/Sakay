@@ -95,7 +95,7 @@ public class TrackLocationActivity extends BaseActivity implements
 
     public LatLng startLocation;
     public LatLng endLocation;
-    public Boolean isRecent = true;
+    public Boolean isRecent = false;
     private List<Polyline> polylines;
     private static final int[] COLORS = new int[]{R.color.colorPrimaryDark, R.color.midGray_light,
             R.color.midGray_light,R.color.midGray_light,R.color.midGray_light};
@@ -170,7 +170,7 @@ public class TrackLocationActivity extends BaseActivity implements
                 otherUserLocation = new LatLng(coordinates.latitude, coordinates.longitude);
                 showOtherUserLocation();
                 if (checkTime(coordinates.timestamp)){
-                    isRecent = false;
+                    isRecent = true;
                 }
             }
 
@@ -581,7 +581,7 @@ public class TrackLocationActivity extends BaseActivity implements
         googleMap.addMarker(options);
 
 
-        if (isRecent){
+        if (!isRecent){
             showNotRecentDialog();
         }
 
