@@ -90,6 +90,13 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private TextView noResponsesYetTextView;
     private CardView responsesView;
 
+    private CardView acceptedView;
+    private CircleImageView acceptedPhotoView;
+    private TextView acceptedAuthorView;
+    private TextView acceptedBodyView;
+
+    private Button acceptedButon;
+
     private String userFacebookId = "";
     public Boolean isAuthor = true;
     public Boolean rideExists = false;
@@ -131,6 +138,15 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public MaterialDialog progressDialog;
     public MaterialDialog loadingDialog;
     public User currentUser;
+
+    public Boolean isAvailable = true;
+    public String acceptedRequest;
+
+    public String acceptedFid;
+    public String acceptedBody;
+    public String acceptedName;
+
+    public Boolean isAcceptedUser = false;
 
     public LatLng startLocation;
     public LatLng endLocation;
@@ -182,6 +198,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
         seeRouteButton = (Button) findViewById(R.id.button_see_route_offer);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_offer_comment);
 
+        acceptedView = (CardView) findViewById(R.id.accepted_offer_view);
+        acceptedPhotoView = (CircleImageView) findViewById(R.id.comment_accepted_author_photo_offer);
+        acceptedAuthorView = (TextView) findViewById(R.id.comment_accepted_author_offer);
+        acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_pickup_offer);
+
         userFacebookId = profile.getId();
         //noResponses();
 
@@ -212,41 +233,46 @@ public class RideOfferDetailActivity extends BaseActivity implements
             }
         });
 
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
-                    if (rideOffer.timeStamp < System.currentTimeMillis()){
-                        sakayButton.setEnabled(false);
-                        timeNotPassed = false;
-                    }
-                    setPhoto(rideOffer.facebookId);
-                    authorView.setText(rideOffer.author);
-                    startView.setText(rideOffer.start);
-                    destinationView.setText(rideOffer.destination);
-                    vehicleView.setText(rideOffer.vehicle);
-                    dateAndTimeView.setText(rideOffer.dateAndTime);
-                    if ((rideOffer.uid.equals(userId))){
-                        buttonDelete.setVisibility(View.VISIBLE);
-                    } else {
-                        isAuthor = false;
-                        sakayButton.setVisibility(View.VISIBLE);
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+//        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+//                    if (rideOffer.timeStamp < System.currentTimeMillis()){
+//                        sakayButton.setEnabled(false);
+//                        timeNotPassed = false;
+//                    }
+//                    isAvailable = rideOffer.available;
+//                    if (!isAvailable){
+//                        sakayButton.setEnabled(false);
+//                        //acceptedPhotoView
+//                    }
+//                    acceptedRequest = rideOffer.accepted;
+//                    setPhoto(rideOffer.facebookId);
+//                    authorView.setText(rideOffer.author);
+//                    startView.setText(rideOffer.start);
+//                    destinationView.setText(rideOffer.destination);
+//                    vehicleView.setText(rideOffer.vehicle);
+//                    dateAndTimeView.setText(rideOffer.dateAndTime);
+//                    if ((rideOffer.uid.equals(userId))){
+//                        buttonDelete.setVisibility(View.VISIBLE);
+//                    } else {
+//                        isAuthor = false;
+//                        sakayButton.setVisibility(View.VISIBLE);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(userId) && timeNotPassed){
+                if (dataSnapshot.hasChild(userId) && timeNotPassed && isAvailable){
                     sakayButton.setText("\u2713" + " Sakay request sent");
                 }
                 loadingDialog.dismiss();
@@ -261,6 +287,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         checkAddress();
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -280,7 +308,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         // Add value event listener to the post
         // [START post_value_event_listener]
-        noResponses();
+       // noResponses();
 
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading map")
@@ -291,7 +319,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(userId) && timeNotPassed){
+                if (dataSnapshot.hasChild(userId) && timeNotPassed && isAvailable){
                     sakayButton.setText("\u2713" + " Sakay request sent");
                 }
             }
@@ -308,6 +336,23 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 if (dataSnapshot.exists()) {
                     // Get Post object and use the values to update the UI
                     RideOffer rideOffer = dataSnapshot.getValue(RideOffer.class);
+
+                    if (rideOffer.timeStamp < System.currentTimeMillis()){
+                        sakayButton.setEnabled(false);
+                        timeNotPassed = false;
+                    }
+                    isAvailable = rideOffer.available;
+                    if (!isAvailable){
+                        sakayButton.setEnabled(false);
+                        //acceptedPhotoView
+                    }
+
+                    setPhoto(rideOffer.facebookId);
+                    authorView.setText(rideOffer.author);
+                    startView.setText(rideOffer.start);
+                    destinationView.setText(rideOffer.destination);
+                    vehicleView.setText(rideOffer.vehicle);
+                    dateAndTimeView.setText(rideOffer.dateAndTime);
 
                     // [START_EXCLUDE]
 //                    setPhoto(rideOffer.facebookId);
@@ -338,7 +383,29 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     vehicleColor = rideOffer.vehicleColor;
                     vehiclePlateNo = rideOffer.vehiclePlateNo;
 
+                    acceptedRequest = rideOffer.accepted;
+                    if (!acceptedRequest.equals("none")){
+                        getAcceptedDetail(acceptedRequest);
+                    }
+
+                    if ((rideOffer.uid.equals(userId))){
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    } else {
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    }
+
+                    noResponses();
+
+//                    if (!isAvailable){
+//                         noResponsesYetTextView.setText("This ride offer is no longer available.");
+//                         noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                    }
+
                     rideExists = true;
+                } else {
+                    Toast.makeText(RideOfferDetailActivity.this, "An error occurred", Toast.LENGTH_SHORT);
+                    finish();
                 }
             }
 
@@ -359,6 +426,37 @@ public class RideOfferDetailActivity extends BaseActivity implements
         sakaysViewRecycler.setAdapter(mAdapter);
 
 
+    }
+
+    public void getAcceptedDetail(final String acceptedUid){
+        mCommentsReference.child(acceptedUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    CommentOffer commentOffer = dataSnapshot.getValue(CommentOffer.class);
+                    acceptedFid = commentOffer.facebookId;
+                    acceptedBody = commentOffer.pickUp;
+                    acceptedName = commentOffer.author;
+                    setAcceptedPhoto(acceptedFid);
+                    acceptedAuthorView.setText(acceptedName);
+                    acceptedBodyView.setText(acceptedBody);
+                    Log.d(TAG, "FID: " + acceptedFid);
+                    Log.d(TAG, "Author: " + acceptedBody);
+                    Log.d(TAG, "Body: " + acceptedName);
+
+
+                } else {
+                    Toast.makeText(RideOfferDetailActivity.this, "Error loading details", Toast.LENGTH_SHORT);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -594,20 +692,107 @@ public class RideOfferDetailActivity extends BaseActivity implements
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren() && isAuthor && timeNotPassed){
-                    responsesTextView.setVisibility(View.VISIBLE);
-                    responsesView.setVisibility(View.VISIBLE);
-                } else {
-                    responsesTextView.setVisibility(View.GONE);
-                    responsesView.setVisibility(View.GONE);
+                if (dataSnapshot.hasChildren()){
                     if (isAuthor){
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            if (!isAvailable){
+                                acceptedView.setVisibility(View.VISIBLE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.GONE);
+                                responsesView.setVisibility(View.GONE);
+                            } else {
+                                acceptedView.setVisibility(View.GONE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.VISIBLE);
+                                responsesView.setVisibility(View.VISIBLE);
+                            }
+                        }
+//                        responsesTextView.setVisibility(View.VISIBLE);
+//                        responsesView.setVisibility(View.VISIBLE);
+                    } else {
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            if (!isAvailable){
+                                if (acceptedRequest.equals(userId)) {
+                                    acceptedView.setVisibility(View.VISIBLE);
+                                    responsesTextView.setVisibility(View.GONE);
+                                    responsesView.setVisibility(View.GONE);
+                                    noResponsesYetTextView.setVisibility(View.GONE);
+                                } else {
+                                    acceptedView.setVisibility(View.GONE);
+                                    responsesTextView.setVisibility(View.GONE);
+                                    responsesView.setVisibility(View.GONE);
+                                    noResponsesYetTextView.setText(R.string.not_available_text);
+                                    noResponsesYetTextView.setVisibility(View.VISIBLE);
+                                }
+
+                            } else {
+                                acceptedView.setVisibility(View.GONE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.GONE);
+                                responsesView.setVisibility(View.GONE);
+                            }
+                        }
+
                     }
-                    if (!timeNotPassed){
-                        noResponsesYetTextView.setText("Scheduled date and time for" +
-                                "\nthis ride offer has paased.");
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+
+                } else {
+//                    responsesTextView.setVisibility(View.GONE);
+//                    responsesView.setVisibility(View.GONE);
+//
+//                    if (isAuthor){
+//
+//                        if (!isAvailable){
+//                            noResponsesYetTextView.setText(R.string.not_available_text);
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        } else {
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//
+//                        if (!timeNotPassed){
+//                            noResponsesYetTextView.setText(R.string.time_passed_text);
+//                            //noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//
+//                    } else {
+//                        if (!timeNotPassed){
+//                            noResponsesYetTextView.setText(R.string.time_passed_text);
+//                            //noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        } else if (!isAvailable){
+//                            noResponsesYetTextView.setText(R.string.not_available_text);
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+                    acceptedView.setVisibility(View.GONE);
+                    if (isAuthor){
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+
+                            acceptedView.setVisibility(View.GONE);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                            responsesTextView.setVisibility(View.GONE);
+                            responsesView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                                acceptedView.setVisibility(View.GONE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.GONE);
+                                responsesView.setVisibility(View.GONE);
+                        }
+
                     }
+
                 }
             }
 
@@ -695,6 +880,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     mCommentIds.add(dataSnapshot.getKey());
                     mComments.add(comment);
                     notifyItemInserted(mComments.size() - 1);
+                    noResponsesYetTextView.setVisibility(View.GONE);
                 }
 
                 @Override
@@ -832,8 +1018,29 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                             createNotif(sakayKey, "sakay", commentAuthorId);
 
-                            setAvailableFalse(mPostReference);
-                            setAvailableFalse(mUserPostReference);
+                            mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                                        CommentOffer commentOffer = snapshot.getValue(CommentOffer.class);
+                                        Log.d(TAG, "Child uid: " + commentOffer.uid);
+                                        if (!commentOffer.uid.equals(commentAuthorId)) {
+                                            createNotif(mPostKey, "requestNotAvailable", commentOffer.uid);
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
+                           // createNotif(mPostKey, "notAvailable", null);
+
+                            setAvailableFalse(mPostReference, commentAuthorId);
+                            setAvailableFalse(mUserPostReference, commentAuthorId);
 
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                             finish();
@@ -867,6 +1074,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public void setPhoto(final String fId) {
         String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
+    }
+
+    public void setAcceptedPhoto(final String fId){
+        String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
+        GlideUtil.loadProfileIcon(imageUrl, acceptedPhotoView);
     }
 
     public void launchSakayDialog(final String location, final Double lat, final Double lng){
@@ -1036,6 +1248,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
         if (type.equals("request")){
             notifId = userAuthorId;
             action = "sent you a ride request";
+        } else if (type.equals("requestNotAvailable")){
+            notifId = commentAuthorID;
+            action = "Ride offer is no longer available";
         } else {
             notifId = commentAuthorID;
             action = "accepted your ride request";
@@ -1053,7 +1268,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
     }
 
-    public void setAvailableFalse(DatabaseReference postRef){
+    public void setAvailableFalse(DatabaseReference postRef, final String acceptedId){
         postRef.runTransaction(new Transaction.Handler(){
             @Override
             public Transaction.Result doTransaction(MutableData mutableData) {
@@ -1062,6 +1277,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                     return Transaction.success(mutableData);
                 }
                 offer.available = false;
+                offer.accepted = acceptedId;
                 mutableData.setValue(offer);
                 return Transaction.success(mutableData);
             }

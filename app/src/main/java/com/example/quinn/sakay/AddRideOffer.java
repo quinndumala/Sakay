@@ -294,7 +294,7 @@ public class AddRideOffer extends BaseActivity
         String key = mDatabase.child("rideOffers").push().getKey();
         RideOffer rideOffer = new RideOffer(userId, username, userFacebookId, start, startLat, startLong,
                 destination, destinationLat, destinationLong,
-                vehicle, vehicleModel, vehicleColor, vehiclePlateNo, dateAndTime, timeStamp);
+                vehicle, vehicleModel, vehicleColor, vehiclePlateNo, dateAndTime, timeStamp, true, "none");
         Map<String, Object> postValues = rideOffer.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();

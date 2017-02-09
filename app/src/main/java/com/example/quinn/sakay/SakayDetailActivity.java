@@ -59,6 +59,7 @@ public class SakayDetailActivity extends BaseActivity implements
     private TextView vehiclePlateNoView;
 
     public MaterialDialog loadingDialog;
+    private static final long ONE_HOUR = 60 * 60 * 1000;
 
 //    public String driverText;
 //    public String riderText;
@@ -113,13 +114,14 @@ public class SakayDetailActivity extends BaseActivity implements
                 otherUser = sakay.otherAuthor;
                 otherUserId = sakay.otherUid;
                 String dateTime = sakay.dateAndTime;
+                sakayTimestamp = sakay.timeStamp;
                 String pickupLocation = "Pickup Location: " + sakay.start;
                 String destination = "Destination: " + sakay.destination;
                 String vehicleType = "Vehicle type: " + sakay.vehicle;
                 String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
                 String vehicleColor = "Color: " + sakay.vehicleColor;
                 String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
-                sakayTimestamp = sakay.timeStamp;
+
                 Log.d(TAG, "sakayTimestamp: " + sakayTimestamp);
 
                 Spannable spannable = new SpannableString(sakayWith);
@@ -176,14 +178,15 @@ public class SakayDetailActivity extends BaseActivity implements
 
         if (id == R.id.fabTrackLocation) {
             if (canTrackUser(sakayTimestamp)){
-                showNotYetDialog();
-            } else {
+
                 Intent intent = new Intent(this, TrackLocationActivity.class);
                 //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
                 intent.putExtra(TrackLocationActivity.EXTRA_SAKAY_KEY, mPostKey);
                 intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_ID, otherUserId);
                 intent.putExtra(TrackLocationActivity.EXTRA_OTHER_USER_NAME, otherUser);
                 startActivity(intent);
+            } else {
+                showNotYetDialog();
             }
 
         } else if (id == R.id.sakay_detail_other_author){
@@ -212,6 +215,8 @@ public class SakayDetailActivity extends BaseActivity implements
                     trackLocationButton.setHideAnimation(AnimationUtils.loadAnimation(SakayDetailActivity.this, R.anim.hide_to_bottom));
                 }
             }, 300);
+        } else {
+            trackLocationButton.hide(false);
         }
     }
 
@@ -235,19 +240,33 @@ public class SakayDetailActivity extends BaseActivity implements
     }
 
     public Boolean canTrackUser(Object timestamp){
+//        long currentTime = System.currentTimeMillis();
+//        long sakayTime = (long) timestamp;
+//        long diff = currentTime - sakayTime;
+//
+//        Log.d(TAG, "Current Time: " + currentTime);
+//        Log.d(TAG, "Report Time: " + sakayTime);
+//
+//        if (diff > 60 * 60 * 1000){
+//            return false;
+//        } else {
+//            return true;
+//        }
         long currentTime = System.currentTimeMillis();
-        long sakayTime = (long) timestamp;
-        long diff = currentTime - sakayTime;
+        long sakayTime = (long)timestamp;
+        long hourBefore = sakayTime - TimeUnit.HOURS.toMillis(1);
 
-        Log.d(TAG, "Current Time: " + currentTime);
-        Log.d(TAG, "Report Time: " + sakayTime);
+        Log.d(TAG, "one hour ago: " + hourBefore);
+        Log.d(TAG, "sakay time: " + sakayTime);
 
-        if (diff > 60 * 60 * 1000){
-            return false;
-        } else {
+        if (currentTime > hourBefore) {
+            //timeStamp passed is more than hour ago from right now
+
             return true;
-        }
+        } else {
 
+            return false;
+        }
     }
 
     @Override

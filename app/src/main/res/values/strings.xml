@@ -196,6 +196,10 @@
     <string name="title_activity_track_location">Track User</string>
     <string name="title_activity_view_map">Directions</string>
     <string name="not_yet_text">"You can track a user an hour before your scheduled sakay."</string>
+    <string name="time_passed_text">"Scheduled date and time for \n"
+                                    "this ride offer has passed."</string>
+    <string name="not_available_text">"This ride offer is no longer available."</string>
+    <string name="not_available_request_text">"This ride request is no longer available."</string>
 
 
 </resources>

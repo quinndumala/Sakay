@@ -34,7 +34,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -78,6 +80,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
     private TextView noResponsesYetTextView;
     private CardView responsesView;
 
+    private CardView acceptedView;
+    private CircleImageView acceptedPhotoView;
+    private TextView acceptedAuthorView;
+    private TextView acceptedBodyView;
+
     private String userFacebookId = "";
     public Boolean isAuthor = true;
     private Profile profile = getCurrentProfile();
@@ -114,6 +121,14 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public User currentUser;
     public MaterialDialog loadingDialog;
 
+    public Boolean isAvailable = true;
+    public Boolean accpted;
+    public String acceptedRequest;
+
+    public String acceptedFid;
+    public String acceptedBody;
+    public String acceptedName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,6 +163,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
         sakayButton = (Button) findViewById(R.id.button_sakay_request);
         seeRouteButton = (Button) findViewById(R.id.button_see_route_request);
         sakaysViewRecycler = (RecyclerView) findViewById(R.id.recycler_request_comment);
+
+        acceptedView = (CardView) findViewById(R.id.accepted_request_view);
+        acceptedPhotoView = (CircleImageView) findViewById(R.id.comment_accepted_author_photo_request);
+        acceptedAuthorView = (TextView) findViewById(R.id.comment_accepted_author_request);
+        acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_vehicle_request);
         userFacebookId = profile.getId();
 
         loadingDialog = new MaterialDialog.Builder(this)
@@ -179,35 +199,42 @@ public class RideRequestDetailActivity extends BaseActivity implements
             }
         });
 
-        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
-                    if (rideRequest.timeStamp < System.currentTimeMillis()){
-                        sakayButton.setEnabled(false);
-                        timeNotPassed = false;
-                    }
-                    if ((rideRequest.uid.equals(userId))){
-                        buttonDelete.setVisibility(View.VISIBLE);
-                    } else {
-                        isAuthor = false;
-                        sakayButton.setVisibility(View.VISIBLE);
-                    }
-                    setPhoto(rideRequest.facebookId);
-                    authorView.setText(rideRequest.author);
-                    startView.setText(rideRequest.start);
-                    destinationView.setText(rideRequest.destination);
-                    dateAndTimeView.setText(rideRequest.dateAndTime);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+//        mPostReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.exists()){
+//                    RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
+//                    if (rideRequest.timeStamp < System.currentTimeMillis()){
+//                        sakayButton.setEnabled(false);
+//                        timeNotPassed = false;
+//                    }
+//                    if (!rideRequest.available){
+//                        sakayButton.setEnabled(false);
+//                        isAvailable = false;
+//                    }
+//                    setPhoto(rideRequest.facebookId);
+//                    authorView.setText(rideRequest.author);
+//                    startView.setText(rideRequest.start);
+//                    destinationView.setText(rideRequest.destination);
+//                    dateAndTimeView.setText(rideRequest.dateAndTime);
+//
+//                    if ((rideRequest.uid.equals(userId))){
+//                        buttonDelete.setVisibility(View.VISIBLE);
+//                    } else {
+//                        isAuthor = false;
+//                        sakayButton.setVisibility(View.VISIBLE);
+//                    }
+//
+//                    isAvailable = rideRequest.available;
+//
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -241,7 +268,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public void onStart() {
         super.onStart();
         checkConnection();
-        noResponses();
+        //noResponses();
 
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -264,7 +291,18 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     RideRequest rideRequest = dataSnapshot.getValue(RideRequest.class);
                     if (rideRequest.timeStamp < System.currentTimeMillis()){
                         sakayButton.setEnabled(false);
+                        timeNotPassed = false;
                     }
+                    isAvailable = rideRequest.available;
+                    if (!isAvailable){
+                        sakayButton.setEnabled(false);
+                    }
+                    setPhoto(rideRequest.facebookId);
+                    authorView.setText(rideRequest.author);
+                    startView.setText(rideRequest.start);
+                    destinationView.setText(rideRequest.destination);
+                    dateAndTimeView.setText(rideRequest.dateAndTime);
+
 
                     userAuthorId = rideRequest.uid;
                     userAuthorName = rideRequest.author;
@@ -280,6 +318,30 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
                     dateAndTime = rideRequest.dateAndTime;
                     timeStamp = rideRequest.timeStamp;
+
+                    acceptedRequest = rideRequest.accepted;
+                    if (!acceptedRequest.equals("none")){
+                        getAcceptedDetail(acceptedRequest);
+                    }
+
+                    if ((rideRequest.uid.equals(userId))){
+                        buttonDelete.setVisibility(View.VISIBLE);
+                    } else {
+                        isAuthor = false;
+                        sakayButton.setVisibility(View.VISIBLE);
+                    }
+
+                    noResponses();
+
+
+//                    if (!isAvailable){
+//                        //TODO: hid the view here or something..
+//                        noResponsesYetTextView.setText("This ride request is no longer available.");
+//                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                    }
+                } else {
+                    Toast.makeText(RideRequestDetailActivity.this, "An error occurred", Toast.LENGTH_SHORT);
+                    finish();
                 }
 
 
@@ -303,6 +365,37 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
         mAdapter = new CommentAdapter(this, mCommentsReference);
         sakaysViewRecycler.setAdapter(mAdapter);
+    }
+
+    public void getAcceptedDetail(final String acceptedUid){
+        mCommentsReference.child(acceptedUid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    CommentRequest commentRequest = dataSnapshot.getValue(CommentRequest.class);
+                    acceptedFid = commentRequest.facebookId;
+                    acceptedBody = commentRequest.vehicle;
+                    acceptedName = commentRequest.author;
+                    setAcceptedPhoto(acceptedFid);
+                    acceptedAuthorView.setText(acceptedName);
+                    acceptedBodyView.setText(acceptedBody);
+                    Log.d(TAG, "FID: " + acceptedFid);
+                    Log.d(TAG, "Author: " + acceptedBody);
+                    Log.d(TAG, "Body: " + acceptedName);
+
+
+                } else {
+                    Toast.makeText(RideRequestDetailActivity.this, "Error loading details", Toast.LENGTH_SHORT);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -394,21 +487,107 @@ public class RideRequestDetailActivity extends BaseActivity implements
         mCommentsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren() && isAuthor && timeNotPassed){
-                    responsesTextView.setVisibility(View.VISIBLE);
-                    responsesView.setVisibility(View.VISIBLE);
-                } else {
-                    responsesTextView.setVisibility(View.GONE);
-                    responsesView.setVisibility(View.GONE);
+                if (dataSnapshot.hasChildren()){
                     if (isAuthor){
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            if (!isAvailable){
+                                acceptedView.setVisibility(View.VISIBLE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.GONE);
+                                responsesView.setVisibility(View.GONE);
+                            } else {
+                                acceptedView.setVisibility(View.GONE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.VISIBLE);
+                                responsesView.setVisibility(View.VISIBLE);
+                            }
+                        }
+//                        responsesTextView.setVisibility(View.VISIBLE);
+//                        responsesView.setVisibility(View.VISIBLE);
+                    } else {
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            if (!isAvailable){
+                                if (acceptedRequest.equals(userId)) {
+                                    acceptedView.setVisibility(View.VISIBLE);
+                                    responsesTextView.setVisibility(View.GONE);
+                                    responsesView.setVisibility(View.GONE);
+                                    noResponsesYetTextView.setVisibility(View.GONE);
+                                } else {
+                                    acceptedView.setVisibility(View.GONE);
+                                    responsesTextView.setVisibility(View.GONE);
+                                    responsesView.setVisibility(View.GONE);
+                                    noResponsesYetTextView.setText(R.string.not_available_request_text);
+                                    noResponsesYetTextView.setVisibility(View.VISIBLE);
+                                }
+
+                            } else {
+                                acceptedView.setVisibility(View.GONE);
+                                noResponsesYetTextView.setVisibility(View.GONE);
+                                responsesTextView.setVisibility(View.GONE);
+                                responsesView.setVisibility(View.GONE);
+                            }
+                        }
+
                     }
 
-                    if (!timeNotPassed){
-                        noResponsesYetTextView.setText("Scheduled date and time for" +
-                                "\nthis ride request has passed.");
-                        noResponsesYetTextView.setVisibility(View.VISIBLE);
+                } else {
+//                    responsesTextView.setVisibility(View.GONE);
+//                    responsesView.setVisibility(View.GONE);
+//
+//                    if (isAuthor){
+//
+//                        if (!isAvailable){
+//                            noResponsesYetTextView.setText(R.string.not_available_text);
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        } else {
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//
+//                        if (!timeNotPassed){
+//                            noResponsesYetTextView.setText(R.string.time_passed_text);
+//                            //noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//
+//                    } else {
+//                        if (!timeNotPassed){
+//                            noResponsesYetTextView.setText(R.string.time_passed_text);
+//                            //noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        } else if (!isAvailable){
+//                            noResponsesYetTextView.setText(R.string.not_available_text);
+//                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+                    acceptedView.setVisibility(View.GONE);
+                    if (isAuthor){
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+
+                            acceptedView.setVisibility(View.GONE);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                            responsesTextView.setVisibility(View.GONE);
+                            responsesView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        if (!timeNotPassed){
+                            noResponsesYetTextView.setText(R.string.time_passed_text);
+                            noResponsesYetTextView.setVisibility(View.VISIBLE);
+                        } else {
+                            acceptedView.setVisibility(View.GONE);
+                            noResponsesYetTextView.setVisibility(View.GONE);
+                            responsesTextView.setVisibility(View.GONE);
+                            responsesView.setVisibility(View.GONE);
+                        }
+
                     }
+
                 }
             }
 
@@ -504,6 +683,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     mCommentIds.add(dataSnapshot.getKey());
                     mComments.add(comment);
                     notifyItemInserted(mComments.size() - 1);
+                    noResponsesYetTextView.setVisibility(View.GONE);
                     // [END_EXCLUDE]
                 }
 
@@ -659,6 +839,28 @@ public class RideRequestDetailActivity extends BaseActivity implements
                                     userId, userAuthorName, userFacebookId,
                                     sakayKey);
                             createNotif(sakayKey, "sakay", commentAuthorId);
+
+                            mCommentsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot snapshot: dataSnapshot.getChildren()){
+                                        CommentRequest commentRequest = snapshot.getValue(CommentRequest.class);
+                                        Log.d(TAG, "Child uid: " + commentRequest.uid);
+                                        if (!commentRequest.uid.equals(commentAuthorId)) {
+                                            createNotif(mPostKey, "offerNotAvailable", commentRequest.uid);
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+                            setAvailableFalse(mPostReference, commentAuthorId);
+                            setAvailableFalse(mUserPostReference, commentAuthorId);
+
                             Toast.makeText(mContext, "Sakay succesfully added", Toast.LENGTH_SHORT).show();
                             finish();
                         }
@@ -693,6 +895,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public void setPhoto(final String fId) {
         String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
+    }
+
+    public void setAcceptedPhoto(final String fId){
+        String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
+        GlideUtil.loadProfileIcon(imageUrl, acceptedPhotoView);
     }
 
     public void launchSakayDialog(){
@@ -817,7 +1024,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
 
     public void launchConfirmDelete(){
         new MaterialDialog.Builder(this)
-                .content("Do you want to delete this ride request?")
+                .content("Delete this ride request?")
                 .positiveText("OK")
                 .negativeText("Cancel")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -861,6 +1068,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         if(type.equals("offer")){
             notifId = userAuthorId;
             action = "sent you a ride offer";
+        } else if (type.equals("offerNotAvailable")) {
+            notifId = commentAuthorID;
+            action = "Ride request is no longer available";
         } else {
             notifId = commentAuthorID;
             action = "accepted your ride offer";
@@ -875,6 +1085,29 @@ public class RideRequestDetailActivity extends BaseActivity implements
         mRootRef.updateChildren(childUpdates);
 
         mRootRef.child("notif-check").child(notifId).setValue(true);
+    }
+
+    public void setAvailableFalse(DatabaseReference postRef, final String acceptedId){
+        postRef.runTransaction(new Transaction.Handler(){
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                RideRequest rideRequest = mutableData.getValue(RideRequest.class);
+                if (rideRequest == null) {
+                    return Transaction.success(mutableData);
+                }
+                rideRequest.available = false;
+                rideRequest.accepted = acceptedId;
+                mutableData.setValue(rideRequest);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b,
+                                   DataSnapshot dataSnapshot) {
+                // Transaction completed
+                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+            }
+        });
     }
 
 }

@@ -326,7 +326,7 @@ public class AddRideRequest extends BaseActivity
         // /posts/$postid simultaneously
         String key = mDatabase.child("rideRequests").push().getKey();
         RideRequest rideRequest = new RideRequest(userId, username, userFacebookId, start, startLat, startLong,
-                destination, destinationLat, destinationLong, dateAndTime, timeStamp);
+                destination, destinationLat, destinationLong, dateAndTime, timeStamp, true, "none");
         Map<String, Object> postValues = rideRequest.toMap();
 
         Map<String, Object> childUpdates = new HashMap<>();

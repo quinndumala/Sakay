@@ -130,9 +130,9 @@ public class NotificationsActivity extends BaseActivity
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(notifType.equals("request")){
+                        if(notifType.equals("request") || notifType.equals("requestNotAvailable")){
                             viewRideOffer(postKey);
-                        } else if (notifType.equals("offer")){
+                        } else if (notifType.equals("offer") || notifType.equals("offerNotAvailable")){
                             viewRideRequest(postKey);
                         } else if(notifType.equals("sakay")){
                             viewSakay(postKey);
