@@ -95,7 +95,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     private TextView acceptedAuthorView;
     private TextView acceptedBodyView;
 
-    private Button acceptedButon;
+    //private Button acceptedButon;
 
     private String userFacebookId = "";
     public Boolean isAuthor = true;
@@ -145,6 +145,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public String acceptedFid;
     public String acceptedBody;
     public String acceptedName;
+    public Button acceptedButton;
 
     public Boolean isAcceptedUser = false;
 
@@ -203,6 +204,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
         acceptedAuthorView = (TextView) findViewById(R.id.comment_accepted_author_offer);
         acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_pickup_offer);
 
+        acceptedButton = (Button) findViewById(R.id.comment_button_view_profile_offer);
+
         userFacebookId = profile.getId();
         //noResponses();
 
@@ -210,6 +213,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 .title("Loading details")
                 .content("Please wait")
                 .progress(true, 0)
+                .cancelable(false)
                 .show();
 
         sakayButton.setOnClickListener(this);
@@ -217,6 +221,7 @@ public class RideOfferDetailActivity extends BaseActivity implements
         buttonDelete.setOnClickListener(this);
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
+        acceptedButton.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -491,9 +496,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
             Log.d(TAG, "delete clicked");
             launchConfirmDelete();
         } else if (id == R.id.post_author_photo_large){
-            viewProfile();
+            viewProfile(userAuthorId);
         } else if (id == R.id.post_author_large){
-            viewProfile();
+            viewProfile(userAuthorId);
+        } else if (id == R.id.comment_button_view_profile_offer) {
+            viewProfile(acceptedRequest);
         }
 
     }
@@ -651,9 +658,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
         });
     }
 
-    public void viewProfile(){
+    public void viewProfile(String userId){
         Intent intent = new Intent(this, ViewProfileActivity.class);
-        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userAuthorId);
+        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userId);
         startActivity(intent);
     }
 

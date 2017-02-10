@@ -105,6 +105,7 @@ public class AddRideOffer extends BaseActivity
 
     public Boolean workSet = false;
     public Boolean homeSet = false;
+    public Boolean isTimeValid = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +123,12 @@ public class AddRideOffer extends BaseActivity
                 String selectedDate = getDateFormat().format(date.getTime());
                 dateAndTime = selectedDate;
                 time = date.getTimeInMillis();
+                if (time < System.currentTimeMillis()){
+                    launchTimePassedDialog();
+                    isTimeValid = false;
+                } else {
+                    isTimeValid = true;
+                }
                 Log.d(TAG, "Selected date: " + selectedDate);
                 Log.d(TAG, "Timestamp: " + time);
             }
@@ -202,6 +209,9 @@ public class AddRideOffer extends BaseActivity
                 || TextUtils.isEmpty(vehicleColor)
                 || TextUtils.isEmpty(vehiclePlateNo) ){
             missingInformationAlert();
+            return;
+        }  else if(!isTimeValid){
+            launchTimePassedDialog();
             return;
         } else {
             confirmPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
@@ -671,6 +681,15 @@ public class AddRideOffer extends BaseActivity
         fVehicleModel.setText(currentVehicleModel);
         fVehicleColor.setText(currentVehicleColor);
         fVehiclePlateNo.setText(currentVehiclePlateNo);
+    }
+
+    public void launchTimePassedDialog(){
+        new MaterialDialog.Builder(this)
+                .title("Warning")
+                .content("Ride schedule can't be set to the past!")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
     }
 
 }

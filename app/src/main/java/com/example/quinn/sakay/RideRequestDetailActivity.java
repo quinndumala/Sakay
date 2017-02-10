@@ -128,6 +128,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public String acceptedFid;
     public String acceptedBody;
     public String acceptedName;
+    public Button acceptedButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,12 +169,14 @@ public class RideRequestDetailActivity extends BaseActivity implements
         acceptedPhotoView = (CircleImageView) findViewById(R.id.comment_accepted_author_photo_request);
         acceptedAuthorView = (TextView) findViewById(R.id.comment_accepted_author_request);
         acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_vehicle_request);
+        acceptedButton = (Button) findViewById(R.id.comment_button_view_profile_request);
         userFacebookId = profile.getId();
 
         loadingDialog = new MaterialDialog.Builder(this)
                 .title("Loading details")
                 .content("Please wait")
                 .progress(true, 0)
+                .cancelable(false)
                 .show();
 
         checkForVehicle();
@@ -183,6 +186,7 @@ public class RideRequestDetailActivity extends BaseActivity implements
         buttonDelete.setOnClickListener(this);
         authorPhotoView.setOnClickListener(this);
         authorView.setOnClickListener(this);
+        acceptedButton.setOnClickListener(this);
         sakaysViewRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         mRootRef.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -428,9 +432,11 @@ public class RideRequestDetailActivity extends BaseActivity implements
         } else if (id == R.id.button_request_detail_delete){
             launchConfirmDelete();
         } else if (id == R.id.post_author_photo_large){
-            viewProfile();
+            viewProfile(userAuthorId);
         } else if (id == R.id.post_author_large){
-            viewProfile();
+            viewProfile(userAuthorId);
+        } else if (id == R.id.comment_button_view_profile_request){
+            viewProfile(acceptedRequest);
         }
     }
 
@@ -454,9 +460,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         }
     }
 
-    public void viewProfile(){
+    public void viewProfile(String userId){
         Intent intent = new Intent(this, ViewProfileActivity.class);
-        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userAuthorId);
+        intent.putExtra(ViewProfileActivity.EXTRA_USER_KEY, userId);
         startActivity(intent);
     }
 
