@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -65,9 +66,19 @@ public class AccountFragment extends Fragment
     private DatabaseReference mDatabase;
     private DatabaseReference userRef;
 
+    private DatabaseReference userRatingsRef;
+    private DatabaseReference userRatingRef;
+    private DatabaseReference ratingsCountRef;
+    private DatabaseReference ratingsRef;
+
     private CircleImageView profilePhoto;
     private TextView profileName;
     private TextView userEmail;
+
+    private TextView userRatingTextView;
+    private TextView userRatingNumView;
+    private ImageView userRatingStarView;
+
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     private GoogleApiClient mGoogleApiClient;
@@ -107,8 +118,15 @@ public class AccountFragment extends Fragment
         uid = getActivity().getIntent().getExtras().getString("user_id");
         mDatabase = FirebaseDatabase.getInstance().getReference();
         userRef = mDatabase.child("users").child(userId);
+
+        userRatingsRef = mDatabase.child("users-ratings").child(userId);
+        userRatingRef = userRatingsRef.child("rating");
+        ratingsCountRef = userRatingsRef.child("ratingsCount");
+        ratingsRef = userRatingsRef.child("ratings");
+
         accountView = (ViewGroup) view.findViewById(R.id.profile);
         mAuth = FirebaseAuth.getInstance();
+        facebookUserId = profile.getId();
 
         return view;
     }
@@ -128,7 +146,12 @@ public class AccountFragment extends Fragment
         profileName = (TextView) getView().findViewById(R.id.profile_user_name);
         profilePhoto = (CircleImageView) getView().findViewById(R.id.profile_user_photo);
         userEmail = (TextView) getView().findViewById(R.id.profile_user_email) ;
-        facebookUserId = profile.getId();
+
+        userRatingTextView = (TextView) getView().findViewById(R.id.view_profile_rating_text);
+        userRatingNumView = (TextView) getView().findViewById(R.id.view_profile_rating_number);
+        userRatingStarView = (ImageView) getView().findViewById(R.id.view_profile_rating_stars);
+
+
 
         progressDialog = new MaterialDialog.Builder(getActivity())
                 .title("Loading account information")
@@ -143,6 +166,26 @@ public class AccountFragment extends Fragment
         //String userRef = String.format("users/%s", uid);
 
         //DatabaseReference user_ref = database.getReference(userRef);
+        userRatingRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    String value = String.valueOf(dataSnapshot.getValue());
+                    loadStars(value);
+                    loadNumbers(value);
+                    userRatingTextView.setText("Reputation");
+                    userRatingNumView.setVisibility(View.VISIBLE);
+                    userRatingStarView.setVisibility(View.VISIBLE);
+
+//                    userRatingNumView.setText(value);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -159,6 +202,8 @@ public class AccountFragment extends Fragment
 
             }
         });
+
+
 
 //        name_ref.addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -303,5 +348,33 @@ public class AccountFragment extends Fragment
 
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    public void loadStars(String value){
+        if (value == "1"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_one));
+        } else if (value == "2"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_two));
+        } else if (value == "3"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_three));
+        } else if (value == "4"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_four));
+        } else if (value == "5"){
+            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_five));
+        }
+    }
+
+    public void loadNumbers(String value){
+        if (value == "1"){
+            userRatingNumView.setText("1.0");
+        } else if (value == "2"){
+            userRatingNumView.setText("2.0");
+        } else if (value == "3"){
+            userRatingNumView.setText("3.0");
+        } else if (value == "4"){
+            userRatingNumView.setText("4.0");
+        } else if (value == "5"){
+            userRatingNumView.setText("5.0");
+        }
     }
 }
