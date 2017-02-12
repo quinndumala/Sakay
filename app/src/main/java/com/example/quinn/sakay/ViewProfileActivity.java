@@ -1,24 +1,33 @@
 package com.example.quinn.sakay;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.quinn.sakay.Models.Util;
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -63,7 +72,15 @@ public class ViewProfileActivity extends BaseActivity implements
 
     private ViewGroup viewProfileContent;
     private ProgressBar progressbar;
+    private FloatingActionMenu buttonRate;
+    private FloatingActionButton buttonRateOne;
+    private FloatingActionButton buttonRateTwo;
+    private FloatingActionButton buttonRateThree;
+    private FloatingActionButton buttonRateFour;
+    private FloatingActionButton buttonRateFive;
     private FloatingActionButton buttonRateUser;
+    private Handler mUiHandler = new Handler();
+
     private ViewGroup mobileNumberView;
     private ViewGroup emailView;
     private ViewGroup facebookPageView;
@@ -76,6 +93,7 @@ public class ViewProfileActivity extends BaseActivity implements
     public Boolean notYetRated = true;
     public Long aveRating = 0L;
     public Long numOfRatings;
+    public Boolean isUser = true;
 
     //final ProgressBar progressBar = (ProgressBar) findViewById(R.id.view_profile_progress);
     public MaterialDialog progressDialog;
@@ -124,12 +142,26 @@ public class ViewProfileActivity extends BaseActivity implements
         viewProfileContent = (ViewGroup) findViewById(R.id.view_profile_content);
         buttonRateUser = (FloatingActionButton) findViewById(R.id.view_profile_rate_button);
 
+        buttonRate = (FloatingActionMenu) findViewById(R.id.fab_rate_user);
+        buttonRate.setClosedOnTouchOutside(true);
+        buttonRateOne = (FloatingActionButton) findViewById(R.id.fab_one);
+        buttonRateTwo = (FloatingActionButton) findViewById(R.id.fab_two);
+        buttonRateThree = (FloatingActionButton) findViewById(R.id.fab_three);
+        buttonRateFour = (FloatingActionButton) findViewById(R.id.fab_four);
+        buttonRateFive = (FloatingActionButton) findViewById(R.id.fab_five);
+
         progressDialog = new MaterialDialog.Builder(this)
                 .title("Loading profile")
                 .content("Please wait")
                 .progress(true, 0)
                 .cancelable(false)
                 .show();
+
+        if (!(mUserKey.equals(MY_USER_ID))){
+            //buttonRateUser.setVisibility(View.VISIBLE);
+            isUser = false;
+
+        }
 
         userFacebookIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -181,7 +213,6 @@ public class ViewProfileActivity extends BaseActivity implements
         });
 
 
-
         userEmailRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -206,6 +237,10 @@ public class ViewProfileActivity extends BaseActivity implements
 
                 }
                 progressDialog.dismiss();
+                if (!isUser){
+                    showRateButton();
+                }
+
             }
 
             @Override
@@ -215,18 +250,23 @@ public class ViewProfileActivity extends BaseActivity implements
         });
 
 
-        if (!(mUserKey.equals(MY_USER_ID))){
-            buttonRateUser.setVisibility(View.VISIBLE);
-        }
+
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        checkConnection();
 
 
         //hasRated();
         //listenToRatings();
+
+        buttonRateOne.setOnClickListener(this);
+        buttonRateTwo.setOnClickListener(this);
+        buttonRateThree.setOnClickListener(this);
+        buttonRateFour.setOnClickListener(this);
+        buttonRateFive.setOnClickListener(this);
 
         mobileNumberView.setOnClickListener(this);
         emailView.setOnClickListener(this);
@@ -234,6 +274,53 @@ public class ViewProfileActivity extends BaseActivity implements
         buttonRateUser.setOnClickListener(this);
 
 
+
+    }
+
+    private void showRateButton(){
+        buttonRate.setVisibility(View.VISIBLE);
+        buttonRate.hideMenuButton(false);
+        mUiHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                buttonRate.showMenuButton(true);
+                buttonRate.setMenuButtonShowAnimation(AnimationUtils.loadAnimation(ViewProfileActivity.this,
+                        R.anim.fab_scale_up));
+                buttonRate.setMenuButtonHideAnimation(AnimationUtils.loadAnimation(ViewProfileActivity.this,
+                        R.anim.fab_scale_down));
+            }
+        }, 350);
+        createCustomAnimation();
+    }
+
+    private void createCustomAnimation() {
+        AnimatorSet set = new AnimatorSet();
+
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(buttonRate.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(buttonRate.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(buttonRate.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(buttonRate.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                buttonRate.getMenuIconView().setImageResource(buttonRate.isOpened()
+                        ? R.drawable.ic_star_empty : R.drawable.ic_close);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+
+        buttonRate.setIconToggleAnimatorSet(set);
     }
 
     @Override
@@ -271,11 +358,46 @@ public class ViewProfileActivity extends BaseActivity implements
                 Toast.makeText(ViewProfileActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
             }
         } else if (id == R.id.view_profile_rate_button){
-            launchRateDialog();
+            //launchRateDialog();
         } else if (id == R.id.view_profile_phone_num){
             Intent intent = new Intent(Intent.ACTION_DIAL);
             intent.setData(Uri.parse("tel:" + USER_PHONE_NO));
             startActivity(intent);
+        } else if (id == R.id.fab_one){
+            if (Util.Operations.isOnline(this)){
+                submitRating(1);
+            } else {
+                showErrorToast();
+            }
+            buttonRate.toggle(true);
+        } else if (id == R.id.fab_two){
+            if (Util.Operations.isOnline(this)){
+                submitRating(2);
+            } else {
+                showErrorToast();
+            }
+            buttonRate.toggle(true);
+        } else if (id == R.id.fab_three){
+            if (Util.Operations.isOnline(this)){
+                submitRating(3);
+            } else {
+                showErrorToast();
+            }
+            buttonRate.toggle(true);
+        } else if (id == R.id.fab_four){
+            if (Util.Operations.isOnline(this)){
+                submitRating(4);
+            } else {
+                showErrorToast();
+            }
+            buttonRate.toggle(true);
+        } else if (id == R.id.fab_five){
+            if (Util.Operations.isOnline(this)){
+                submitRating(5);
+            } else {
+                showErrorToast();
+            }
+            buttonRate.toggle(true);
         }
     }
 
@@ -283,6 +405,12 @@ public class ViewProfileActivity extends BaseActivity implements
         boolean isConnected = ConnectivityReceiver.isConnected();
         showSnack(isConnected);
     }
+
+    private void showErrorToast(){
+        Toast.makeText(this, "Something went wrong. Try again", Toast.LENGTH_SHORT).show();
+    }
+
+
 
     private void showSnack(boolean isConnected) {
         String message;
@@ -323,19 +451,19 @@ public class ViewProfileActivity extends BaseActivity implements
     }
 
     public void launchRateDialog() {
-        new MaterialDialog.Builder(this)
-                .title("Rate this user")
-                .items(R.array.offer_select_rating_score)
-                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
-                    @Override
-                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        submitRating(text);
-                        //showToast();
-                        return true;
-                    }
-                })
-                .positiveText("OK")
-                .show();
+//        new MaterialDialog.Builder(this)
+//                .title("Rate this user")
+//                .items(R.array.offer_select_rating_score)
+//                .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+//                    @Override
+//                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+//                        submitRating(text);
+//                        //showToast();
+//                        return true;
+//                    }
+//                })
+//                .positiveText("OK")
+//                .show();
     }
 
     public void loadStars(String value){
@@ -392,22 +520,22 @@ public class ViewProfileActivity extends BaseActivity implements
     }
 
 
-    public void submitRating(CharSequence text){
+    public void submitRating(Integer rating){
         Log.d(TAG, "on submitRating");
-        int score;
-
-        String rating = text.toString();
-        if (rating.equals("5  Excellent")){
-            score = 5;
-        } else if (rating.equals("4  Great")) {
-            score = 4;
-        } else if (rating.equals("3  Satisfactory")){
-            score = 3;
-        } else if (rating.equals("2  Unsatisfied")){
-            score = 2;
-        } else {
-            score = 1;
-        }
+//        int score;
+//
+//        String rating = text.toString();
+//        if (rating.equals("5  Excellent")){
+//            score = 5;
+//        } else if (rating.equals("4  Great")) {
+//            score = 4;
+//        } else if (rating.equals("3  Satisfactory")){
+//            score = 3;
+//        } else if (rating.equals("2  Unsatisfied")){
+//            score = 2;
+//        } else {
+//            score = 1;
+//        }
 
 
         //String key = ratingsRef.child(MY_USER_ID).push().getKey();
@@ -416,7 +544,7 @@ public class ViewProfileActivity extends BaseActivity implements
 //        }
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/users-ratings/" + mUserKey + "/ratings/" + MY_USER_ID, score);
+        childUpdates.put("/users-ratings/" + mUserKey + "/ratings/" + MY_USER_ID, rating);
         mRootRef.updateChildren(childUpdates);
         updateRatings();
 

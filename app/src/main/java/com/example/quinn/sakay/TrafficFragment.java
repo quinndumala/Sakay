@@ -172,6 +172,7 @@ public class TrafficFragment extends Fragment
         fab2.setOnClickListener(clickListener);
         fab3.setOnClickListener(clickListener);
         fabMyLocation.setOnClickListener(clickListener);
+
         menuTraffic.hideMenuButton(false);
         mUiHandler.postDelayed(new Runnable() {
             @Override

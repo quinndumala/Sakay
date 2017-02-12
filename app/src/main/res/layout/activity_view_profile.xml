@@ -68,7 +68,7 @@
         android:id="@+id/view_profile_rate_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom|end"
         android:layout_marginBottom="12dp"
         android:layout_marginRight="16dp"
         app:fab_elevationCompat="4dp"
@@ -78,6 +78,91 @@
         fab:fab_colorPressed="@color/colorPrimaryDark"
         android:visibility="gone"
         />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        >
+
+        <com.github.clans.fab.FloatingActionMenu
+            android:id="@+id/fab_rate_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="end"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="16dp"
+            app:fab_elevationCompat="4dp"
+            fab:fab_hideAnimation="@anim/hide_to_bottom"
+            fab:menu_labels_ellipsize="end"
+            fab:menu_labels_singleLine="true"
+            fab:menu_fab_label="Rate User"
+            fab:menu_icon="@drawable/ic_star_empty"
+            fab:menu_colorNormal="@color/colorPrimary"
+            fab:menu_colorPressed="@color/colorPrimaryDark"
+            android:visibility="gone">
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_five"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/number_five"
+                fab:fab_size="mini"
+                fab:fab_label="Excellent"
+                fab:fab_colorNormal="@color/white"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_four"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/number_four"
+                fab:fab_size="mini"
+                fab:fab_label="Great"
+                fab:fab_colorNormal="@color/white"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_three"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/number_three"
+                fab:fab_size="mini"
+                fab:fab_label="Satisfied"
+                fab:fab_colorNormal="@color/white"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/number_two"
+                fab:fab_size="mini"
+                fab:fab_label="Unsatisfied"
+                fab:fab_colorNormal="@color/white"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+            <com.github.clans.fab.FloatingActionButton
+                android:id="@+id/fab_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/number_one"
+                fab:fab_size="mini"
+                fab:fab_label="Poor"
+                fab:fab_colorNormal="@color/white"
+                fab:fab_colorPressed="@color/lightGray"
+                />
+
+        </com.github.clans.fab.FloatingActionMenu>
+
+    </RelativeLayout>
+
+
 
 
 </android.support.design.widget.CoordinatorLayout>
