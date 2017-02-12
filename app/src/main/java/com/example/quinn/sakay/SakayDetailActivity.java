@@ -4,17 +4,20 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.quinn.sakay.Models.Sakay;
 import com.facebook.Profile;
@@ -57,6 +60,8 @@ public class SakayDetailActivity extends BaseActivity implements
     private TextView vehicleModelView;
     private TextView vehicleColorView;
     private TextView vehiclePlateNoView;
+
+    public Boolean canDelete = false;
 
     public MaterialDialog loadingDialog;
     private static final long ONE_HOUR = 60 * 60 * 1000;
@@ -103,42 +108,45 @@ public class SakayDetailActivity extends BaseActivity implements
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Sakay sakay = dataSnapshot.getValue(Sakay.class);
+                if (dataSnapshot.exists()){
+                    Sakay sakay = dataSnapshot.getValue(Sakay.class);
 
-                String sakayWith;
-                if(sakay.role.equals("driver")) {
-                    sakayWith = "You will be driving for " + sakay.otherAuthor;
-                } else {
-                    sakayWith = "You will be riding with " + sakay.otherAuthor;
+                    String sakayWith;
+                    if(sakay.role.equals("driver")) {
+                        sakayWith = "You will be driving for " + sakay.otherAuthor;
+                    } else {
+                        sakayWith = "You will be riding with " + sakay.otherAuthor;
+                    }
+                    otherUser = sakay.otherAuthor;
+                    otherUserId = sakay.otherUid;
+                    String dateTime = sakay.dateAndTime;
+                    sakayTimestamp = sakay.timeStamp;
+                    String pickupLocation = "Pickup Location: " + sakay.start;
+                    String destination = "Destination: " + sakay.destination;
+                    String vehicleType = "Vehicle type: " + sakay.vehicle;
+                    String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
+                    String vehicleColor = "Color: " + sakay.vehicleColor;
+                    String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
+
+                    Log.d(TAG, "sakayTimestamp: " + sakayTimestamp);
+
+                    Spannable spannable = new SpannableString(sakayWith);
+                    spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
+                            sakayWith.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                    otherAuthorNameView.setText(spannable, TextView.BufferType.SPANNABLE);
+                    dateAndTimeView.setText(dateTime);
+                    startView.setText(pickupLocation);
+                    destinationView.setText(destination);
+                    vehicleTypeView.setText(vehicleType);
+                    vehicleModelView.setText(vehicleModel);
+                    vehicleColorView.setText(vehicleColor);
+                    vehiclePlateNoView.setText(vehiclePlateNo);
+                    // [END_EXCLUDE]
+                    loadingDialog.dismiss();
+                    showFab();
                 }
-                otherUser = sakay.otherAuthor;
-                otherUserId = sakay.otherUid;
-                String dateTime = sakay.dateAndTime;
-                sakayTimestamp = sakay.timeStamp;
-                String pickupLocation = "Pickup Location: " + sakay.start;
-                String destination = "Destination: " + sakay.destination;
-                String vehicleType = "Vehicle type: " + sakay.vehicle;
-                String vehicleModel = "Manufacturer and model: " + sakay.vehicleModel;
-                String vehicleColor = "Color: " + sakay.vehicleColor;
-                String vehiclePlateNo = "Plate number: " + sakay.vehiclePlateNo;
 
-                Log.d(TAG, "sakayTimestamp: " + sakayTimestamp);
-
-                Spannable spannable = new SpannableString(sakayWith);
-                spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#2480D9")), sakayWith.indexOf(sakay.otherAuthor),
-                        sakayWith.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-                otherAuthorNameView.setText(spannable, TextView.BufferType.SPANNABLE);
-                dateAndTimeView.setText(dateTime);
-                startView.setText(pickupLocation);
-                destinationView.setText(destination);
-                vehicleTypeView.setText(vehicleType);
-                vehicleModelView.setText(vehicleModel);
-                vehicleColorView.setText(vehicleColor);
-                vehiclePlateNoView.setText(vehiclePlateNo);
-                // [END_EXCLUDE]
-                loadingDialog.dismiss();
-                showFab();
             }
 
             @Override
@@ -195,11 +203,24 @@ public class SakayDetailActivity extends BaseActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sakay_detail_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home){
             finish();
             return true;
+        } else if (id == R.id.action_delete){
+            if (canDelete){
+                showConfirmDelete();
+            } else {
+                showCantDelete();
+            }
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -217,6 +238,7 @@ public class SakayDetailActivity extends BaseActivity implements
             }, 300);
         } else {
             trackLocationButton.hide(false);
+            canDelete = true;
         }
     }
 
@@ -296,6 +318,35 @@ public class SakayDetailActivity extends BaseActivity implements
         new MaterialDialog.Builder(this)
                 .title("Not yet")
                 .content(R.string.not_yet_text)
+                .positiveText("OK")
+                .show();
+    }
+
+    public void deleteSakay(){
+        finish();
+        mPostReference.removeValue();
+        Toast.makeText(this, "Sakay deleted", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showConfirmDelete(){
+        new MaterialDialog.Builder(this)
+                .content("Delete this sakay?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                       deleteSakay();
+
+                    }
+                })
+                .show();
+    }
+
+    public void showCantDelete(){
+        new MaterialDialog.Builder(this)
+                .title("Warning")
+                .content("You can't delete a sakay before the scheduled date")
                 .positiveText("OK")
                 .show();
     }

@@ -200,6 +200,7 @@
                                     "this ride offer has passed."</string>
     <string name="not_available_text">"This ride offer is no longer available."</string>
     <string name="not_available_request_text">"This ride request is no longer available."</string>
+    <string name="string_delete">Delete</string>
 
 
 </resources>
