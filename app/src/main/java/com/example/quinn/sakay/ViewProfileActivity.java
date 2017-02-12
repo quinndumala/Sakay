@@ -152,7 +152,7 @@ public class ViewProfileActivity extends BaseActivity implements
                     String value = String.valueOf(dataSnapshot.getValue());
                     loadStars(value);
                     loadNumbers(value);
-                    userRatingTextView.setText("User Rating");
+                    userRatingTextView.setText("User Reputation");
                     userRatingNumView.setVisibility(View.VISIBLE);
                     userRatingStarView.setVisibility(View.VISIBLE);
 

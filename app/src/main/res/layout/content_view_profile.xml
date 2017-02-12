@@ -39,7 +39,7 @@
                     android:id="@+id/view_profile_rating_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No ratings yet"
+                    android:text="This user has not been rated yet."
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:textSize="15sp"/>
@@ -49,13 +49,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="0.0"
-                    android:textSize="34sp"
+                    android:textColor="@color/black"
+                    android:textSize="50sp"
                     android:layout_marginBottom="10dp"
                     android:visibility="gone"/>
                 <ImageView
                     android:id="@+id/view_profile_rating_stars"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:src="@drawable/ratings_none"
                     android:layout_marginBottom="16dp"
                     android:visibility="gone"/>
