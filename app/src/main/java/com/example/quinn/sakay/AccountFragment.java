@@ -71,7 +71,7 @@ public class AccountFragment extends Fragment
     private DatabaseReference ratingsCountRef;
     private DatabaseReference ratingsRef;
 
-    private CircleImageView profilePhoto;
+    private ImageView userPhoto;
     private TextView profileName;
     private TextView userEmail;
 
@@ -124,7 +124,7 @@ public class AccountFragment extends Fragment
         ratingsCountRef = userRatingsRef.child("ratingsCount");
         ratingsRef = userRatingsRef.child("ratings");
 
-        accountView = (ViewGroup) view.findViewById(R.id.profile);
+        //accountView = (ViewGroup) view.findViewById(R.id.profile);
         mAuth = FirebaseAuth.getInstance();
         facebookUserId = profile.getId();
 
@@ -144,12 +144,12 @@ public class AccountFragment extends Fragment
         });
 
         profileName = (TextView) getView().findViewById(R.id.profile_user_name);
-        profilePhoto = (CircleImageView) getView().findViewById(R.id.profile_user_photo);
+        userPhoto = (ImageView) getView().findViewById(R.id.account_user_photo);
         userEmail = (TextView) getView().findViewById(R.id.profile_user_email) ;
 
-        userRatingTextView = (TextView) getView().findViewById(R.id.view_profile_rating_text);
-        userRatingNumView = (TextView) getView().findViewById(R.id.view_profile_rating_number);
-        userRatingStarView = (ImageView) getView().findViewById(R.id.view_profile_rating_stars);
+        //userRatingTextView = (TextView) getView().findViewById(R.id.view_profile_rating_text);
+        //userRatingNumView = (TextView) getView().findViewById(R.id.view_profile_rating_number);
+        //userRatingStarView = (ImageView) getView().findViewById(R.id.view_profile_rating_stars);
 
 
 
@@ -161,7 +161,7 @@ public class AccountFragment extends Fragment
 
 
         String photoUrl =  "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-        GlideUtil.loadProfileIcon(photoUrl, profilePhoto);
+        GlideUtil.loadProfileIcon(photoUrl, userPhoto);
 
         //String userRef = String.format("users/%s", uid);
 
@@ -171,11 +171,11 @@ public class AccountFragment extends Fragment
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     String value = String.valueOf(dataSnapshot.getValue());
-                    loadStars(value);
-                    loadNumbers(value);
-                    userRatingTextView.setText("Reputation");
-                    userRatingNumView.setVisibility(View.VISIBLE);
-                    userRatingStarView.setVisibility(View.VISIBLE);
+                    //loadStars(value);
+                    //loadNumbers(value);
+                   // userRatingTextView.setText("Reputation");
+                    //userRatingNumView.setVisibility(View.VISIBLE);
+                    //userRatingStarView.setVisibility(View.VISIBLE);
 
 //                    userRatingNumView.setText(value);
                 }
@@ -352,29 +352,29 @@ public class AccountFragment extends Fragment
 
     public void loadStars(String value){
         if (value == "1"){
-            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_one));
+           // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_one));
         } else if (value == "2"){
-            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_two));
+           // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_two));
         } else if (value == "3"){
-            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_three));
+           // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_three));
         } else if (value == "4"){
-            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_four));
+           // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_four));
         } else if (value == "5"){
-            userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_five));
+           // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_five));
         }
     }
 
-    public void loadNumbers(String value){
-        if (value == "1"){
-            userRatingNumView.setText("1.0");
-        } else if (value == "2"){
-            userRatingNumView.setText("2.0");
-        } else if (value == "3"){
-            userRatingNumView.setText("3.0");
-        } else if (value == "4"){
-            userRatingNumView.setText("4.0");
-        } else if (value == "5"){
-            userRatingNumView.setText("5.0");
-        }
-    }
+//    public void loadNumbers(String value){
+//        if (value == "1"){
+//            userRatingNumView.setText("1.0");
+//        } else if (value == "2"){
+//            userRatingNumView.setText("2.0");
+//        } else if (value == "3"){
+//            userRatingNumView.setText("3.0");
+//        } else if (value == "4"){
+//            userRatingNumView.setText("4.0");
+//        } else if (value == "5"){
+//            userRatingNumView.setText("5.0");
+//        }
+//    }
 }

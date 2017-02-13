@@ -409,8 +409,10 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
                     rideExists = true;
                 } else {
-                    Toast.makeText(RideOfferDetailActivity.this, "An error occurred", Toast.LENGTH_SHORT);
                     finish();
+                    Toast.makeText(RideOfferDetailActivity.this, "Failed to load ride request details",
+                            Toast.LENGTH_SHORT);
+
                 }
             }
 

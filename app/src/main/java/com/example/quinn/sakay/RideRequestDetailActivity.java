@@ -344,8 +344,10 @@ public class RideRequestDetailActivity extends BaseActivity implements
 //                        noResponsesYetTextView.setVisibility(View.VISIBLE);
 //                    }
                 } else {
-                    Toast.makeText(RideRequestDetailActivity.this, "An error occurred", Toast.LENGTH_SHORT);
                     finish();
+                    Toast.makeText(RideRequestDetailActivity.this, "Failed to load ride request details",
+                            Toast.LENGTH_SHORT);
+
                 }
 
 

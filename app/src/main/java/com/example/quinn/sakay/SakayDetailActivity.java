@@ -145,6 +145,10 @@ public class SakayDetailActivity extends BaseActivity implements
                     // [END_EXCLUDE]
                     loadingDialog.dismiss();
                     showFab();
+                } else {
+                    finish();
+                    Toast.makeText(SakayDetailActivity.this, "Failed to load sakay details.",
+                            Toast.LENGTH_SHORT).show();
                 }
 
             }

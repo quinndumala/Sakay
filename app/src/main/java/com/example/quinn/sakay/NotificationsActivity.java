@@ -136,8 +136,10 @@ public class NotificationsActivity extends BaseActivity
                             viewRideRequest(postKey);
                         } else if(notifType.equals("sakay")){
                             viewSakay(postKey);
+                        } else if(notifKey.equals(null)){
+                            Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
                         }
-                        else {
+                        else  {
                             Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
                         }
 
@@ -178,6 +180,10 @@ public class NotificationsActivity extends BaseActivity
             }
         });
    }
+
+    public void findKey(){
+
+    }
 
     public void viewRideOffer(String refKey){
         Intent intent = new Intent(this, RideOfferDetailActivity.class);
