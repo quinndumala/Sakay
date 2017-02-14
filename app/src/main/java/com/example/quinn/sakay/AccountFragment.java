@@ -56,7 +56,7 @@ import static com.facebook.Profile.getCurrentProfile;
 public class AccountFragment extends Fragment
         implements
         GoogleApiClient.OnConnectionFailedListener,
-        ConnectivityReceiver.ConnectivityReceiverListener{
+        ConnectivityReceiver.ConnectivityReceiverListener {
 
     private ViewGroup accountView;
     //private View view;
@@ -78,6 +78,11 @@ public class AccountFragment extends Fragment
     private TextView userRatingTextView;
     private TextView userRatingNumView;
     private ImageView userRatingStarView;
+
+    private ImageView accountReputationIcon;
+    private TextView accountReputationText;
+    private ViewGroup accountOffersView;
+    private ViewGroup accountRequestsView;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -151,6 +156,10 @@ public class AccountFragment extends Fragment
         //userRatingNumView = (TextView) getView().findViewById(R.id.view_profile_rating_number);
         //userRatingStarView = (ImageView) getView().findViewById(R.id.view_profile_rating_stars);
 
+        accountReputationIcon = (ImageView) getView().findViewById(R.id.account_reputation_icon);
+        accountReputationText = (TextView) getView().findViewById(R.id.account_reputation_text);
+        accountOffersView = (ViewGroup) getView().findViewById(R.id.account_offers_view);
+        accountRequestsView = (ViewGroup) getView().findViewById(R.id.account_requests_view);
 
 
         progressDialog = new MaterialDialog.Builder(getActivity())
@@ -171,9 +180,10 @@ public class AccountFragment extends Fragment
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()){
                     String value = String.valueOf(dataSnapshot.getValue());
-                    //loadStars(value);
+                    loadStars(value);
                     //loadNumbers(value);
                    // userRatingTextView.setText("Reputation");
+                    accountReputationText.setText("Reputation");
                     //userRatingNumView.setVisibility(View.VISIBLE);
                     //userRatingStarView.setVisibility(View.VISIBLE);
 
@@ -232,10 +242,58 @@ public class AccountFragment extends Fragment
 //        });
     }
 
+
+    private View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.account_offers_icon:
+
+                    break;
+                case R.id.account_offers_view:
+                    Intent offersIntent = new Intent(getActivity(), MyRideOffers.class);
+                    //intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                    startActivity(offersIntent);
+                    break;
+
+                case R.id.account_requests_view:
+                    Intent requestsIntent = new Intent(getActivity(), MyRideRequests.class);
+                    startActivity(requestsIntent);
+                    break;
+
+            }
+        }
+    };
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        accountOffersView.setOnClickListener(clickListener);
+        accountRequestsView.setOnClickListener(clickListener);
+
+    }
+
     @Override
     public void onStart(){
         super.onStart();
         checkConnection();
+
+        userRatingRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    String value = String.valueOf(dataSnapshot.getValue());
+                    loadStars(value);
+                    accountReputationText.setText("Reputation");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
@@ -261,6 +319,8 @@ public class AccountFragment extends Fragment
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack(isConnected);
     }
+
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
@@ -353,14 +413,19 @@ public class AccountFragment extends Fragment
     public void loadStars(String value){
         if (value == "1"){
            // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_one));
+            accountReputationIcon.setImageDrawable(getResources().getDrawable(R.drawable.reputation_one));
         } else if (value == "2"){
            // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_two));
+            accountReputationIcon.setImageDrawable(getResources().getDrawable(R.drawable.reputation_two));
         } else if (value == "3"){
            // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_three));
+            accountReputationIcon.setImageDrawable(getResources().getDrawable(R.drawable.reputation_three));
         } else if (value == "4"){
            // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_four));
+            accountReputationIcon.setImageDrawable(getResources().getDrawable(R.drawable.reputation_four));
         } else if (value == "5"){
            // userRatingStarView.setImageDrawable(getResources().getDrawable(R.drawable.ratings_five));
+            accountReputationIcon.setImageDrawable(getResources().getDrawable(R.drawable.reputation_five));
         }
     }
 

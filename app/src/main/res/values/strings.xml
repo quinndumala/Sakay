@@ -201,6 +201,8 @@
     <string name="not_available_text">"This ride offer is no longer available."</string>
     <string name="not_available_request_text">"This ride request is no longer available."</string>
     <string name="string_delete">Delete</string>
+    <string name="title_activity_my_ride_offers">My Ride Offers</string>
+    <string name="title_activity_my_ride_requests">My Ride Requests</string>
 
 
 </resources>

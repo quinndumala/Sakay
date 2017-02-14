@@ -331,7 +331,6 @@ public class RideRequestsFragment extends Fragment
         String message;
         int color = Color.WHITE;
         if (!(isConnected)) {
-            addRideRequest.setVisibility(View.GONE);
             message = "No connection";
             Snackbar snackbar = Snackbar
                     .make(getView().findViewById(R.id.fragment_ride_requests_layout), message, Snackbar.LENGTH_INDEFINITE);

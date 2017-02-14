@@ -63,48 +63,48 @@
             </RelativeLayout>
         </android.support.v7.widget.CardView>
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/account_ratings_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_below="@id/account_name_view"
-            android:visibility="gone">
+        <!--<android.support.v7.widget.CardView-->
+            <!--android:id="@+id/account_ratings_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:layout_below="@id/account_name_view"-->
+            <!--android:visibility="gone">-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/view_profile_rating_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="No ratings yet."
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:id="@+id/view_profile_rating_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="0.0"
-                    android:textColor="@color/black"
-                    android:textSize="48sp"
-                    android:layout_marginBottom="10dp"
-                    android:visibility="gone"/>
-                <ImageView
-                    android:id="@+id/view_profile_rating_stars"
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:src="@drawable/ratings_none"
-                    android:layout_marginBottom="16dp"
-                    android:visibility="gone"/>
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center"-->
+                <!--android:orientation="vertical">-->
+                <!--<TextView-->
+                    <!--android:id="@+id/view_profile_rating_text"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="No ratings yet."-->
+                    <!--android:layout_marginTop="16dp"-->
+                    <!--android:layout_marginBottom="16dp"-->
+                    <!--android:textSize="15sp"/>-->
+                <!--<TextView-->
+                    <!--android:id="@+id/view_profile_rating_number"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="0.0"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--android:textSize="48sp"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:visibility="gone"/>-->
+                <!--<ImageView-->
+                    <!--android:id="@+id/view_profile_rating_stars"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="25dp"-->
+                    <!--android:src="@drawable/ratings_none"-->
+                    <!--android:layout_marginBottom="16dp"-->
+                    <!--android:visibility="gone"/>-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
-        </android.support.v7.widget.CardView>
+        <!--</android.support.v7.widget.CardView>-->
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
@@ -133,6 +133,7 @@
                         android:layout_height="55dp"
                         android:src="@drawable/reputation_none"/>
                     <TextView
+                        android:id="@+id/account_reputation_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="No ratings"
@@ -141,6 +142,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/account_offers_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -161,6 +163,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/account_requests_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -181,10 +184,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-
-
-
 
         </android.support.v7.widget.CardView>
 

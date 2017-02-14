@@ -188,6 +188,25 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.quinn.sakay.RideOfferDetailActivity" />
         </activity>
+        <activity
+            android:name=".MyRideOffers"
+            android:label="@string/title_activity_my_ride_offers"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
+        </activity>
+        <activity
+            android:name=".MyRideRequests"
+            android:label="@string/title_activity_my_ride_requests"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.quinn.sakay.MainActivity" />
+            
+        </activity>
     </application>
 
 </manifest>
