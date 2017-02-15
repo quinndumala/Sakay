@@ -147,7 +147,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_weight="0.3"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
                     <ImageView
                         android:id="@+id/account_offers_icon"
@@ -168,7 +169,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_weight="0.3"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
                     <ImageView
                         android:id="@+id/account_requests_icon"

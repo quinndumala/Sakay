@@ -15,23 +15,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp"
+
+
+
+        android:background="?attr/selectableItemBackground"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Mobile Number"
             android:textSize="17sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
         <TextView
             android:id="@+id/settings_phone_number_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="not set"
             android:textSize="14sp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             />
     </LinearLayout>
     <View style="@style/horizontal_divider"
@@ -43,24 +49,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp"
+
         android:layout_below="@id/settings_phone_number"
+        android:background="?attr/selectableItemBackground"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Home Address"
             android:textSize="17sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
         <TextView
             android:id="@+id/settings_home_address_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="not set"
             android:textSize="14sp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             />
     </LinearLayout>
     <View style="@style/horizontal_divider"
@@ -72,24 +82,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp"
         android:layout_below="@id/settings_divider_two"
+        android:background="?attr/selectableItemBackground"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Work Address"
             android:textSize="17sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
         <TextView
             android:id="@+id/settings_work_address_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="not set"
             android:textSize="14sp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             />
     </LinearLayout>
     <View style="@style/horizontal_divider"
@@ -101,24 +114,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="12dp"
         android:layout_below="@id/settings_divider_three"
+        android:background="?attr/selectableItemBackground"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="My Vehicle"
             android:textSize="17sp"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
         <TextView
             android:id="@+id/settings_vehicle_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="not set"
             android:textSize="14sp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             />
     </LinearLayout>
 

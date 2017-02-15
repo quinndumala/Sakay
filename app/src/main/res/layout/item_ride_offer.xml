@@ -8,7 +8,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless">
 
         <include
             android:id="@+id/ride_request_author_layout"

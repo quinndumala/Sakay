@@ -17,7 +17,8 @@
         android:clipToPadding="false"
         android:padding="5dp"
         android:scrollbars="vertical"
-        tools:listitem="@layout/item_ride_request" />
+        tools:listitem="@layout/item_ride_request"
+        />
 
     <TextView android:id="@+id/no_requests_text"
         android:layout_width="match_parent"
