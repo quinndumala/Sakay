@@ -1,29 +1,69 @@
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_sakays_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context="com.example.quinn.sakay.SakaysFragment"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/sakays_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:clipToPadding="false"
-        android:padding="5dp"
-        android:scrollbars="vertical"
-        tools:listitem="@layout/item_sakay"
-        />
-    <TextView android:id="@+id/no_sakays_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="No Sakays"
-        android:textSize="18sp"
-        android:visibility="gone"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/sakay_today_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:paddingTop="12dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="2dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sakays_today_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:clipToPadding="false"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_sakay"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All Sakays"
+            android:paddingTop="16dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="2dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sakays_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:clipToPadding="false"
+            android:padding="5dp"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_sakay"
+            />
+        <TextView android:id="@+id/no_sakays_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="No Sakays"
+            android:textSize="18sp"
+            android:visibility="gone"/>
+
+    </LinearLayout>
 
 
 
-</android.support.design.widget.CoordinatorLayout>
+
+
+</ScrollView>

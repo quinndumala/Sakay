@@ -27,6 +27,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,10 +46,15 @@ public class SakaysFragment extends Fragment
     private DatabaseReference userSakaysRef;
 
     private FirebaseRecyclerAdapter<Sakay, SakaysViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<Sakay, SakaysViewHolder> todayAdapter;
     private RecyclerView mRecycler;
+    private RecyclerView todayRecycler;
     private LinearLayoutManager mManager;
+    private LinearLayoutManager todayManager;
     private final String userId = getUid();
     private TextView noSakays;
+
+    public TextView todayTextView;
 
     public SakaysFragment() {
         // Required empty public constructor
@@ -70,12 +79,14 @@ public class SakaysFragment extends Fragment
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_sakays, container, false);
         noSakays = (TextView) rootView.findViewById(R.id.no_sakays_text);
+        todayTextView = (TextView) rootView.findViewById(R.id.sakay_today_text);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         userSakaysRef = mDatabase.child("user-sakays").child(userId);
 
         mRecycler = (RecyclerView) rootView.findViewById(R.id.sakays_list);
-        mRecycler.setHasFixedSize(true);
+        todayRecycler = (RecyclerView) rootView.findViewById(R.id.sakays_today_list);
+        //mRecycler.setHasFixedSize(true);
 
         return rootView;
     }
@@ -110,8 +121,71 @@ public class SakaysFragment extends Fragment
         mManager = new LinearLayoutManager(getActivity());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
+        mRecycler.setNestedScrollingEnabled(false);
         mRecycler.setLayoutManager(mManager);
 
+        todayManager = new LinearLayoutManager(getActivity());
+        todayManager.setReverseLayout(true);
+        todayManager.setStackFromEnd(true);
+        todayRecycler.setNestedScrollingEnabled(false);
+        todayRecycler.setLayoutManager(todayManager);
+
+        getTodaySakays();
+        getAllSakays();
+    }
+
+    public static Long getStartOfDay() {
+        Calendar today = new GregorianCalendar();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return today.getTimeInMillis();
+
+    }
+
+    public Query getQuery(DatabaseReference databaseReference) {
+        // [START recent_posts_query]
+        // Last 100 posts, these are automatically the 100 most recent
+        // due to sorting by push() keys
+        Query recentSakaysQuery = databaseReference.child("user-sakays").child(userId).orderByChild("timeStamp")
+                .limitToFirst(20);
+        // [END recent_posts_query]
+
+        return recentSakaysQuery;
+    }
+
+    public Query getTodayQuery(DatabaseReference databaseReference){
+        Long todayMidnight = getStartOfDay();
+        long endTime = todayMidnight + TimeUnit.HOURS.toMillis(24);
+        Query sakaysTodayQuery = databaseReference.child("user-sakays").child(userId).orderByChild("timeStamp")
+                .startAt(todayMidnight).endAt(endTime);
+        return sakaysTodayQuery;
+    }
+
+    public void isQueryEmpty(Query query){;
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue() == null){
+                    //noRequestsView.setVisibility(View.VISIBLE);
+                    todayTextView.setText("No sakays for today");
+
+                } else {
+                    //noRequestsView.setVisibility(View.GONE);
+                    todayTextView.setText("Today");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getAllSakays(){
         Query postsQuery = getQuery(mDatabase);
 
         mAdapter = new FirebaseRecyclerAdapter<Sakay, SakaysViewHolder>(Sakay.class,
@@ -135,15 +209,30 @@ public class SakaysFragment extends Fragment
         mRecycler.setAdapter(mAdapter);
     }
 
-    public Query getQuery(DatabaseReference databaseReference) {
-        // [START recent_posts_query]
-        // Last 100 posts, these are automatically the 100 most recent
-        // due to sorting by push() keys
-        Query recentSakaysQuery = databaseReference.child("user-sakays").child(userId).orderByChild("timeStamp")
-                .limitToFirst(20);
-        // [END recent_posts_query]
+    public void getTodaySakays(){
+        Query todayQuery = getTodayQuery(mDatabase);
+        isQueryEmpty(todayQuery);
 
-        return recentSakaysQuery;
+        todayAdapter = new FirebaseRecyclerAdapter<Sakay, SakaysViewHolder>(Sakay.class,
+                R.layout.item_sakay, SakaysViewHolder.class, todayQuery) {
+            @Override
+            protected void populateViewHolder(final SakaysViewHolder viewHolder, final Sakay model,
+                                              final int position) {
+                final DatabaseReference postRef = getRef(position);
+                final String postKey = postRef.getKey();
+                viewHolder.bindToPost(model, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View starView) {
+                        Intent intent = new Intent(getActivity(), SakayDetailActivity.class);
+                        intent.putExtra(RideOfferDetailActivity.EXTRA_POST_KEY, postKey);
+                        startActivity(intent);
+                    }
+                });
+
+            }
+        };
+        todayRecycler.setAdapter(todayAdapter);
+
     }
 
     @Override
