@@ -3,6 +3,7 @@ package com.example.quinn.sakay;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.quinn.sakay.Models.Notif;
@@ -15,14 +16,17 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NotifsViewHolder extends RecyclerView.ViewHolder {
     public CircleImageView authorPhotoView;
+    public ImageView iconTypeView;
     public TextView authorNameView;
     public TextView authorActionView;
     public TextView timeView;
+
 
     public NotifsViewHolder(View itemView){
         super(itemView);
 
         authorPhotoView = (CircleImageView) itemView.findViewById(R.id.notif_photo);
+        iconTypeView = (ImageView) itemView.findViewById(R.id.notif_type_image) ;
         authorNameView = (TextView) itemView.findViewById(R.id.notif_user_name);
         authorActionView = (TextView) itemView.findViewById(R.id.notif_user_description);
         timeView = (TextView) itemView.findViewById(R.id.notif_time);
@@ -42,4 +46,6 @@ public class NotifsViewHolder extends RecyclerView.ViewHolder {
         String imageUrl = "https://graph.facebook.com/" + fId + "/picture?height=150";
         GlideUtil.loadProfileIcon(imageUrl, authorPhotoView);
     }
+
+
 }

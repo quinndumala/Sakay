@@ -26,16 +26,31 @@
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
-        <TextView
-            android:id="@+id/notif_time"
-            style="@style/TextAppearance.AppCompat.Small"
+        <LinearLayout
+            android:paddingTop="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Jan 1, 2017 10:00 am"
-            android:layout_below="@id/notif_user_name"
-            android:maxLines="1"
-            android:ellipsize="end"
-            />
+            android:orientation="horizontal"
+            android:layout_below="@id/notif_user_name">
+            <ImageView
+                android:id="@+id/notif_type_image"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/notif_icon_offer"/>
+            <TextView
+                android:paddingStart="5dp"
+                android:id="@+id/notif_time"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Jan 1, 2017 10:00 am"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+
+        </LinearLayout>
+
+
 
 
     </RelativeLayout>

@@ -3,6 +3,7 @@ package com.example.quinn.sakay;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -130,6 +131,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
     public String acceptedName;
     public Button acceptedButton;
 
+    public Drawable corssMarkIcon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +173,9 @@ public class RideRequestDetailActivity extends BaseActivity implements
         acceptedAuthorView = (TextView) findViewById(R.id.comment_accepted_author_request);
         acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_vehicle_request);
         acceptedButton = (Button) findViewById(R.id.comment_button_view_profile_request);
+
+        corssMarkIcon = getResources().getDrawable(R.drawable.ic_cross_mark);
+
         userFacebookId = profile.getId();
 
         loadingDialog = new MaterialDialog.Builder(this)
@@ -244,7 +250,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId) && timeNotPassed){
-                    sakayButton.setText("\u2713" + " Sakay offer sent");
+                    sakayButton.setText("Cancel Offer");
+                    sakayButton.setCompoundDrawablesWithIntrinsicBounds(corssMarkIcon, null, null, null );
                 }
                 loadingDialog.dismiss();
             }
@@ -278,7 +285,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId) && timeNotPassed){
-                    sakayButton.setText("\u2713" + " Sakay offer sent");
+                    sakayButton.setText("Cancel Offer");
+                    sakayButton.setCompoundDrawablesWithIntrinsicBounds(corssMarkIcon, null, null, null );
                 }
             }
 
@@ -473,7 +481,8 @@ public class RideRequestDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)){
-                    launchAlreadySentDialog();
+                    //launchAlreadySentDialog();
+                    launchCancelCommentDialog();
                 } else {
                     //launchSakayDialog();
                     if (carSet){
@@ -642,6 +651,14 @@ public class RideRequestDetailActivity extends BaseActivity implements
                     }
                 }
         );
+    }
+
+    public void deleteComment(DatabaseReference postCommentsRef){
+        sakayButton.setText("Offer Sakay");
+        sakayButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null );
+        postCommentsRef.child(userId).removeValue();
+        Toast.makeText(this, "Sakay Offer Cancelled", Toast.LENGTH_SHORT).show();
+
     }
 
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -933,6 +950,20 @@ public class RideRequestDetailActivity extends BaseActivity implements
         new MaterialDialog.Builder(this)
                 .content("Sakay request has already been sent for this ride request")
                 .positiveText("OK")
+                .show();
+    }
+
+    public void launchCancelCommentDialog(){
+        new MaterialDialog.Builder(this)
+                .content("Cancel Sakay Offer?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        deleteComment(mCommentsReference);
+                    }
+                })
                 .show();
     }
 

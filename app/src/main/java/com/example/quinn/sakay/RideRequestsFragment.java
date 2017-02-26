@@ -159,7 +159,9 @@ public class RideRequestsFragment extends Fragment
                     } else {
                         hasNotifs = false;
                     }
-                    getActivity().invalidateOptionsMenu();
+                    if(getActivity() != null){
+                        getActivity().invalidateOptionsMenu();
+                    }
                 }
             }
 

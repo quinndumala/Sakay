@@ -42,6 +42,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.facebook.Profile.getCurrentProfile;
 
@@ -106,6 +107,7 @@ public class AddRideOffer extends BaseActivity
     public Boolean workSet = false;
     public Boolean homeSet = false;
     public Boolean isTimeValid = true;
+    public Boolean isBeyondTwoWeeks = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +130,13 @@ public class AddRideOffer extends BaseActivity
                     isTimeValid = false;
                 } else {
                     isTimeValid = true;
+                }
+
+                if (beyondTwoWeeks(time)) {
+                    launchMoreThanTwoWeeksDialog();
+                    isBeyondTwoWeeks = true;
+                } else {
+                    isBeyondTwoWeeks = false;
                 }
                 Log.d(TAG, "Selected date: " + selectedDate);
                 Log.d(TAG, "Timestamp: " + time);
@@ -210,8 +219,11 @@ public class AddRideOffer extends BaseActivity
                 || TextUtils.isEmpty(vehiclePlateNo) ){
             missingInformationAlert();
             return;
-        }  else if(!isTimeValid){
+        }  else if(!isTimeValid) {
             launchTimePassedDialog();
+            return;
+        } else if(isBeyondTwoWeeks) {
+            launchMoreThanTwoWeeksDialog();
             return;
         } else {
             confirmPost(start, destination, vehicle, vehicleModel, vehicleColor, vehiclePlateNo);
@@ -644,13 +656,7 @@ public class AddRideOffer extends BaseActivity
                 .show();
     }
 
-    public void missingInformationAlert(){
-        new MaterialDialog.Builder(this)
-                .content("Missing some information")
-                .positiveText("OK")
-                .cancelable(false)
-                .show();
-    }
+
 
 
 
@@ -683,13 +689,19 @@ public class AddRideOffer extends BaseActivity
         fVehiclePlateNo.setText(currentVehiclePlateNo);
     }
 
-    public void launchTimePassedDialog(){
-        new MaterialDialog.Builder(this)
-                .title("Warning")
-                .content("Ride schedule can't be set to the past!")
-                .positiveText("OK")
-                .cancelable(false)
-                .show();
+
+    public Boolean beyondTwoWeeks(Object timestamp){
+        long currentTime = System.currentTimeMillis();
+        long selectedTime = (long) timestamp;
+        long twoWeekLimit = currentTime + TimeUnit.DAYS.toMillis(14);
+
+        if (selectedTime > twoWeekLimit) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
+
 
 }

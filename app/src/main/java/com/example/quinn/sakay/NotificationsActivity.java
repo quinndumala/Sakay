@@ -127,6 +127,8 @@ public class NotificationsActivity extends BaseActivity
                 final String postKey = model.getPostKey();
                 final Boolean hasNotifRead = model.getRead();
 
+                setTypeIcon(notifType, viewHolder);
+
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -137,10 +139,10 @@ public class NotificationsActivity extends BaseActivity
                         } else if(notifType.equals("sakay")){
                             viewSakay(postKey);
                         } else if(notifKey.equals(null)){
-                            Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
+                            Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT).show();
                         }
                         else  {
-                            Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT);
+                            //Toast.makeText(NotificationsActivity.this, "Not found", Toast.LENGTH_SHORT).show();
                         }
 
                         DatabaseReference notifRef = userNotifsRef.child(notifKey);
@@ -154,10 +156,25 @@ public class NotificationsActivity extends BaseActivity
                 }
 
                 viewHolder.bindToPost(model);
+
             }
         };
         mRecycler.setAdapter(mAdapter);
     }
+
+    public void setTypeIcon(final String type, NotifsViewHolder viewHolder){
+        if (type.equals("offer")) {
+            viewHolder.iconTypeView.setImageDrawable(getResources().getDrawable(R.drawable.notif_icon_offer));
+        } else if (type.equals("request")){
+            viewHolder.iconTypeView.setImageDrawable(getResources().getDrawable(R.drawable.notif_icon_request));
+        } else if (type.equals("sakay")){
+            viewHolder.iconTypeView.setImageDrawable(getResources().getDrawable(R.drawable.notif_icon_check));
+        } else {
+            viewHolder.iconTypeView.setImageDrawable(getResources().getDrawable(R.drawable.notif_icon_x));
+        }
+
+    }
+
 
    public void notifClicked(DatabaseReference notifRef){
         notifRef.runTransaction(new Transaction.Handler(){

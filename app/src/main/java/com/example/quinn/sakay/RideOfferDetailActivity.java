@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -152,6 +153,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
     public LatLng startLocation;
     public LatLng endLocation;
 
+    public Drawable corssMarkIcon;
+
     //String arrRef;
 
     @Override
@@ -163,13 +166,11 @@ public class RideOfferDetailActivity extends BaseActivity implements
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Get post key from intent
         mPostKey = getIntent().getStringExtra(EXTRA_POST_KEY);
         if (mPostKey == null) {
             throw new IllegalArgumentException("Must pass EXTRA_POST_KEY");
         }
 
-        // Initialize Database
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mPostReference = mRootRef.child("rideOffers").child(mPostKey);
         mUserPostReference = mRootRef.child("user-rideOffers").child(userId).child(mPostKey);
@@ -205,6 +206,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
         acceptedBodyView = (TextView) findViewById(R.id.comment_accepted_pickup_offer);
 
         acceptedButton = (Button) findViewById(R.id.comment_button_view_profile_offer);
+
+        corssMarkIcon = getResources().getDrawable(R.drawable.ic_cross_mark);
 
         userFacebookId = profile.getId();
         //noResponses();
@@ -278,7 +281,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId) && timeNotPassed && isAvailable){
-                    sakayButton.setText("\u2713" + " Sakay request sent");
+                    sakayButton.setText("Cancel Request");
+                    sakayButton.setCompoundDrawablesWithIntrinsicBounds(corssMarkIcon, null, null, null );
                 }
                 loadingDialog.dismiss();
             }
@@ -325,7 +329,8 @@ public class RideOfferDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId) && timeNotPassed && isAvailable){
-                    sakayButton.setText("\u2713" + " Sakay request sent");
+                    sakayButton.setText("Cancel Request");
+                    sakayButton.setCompoundDrawablesWithIntrinsicBounds(corssMarkIcon, null, null, null );
                 }
             }
 
@@ -673,7 +678,9 @@ public class RideOfferDetailActivity extends BaseActivity implements
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChild(userId)){
-                    launchAlreadySentDialog();
+                    //launchAlreadySentDialog();
+//                    deleteComment(mCommentsReference);
+                    launchCancelCommentDialog();
                 } else {
                     if (homeSet && workSet){
                         arrRef = getResources().getStringArray(R.array.offer_select_pickup_location_all);
@@ -849,6 +856,32 @@ public class RideOfferDetailActivity extends BaseActivity implements
                 }
         );
     }
+
+    public void deleteComment(DatabaseReference postCommentsRef){
+//        postRef.runTransaction(new Transaction.Handler() {
+//            @Override
+//            public Transaction.Result doTransaction(MutableData mutableData) {
+//                RideOffer rideOffer = mutableData.getValue(RideOffer.class);
+//                if (rideOffer == null){
+//                    return Transaction.success(mutableData);
+//                }
+//
+//
+//                return null;
+//            }
+//
+//            @Override
+//            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+//                Log.d(TAG, "postTransaction:onComplete:" + databaseError);
+//            }
+//        });
+        sakayButton.setText("Request Sakay");
+        sakayButton.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null );
+        postCommentsRef.child(userId).removeValue();
+        Toast.makeText(this, "Sakay Request Cancelled", Toast.LENGTH_SHORT).show();
+
+    }
+
 
     private static class CommentViewHolder extends RecyclerView.ViewHolder {
         public TextView authorView;
@@ -1112,6 +1145,20 @@ public class RideOfferDetailActivity extends BaseActivity implements
         new MaterialDialog.Builder(this)
                 .content("Sakay request already sent")
                 .positiveText("OK")
+                .show();
+    }
+
+    public void launchCancelCommentDialog(){
+        new MaterialDialog.Builder(this)
+                .content("Cancel Sakay Request?")
+                .positiveText("OK")
+                .negativeText("CANCEL")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        deleteComment(mCommentsReference);
+                    }
+                })
                 .show();
     }
 

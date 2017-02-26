@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class BaseActivity extends AppCompatActivity {
@@ -32,5 +33,32 @@ public class BaseActivity extends AppCompatActivity {
 
     private Fragment getExistingDialogFragment() {
         return getSupportFragmentManager().findFragmentByTag(TAG_DIALOG_FRAGMENT);
+    }
+
+    public void launchMoreThanTwoWeeksDialog(){
+        new MaterialDialog.Builder(this)
+                .title("Warning")
+                .content("Ride schedule is set to more than two weeks from now. You might want to change it" +
+                        " to an earlier date.")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
+    }
+
+    public void launchTimePassedDialog(){
+        new MaterialDialog.Builder(this)
+                .title("Warning")
+                .content("Ride schedule can't be set to the past!")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
+    }
+
+    public void missingInformationAlert(){
+        new MaterialDialog.Builder(this)
+                .content("Missing some information")
+                .positiveText("OK")
+                .cancelable(false)
+                .show();
     }
 }
