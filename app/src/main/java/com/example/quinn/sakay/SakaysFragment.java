@@ -236,6 +236,12 @@ public class SakaysFragment extends Fragment
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        checkConnection();
+    }
+
+    @Override
     public void onResume(){
         super.onResume();
 //        ((MainActivity) getActivity())
